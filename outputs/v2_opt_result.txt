@@ -1,0 +1,5 @@
+V2 OPT (500epoch+Score+GlobalNorm): FD002 Train:(46219, 30, 24) Test:(253, 30, 24)
+seed_42=28.2 Score=64522
+seed_123=30.1 Score=185574
+seed_456=29.6 Score=66588
+MEAN=29.3 STD=0.8 BEST=28.2 WORST=30.1

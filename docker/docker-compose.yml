@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  spacecraft-rul:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: spacecraft-rul:latest
+    container_name: spacecraft_rul_training
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - CUDA_VISIBLE_DEVICES=0
+    volumes:
+      - ../data:/workspace/data
+      - ../checkpoints:/workspace/checkpoints
+      - ../outputs:/workspace/outputs
+    command: python scripts/run_pipeline.py --mode all --device cuda
+    shm_size: '8gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

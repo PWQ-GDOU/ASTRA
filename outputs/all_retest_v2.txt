@@ -1,0 +1,3 @@
+Transformer: avg=29.3 best=29.0
+V2: avg=29.5 best=28.9
+TCRSCANet: avg=30.1 best=29.3

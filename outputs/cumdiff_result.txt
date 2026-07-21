@@ -1,0 +1,3 @@
+CumDiff+Score seed42=53.4
+CumDiff+Score seed123=53.1
+CumDiff+Score seed456=53.1

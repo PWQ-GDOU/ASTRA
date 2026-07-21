@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Virtual env
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large data files (use LFS or download scripts)
+*.zip
+
+# Checkpoints (optional, can be large)
+# checkpoints/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Output logs
+outputs/*.log
+
+# Sensitive
+.env
+*.pem
+
+# Exclude very large / duplicate data
+data/processed/femto_bearing.zip
+data/processed/nasa_battery.zip
+data/processed/nasa_battery/*/*.zip
