@@ -1,0 +1,81 @@
+{
+  "protocol": {
+    "split_seed": 2026,
+    "validation_ratio": 0.2,
+    "seq_len": 60,
+    "rul_cap": 125,
+    "checkpoint_selection": "engine-level validation RMSE",
+    "primary_test_target": "official raw RUL",
+    "secondary_test_target": "min(official RUL, 125)",
+    "test_label_alignment": "official RUL indexed by Unit ID"
+  },
+  "single_seed": {
+    "FD001": {
+      "model": "multiscale",
+      "sensor_mode": "all24",
+      "seed": 42,
+      "best_epoch": 5,
+      "val_rmse": 13.362504338819935,
+      "test_raw_rmse": 14.950579794753232,
+      "test_raw_score": 308.6558187488089,
+      "test_cap125_rmse": 13.785357673970001,
+      "test_cap125_score": 277.6103657630951,
+      "n_params": 409921
+    },
+    "FD002": {
+      "model": "multiscale",
+      "sensor_mode": "condnorm24",
+      "seed": 42,
+      "best_epoch": 2,
+      "val_rmse": 17.425704996480913,
+      "test_raw_rmse": 25.57525743382481,
+      "test_raw_score": 5935.9549055330335,
+      "test_cap125_rmse": 14.391240007219922,
+      "test_cap125_score": 1158.0757495200728,
+      "n_params": 409921
+    },
+    "FD003": {
+      "model": "multiscale",
+      "sensor_mode": "all24",
+      "seed": 42,
+      "best_epoch": 28,
+      "val_rmse": 9.791347333151727,
+      "test_raw_rmse": 16.39441065560543,
+      "test_raw_score": 545.1412977682518,
+      "test_cap125_rmse": 14.541164009274805,
+      "test_cap125_score": 469.07261786909504,
+      "n_params": 409921
+    },
+    "FD004": {
+      "model": "multiscale",
+      "sensor_mode": "condnorm24",
+      "seed": 42,
+      "best_epoch": 12,
+      "val_rmse": 15.43619606221423,
+      "test_raw_rmse": 29.040962246152194,
+      "test_raw_score": 7120.332229020925,
+      "test_cap125_rmse": 16.15621098850277,
+      "test_cap125_score": 1089.8455586506159,
+      "n_params": 409921
+    }
+  },
+  "fd002_multiseed": {
+    "seeds": [
+      42,
+      123,
+      456
+    ],
+    "single_model_raw_rmse_mean": 25.84991641431773,
+    "single_model_raw_rmse_std": 0.5553178597289001,
+    "single_model_cap125_rmse_mean": 14.196629552834105,
+    "single_model_cap125_rmse_std": 0.20165211514372036,
+    "fixed_equal_weight_ensemble_raw": {
+      "rmse": 25.131071222289382,
+      "score": 5150.085939258245
+    },
+    "fixed_equal_weight_ensemble_cap125": {
+      "rmse": 12.830788692172405,
+      "score": 759.1952883070138
+    }
+  }
+}
