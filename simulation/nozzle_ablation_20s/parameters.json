@@ -1,0 +1,303 @@
+{
+  "model": "反应流固体传热烧蚀ALE_20秒",
+  "software": "COMSOL Multiphysics 6.4",
+  "unit_system": "SI",
+  "simulation_time": "20 s",
+  "dimensions": "2D Axisymmetric",
+  "parameter_groups": {
+    "geometry": [
+      {
+        "name": "Lpre",
+        "expression": "35[mm]",
+        "description": "前室长度"
+      },
+      {
+        "name": "Lf",
+        "expression": "375[mm]",
+        "description": "燃料通道长度"
+      },
+      {
+        "name": "Lpost",
+        "expression": "50[mm]",
+        "description": "后室长度"
+      },
+      {
+        "name": "dpre",
+        "expression": "80[mm]",
+        "description": "前室直径"
+      },
+      {
+        "name": "df",
+        "expression": "25[mm]",
+        "description": "燃料通道直径"
+      },
+      {
+        "name": "dpost",
+        "expression": "80[mm]",
+        "description": "后室直径"
+      },
+      {
+        "name": "dt0",
+        "expression": "15.875[mm]",
+        "description": "初始喉径"
+      },
+      {
+        "name": "de",
+        "expression": "26[mm]",
+        "description": "喷管出口直径"
+      },
+      {
+        "name": "r_throat0",
+        "expression": "dt0/2",
+        "description": "试前喉部半径"
+      },
+      {
+        "name": "A_in",
+        "expression": "pi*(dpre/2)^2",
+        "description": "入口截面积"
+      },
+      {
+        "name": "A_in_nat",
+        "expression": "pi*(40[mm])^2",
+        "description": "前室入口截面积"
+      },
+      {
+        "name": "r_exit_ref",
+        "expression": "40[mm]",
+        "description": "出口半径参考值，用于推力线积分归一化"
+      }
+    ],
+    "flow": [
+      {
+        "name": "T_in",
+        "expression": "1147[K]",
+        "description": "95%过氧化氢/聚乙烯工况入口温度"
+      },
+      {
+        "name": "mdot_ox",
+        "expression": "0.1596[kg/s]",
+        "description": "氧化剂质量流量"
+      },
+      {
+        "name": "mdot_fuel_avg",
+        "expression": "0.0205[kg/s]",
+        "description": "论文平均燃料热解质量流量"
+      },
+      {
+        "name": "mdot_total",
+        "expression": "mdot_ox+mdot_fuel_avg",
+        "description": "论文推力室总质量流量估计"
+      },
+      {
+        "name": "p_ch0",
+        "expression": "1.43[MPa]",
+        "description": "论文初始燃烧室压力"
+      },
+      {
+        "name": "p_ch20",
+        "expression": "1.16[MPa]",
+        "description": "论文20秒燃烧室压力"
+      },
+      {
+        "name": "p_exit",
+        "expression": "101325[Pa]",
+        "description": "环境压力"
+      },
+      {
+        "name": "t_end",
+        "expression": "20[s]",
+        "description": "论文试车时间"
+      },
+      {
+        "name": "u_in",
+        "expression": "mdot_ox/(rho_in*A_in)",
+        "description": "由159.6克每秒得到的入口平均速度"
+      },
+      {
+        "name": "stagefac",
+        "expression": "1",
+        "description": "论文目标工况压力系数"
+      },
+      {
+        "name": "p_throat_paper",
+        "expression": "0.75[MPa]",
+        "description": "论文喉部压力量级约束"
+      },
+      {
+        "name": "t_curve",
+        "expression": "0[s]",
+        "description": "论文压力曲线当前约束时间点"
+      },
+      {
+        "name": "U_in_nat",
+        "expression": "mdot_total/(rho_paper_in*A_in_nat)",
+        "description": "论文质量流量换算入口速度"
+      },
+      {
+        "name": "F_thrust_ref",
+        "expression": "195.118498260[N]",
+        "description": "ReactingFlowSST压力约束基准推力"
+      }
+    ],
+    "gasProps": [
+      {
+        "name": "Rs_gas",
+        "expression": "287[J/(kg*K)]",
+        "description": "等效燃气气体常数"
+      },
+      {
+        "name": "Cp_gas",
+        "expression": "2600[J/(kg*K)]",
+        "description": "等效燃气定压比热"
+      },
+      {
+        "name": "gamma_gas",
+        "expression": "1.22",
+        "description": "等效燃气比热比"
+      },
+      {
+        "name": "R_univ",
+        "expression": "8.314[J/(mol*K)]",
+        "description": "通用气体常数"
+      },
+      {
+        "name": "atm",
+        "expression": "101325[Pa]",
+        "description": "标准大气压"
+      },
+      {
+        "name": "rho_in",
+        "expression": "p_ch0/(Rs_gas*T_in)",
+        "description": "入口密度估计"
+      },
+      {
+        "name": "mu_gas_nat",
+        "expression": "4e-5[Pa*s]",
+        "description": "高温燃气动力黏度"
+      },
+      {
+        "name": "k_gas_nat",
+        "expression": "0.12[W/(m*K)]",
+        "description": "高温燃气导热系数"
+      },
+      {
+        "name": "Pr_gas_nat",
+        "expression": "0.72",
+        "description": "高温燃气普朗特数"
+      },
+      {
+        "name": "rho_paper_in",
+        "expression": "p_ch0/(Rs_gas*T_in)",
+        "description": "入口燃气密度约束"
+      }
+    ],
+    "species": [
+      {
+        "name": "xOH",
+        "expression": "0.030",
+        "description": "OH摩尔分数约束"
+      },
+      {
+        "name": "xO",
+        "expression": "0.020",
+        "description": "O摩尔分数约束"
+      },
+      {
+        "name": "xH2O",
+        "expression": "0.480",
+        "description": "H2O摩尔分数约束"
+      },
+      {
+        "name": "xCO2",
+        "expression": "0.180",
+        "description": "CO2摩尔分数约束"
+      },
+      {
+        "name": "xO2",
+        "expression": "0.290",
+        "description": "O2摩尔分数约束"
+      },
+      {
+        "name": "wOH_in",
+        "expression": "0.030",
+        "description": "OH入口质量分数近似"
+      },
+      {
+        "name": "wO_in",
+        "expression": "0.020",
+        "description": "O入口质量分数近似"
+      },
+      {
+        "name": "wH2O_in",
+        "expression": "0.480",
+        "description": "H2O入口质量分数近似"
+      },
+      {
+        "name": "wCO2_in",
+        "expression": "0.180",
+        "description": "CO2入口质量分数近似"
+      },
+      {
+        "name": "wO2_in",
+        "expression": "0.290",
+        "description": "O2入口质量分数近似"
+      }
+    ],
+    "material": [
+      {
+        "name": "rho_cc",
+        "expression": "1800[kg/m^3]",
+        "description": "C/C等效密度"
+      },
+      {
+        "name": "rho_fuel",
+        "expression": "930[kg/m^3]",
+        "description": "聚乙烯燃料密度"
+      }
+    ],
+    "ablation": [
+      {
+        "name": "dr_throat_exp",
+        "expression": "(16.392[mm]-15.875[mm])/2",
+        "description": "论文试后喉半径增量"
+      },
+      {
+        "name": "rate_throat_exp",
+        "expression": "dr_throat_exp/t_end",
+        "description": "论文喉部平均烧蚀率"
+      },
+      {
+        "name": "rate_fuel_ref",
+        "expression": "0.495[mm/s]",
+        "description": "论文燃料退移率量级"
+      },
+      {
+        "name": "target_depth_20s",
+        "expression": "0.2585[mm]",
+        "description": "论文20秒后喉部半径增长验收目标"
+      },
+      {
+        "name": "ablation_scale_fit",
+        "expression": "346.0",
+        "description": "按论文20秒喉径增长量级校准的五组分烧蚀缩放"
+      },
+      {
+        "name": "v_ablation_cap",
+        "expression": "0.10[mm/s]",
+        "description": "动网格单步稳定烧蚀速度上限"
+      }
+    ],
+    "thermal": [
+      {
+        "name": "h_outer",
+        "expression": "15[W/(m^2*K)]",
+        "description": "喷管外壁弱对流换热系数"
+      },
+      {
+        "name": "T_amb",
+        "expression": "300[K]",
+        "description": "环境温度"
+      }
+    ]
+  }
+}
