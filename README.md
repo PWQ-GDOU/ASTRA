@@ -59,6 +59,37 @@ ASTRA/
 
 FD002窗口60模型的三个固定seed（42/123/456）单模型`test_raw RMSE=25.850±0.555`，固定等权平均集成为`25.131`；同步cap=125后，集成RMSE为`12.831`。该三seed集成没有使用测试标签拟合权重。
 
+## N-CMAPSS Benchmark（新增，等待数据下载）
+
+**N-CMAPSS**（NASA Dataset 17）是 C-MAPSS 的升级版，使用真实飞行剖面模拟变工况下的涡扇发动机退化，是当前工业 PHM 领域最活跃的公认 benchmark。
+
+严格协议入口：`scripts/exp_ncmapss_strict.py`
+
+- 数据：DS01–DS08，每个文件含 80 个 dev 单元和 20 个 test 单元，完全 unit-disjoint。
+- 预处理：train-only scaler；条件感知归一化（ConditionNormLayer FILM）；RUL cap=125。
+- 模型候选：条件感知 MultiScale TCN、BiGRU+Attention、3层 Transformer+退化头、Physics-Informed GRU。
+- 实验协议：dev 集最后 20% 单元作为 inner validation；固定五 seed；等权集成；无 test 标签参与选择。
+- 指标：RMSE、MAE、NRMSE、NASA 非对称分数（与 C-MAPSS 一致）。
+
+```bash
+# 有数据后运行
+python scripts/exp_ncmapss_strict.py \
+  --data-dir path/to/ncmapss/ \
+  --datasets DS01 DS02 DS03 DS04 \
+  --output outputs/ncmapss_strict_v1 --device cuda:0
+
+# 无需数据的 synthetic smoke test
+python scripts/exp_ncmapss_strict.py --synthetic --output /tmp/smoke
+```
+
+数据下载（约 14GB）：
+
+```
+https://phm-datasets.s3.amazonaws.com/NASA/17.+Turbofan+Engine+Degradation+Simulation+Data+Set+2.zip
+```
+
+解压后将 DS01.h5–DS08.h5 放入 `data/processed/ncmapss/`。
+
 > 注意：C-MAPSS论文对测试RUL是否同步应用RUL cap并不总是说明清楚，因此raw和cap125必须分栏报告，不能直接混比。
 
 ## 主实验总表（竞赛四条线）
