@@ -62,12 +62,13 @@ package-lock.json
 Thumbs.db
 desktop.ini
 
-# --- IDE ---
+# --- IDE / tool configs ---
 .idea/
 .vscode/
 *.sublime-project
 *.sublime-workspace
 .kiro/
+.zcode/
 
 # --- Logs and temp ---
 *.log
