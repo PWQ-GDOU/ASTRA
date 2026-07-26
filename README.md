@@ -101,22 +101,66 @@ FD002窗口60模型的三个固定seed（42/123/456）单模型`test_raw RMSE=25
 - 当前仿真结果只能表述为“COMSOL 反作用轮仿真域结果”；不能表述为真实航天器反作用轮 SOTA。FEMTO proxy 和 COMSOL simulation 必须分别报告。
 - 数据适配器：`src/data/reaction_wheel_sim.py`；审计入口：`scripts/audit_reaction_wheel_sim.py`；初步模型入口：`scripts/exp_reaction_wheel_sim.py`；报告：`outputs/reaction_wheel_sim_audit/SIMULATION_AUDIT.json`、`outputs/reaction_wheel_sim_initial/REACTION_WHEEL_SIM_INITIAL_REPORT.json`、`docs/reaction_wheel_simulation_audit.md`。
 
-## 喷管严格协议结果（新增）
+## 喷管严格协议结果（单轨迹）
 
 旧喷管数字 `2.501 / 2.674 / 3.819` 仍保留在主实验表中，但它们属于历史非严格协议：原始 train/test 有重叠，且 Pure TCN/PCG-TCN 曾使用测试集选 checkpoint。它们不再作为 SOTA 证据。
 
-严格入口：`scripts/exp_nozzle_strict.py`。协议特点：
+严格单轨迹入口：`scripts/exp_nozzle_strict.py`。
 
-- 56 行 COMSOL 轨迹按原始行严格分离，3 个 expanding rolling-origin folds；`fold3` 是锁定测试折。
-- 目标是到 `0.2585 mm` 失效深度的 time-RUL（秒），主模型不输入绝对时间；训练 scaler 只使用 unique train rows。
-- 5 个固定 seed：`42/123/456/2026/3407`；只用 validation early stopping，测试集只评估一次。
-- 对照包括 current-rate 物理外推、local-slope、Ridge、Huber、LSTM、TCN、Tiny Transformer、Physics-Guided TCN。
+- 56 行 COMSOL 轨迹，3 个 expanding rolling-origin folds；`fold3` 是锁定测试折。
+- 目标：到 `0.2585 mm` 失效深度的 time-RUL（秒）；不输入绝对时间；train-only scaler。
+- 5 个固定 seed：`42/123/456/2026/3407`；只用 validation early stopping；测试集只评估一次。
 
-Canonical 严格结果（固定等权 seed ensemble，RMSE，单位秒）：
+严格单轨迹结果（RMSE，秒）：
 
 | 方法 | rolling 三折宏平均 | locked fold3 |
 |---|---:|---:|
 | Current-rate 物理基线 | 0.8767 | **0.0178** |
+| Ridge | **0.7988** | 1.1563 |
+| Physics-Full TCN | 0.9499 | 0.0523 |
+| LSTM/TCN/Transformer | 6.0–6.4 | 10.4–11.0 |
+
+**当前限制**：单条轨迹、单一工况，不能支持跨工况泛化结论。Physics-TCN 在 locked fold 上接近物理基线，但 rolling macro 尚未超过 Ridge。
+
+## 喷管多工况 benchmark（新增，等待新轨迹）
+
+新增独立多轨迹 benchmark 框架，用于接收仿真同学生成的多工况轨迹后直接启动严格实验：
+
+- 数据 schema：`src/data/nozzle_multitrajectory.py`
+  - 必填：`trajectory_id, condition_id, time_s, cumulative_ablation_depth_mm, ablation_rate_m_s, failure_depth_mm, solid_temperature_K, heat_flux_W_m2, pressure_Pa`
+  - 阈值插值（非容差接受）；未到阈值标 right-censored，不伪造 RUL=0
+  - observable tier（温度/热流/压力）和 estimated tier（加上累计深度/烧蚀率）明确分离；oracle 字段被强制排除
+- 模型：`src/models/nozzle_multitrajectory.py`
+  - `PhysicsResidualRateNet`：预测未来烧蚀率增长因子 → 积分到阈值 → EOL/RUL；从 identity 初始化，不从 current_rate 偷窃
+  - `WeibullRULLoss`：CDF 差值加权，临近失效时段权重更高（von Hahn & Mechefske 2022）
+  - `CensoredRULLoss`：event-observed 用 Weibull 加权损失；right-censored 用单侧 hinge
+  - GRU / MultiScale TCN / Transformer 同协议基线
+- 实验入口：`scripts/exp_nozzle_multitrajectory.py`
+  - 外层：leave-one-trajectory-out；内层：旋转 LOO 选候选、窗口、特征 tier 和 epoch
+  - 只用 inner validation 轨迹选择；测试轨迹最后只评估一次
+  - 五 seed、等权 ensemble、group bootstrap 95% CI
+  - 同时报告 all-run RMSE 和 pre-failure RMSE；frozen config SHA256 完整性校验
+- 测试：`tests/test_nozzle_multitrajectory.py`（13 项，全部通过）
+
+当前状态（synthetic smoke test）：
+
+```
+selected_neural all_rmse=3.18  ridge all_rmse=0.26  current_rate all_rmse=9.42
+```
+
+说明 ridge 在合成线性退化数据上最强；实际多工况非线性轨迹是真正的追分场景。
+
+**启动条件**：仿真同学提供 ≥12 条独立 run-to-failure 轨迹，跨 ≥3 工况组，保留参数表和 `trajectory_id/condition_id`。
+
+```bash
+# 有真实多轨迹数据时
+python scripts/exp_nozzle_multitrajectory.py \
+  --data path/to/multi_trajectory.csv \
+  --output outputs/nozzle_multitrajectory_v1 --device cuda:0
+
+# 仅 synthetic smoke test（不依赖真实数据）
+python scripts/exp_nozzle_multitrajectory.py --synthetic --output /tmp/smoke
+```
 | Ridge | **0.7988** | 1.1563 |
 | Huber | 0.8069 | 1.1805 |
 | Physics-Input TCN | 0.8967 | 0.0527 |
