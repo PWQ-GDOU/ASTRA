@@ -1,0 +1,60 @@
+{
+  "schema": "geo_battery_pinn_multi_trajectory_v1",
+  "source": "Generated from COMSOL GEO battery PINN equations (simulation/geo_battery_pinn_extreme branch)",
+  "n_trajectories": 30,
+  "seed": 42,
+  "lhc_parameters": [
+    "kdeg",
+    "orbit_phase_offset",
+    "initial_soh",
+    "tau_thermal"
+  ],
+  "split_assignment": {
+    "GEO_T004": "test",
+    "GEO_T017": "test",
+    "GEO_T027": "test",
+    "GEO_T021": "test",
+    "GEO_T022": "validation",
+    "GEO_T024": "validation",
+    "GEO_T010": "validation",
+    "GEO_T013": "validation",
+    "GEO_T018": "train",
+    "GEO_T019": "train",
+    "GEO_T025": "train",
+    "GEO_T029": "train",
+    "GEO_T026": "train",
+    "GEO_T007": "train",
+    "GEO_T002": "train",
+    "GEO_T012": "train",
+    "GEO_T001": "train",
+    "GEO_T014": "train",
+    "GEO_T003": "train",
+    "GEO_T016": "train",
+    "GEO_T015": "train",
+    "GEO_T023": "train",
+    "GEO_T009": "train",
+    "GEO_T028": "train",
+    "GEO_T020": "train",
+    "GEO_T006": "train",
+    "GEO_T030": "train",
+    "GEO_T008": "train",
+    "GEO_T005": "train",
+    "GEO_T011": "train"
+  },
+  "split_counts": {
+    "train": 22,
+    "validation": 4,
+    "test": 4
+  },
+  "life_length_mean": 1036.8333333333333,
+  "life_length_range": [
+    778,
+    1200
+  ],
+  "rul_at_start_mean": 634.5012515216615,
+  "rul_at_start_range": [
+    319.68556455777446,
+    1769.738322340459
+  ],
+  "all_event_observed": false
+}
