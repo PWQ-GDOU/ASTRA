@@ -58,11 +58,15 @@ from src.models.battery_strict import build_battery_model, RUL_SCALE, count_para
 GEO_FEATURE_NAMES = (
     "soh", "capacity_mAh", "rint", "Tcell",
     "shadow_min", "F_DOD", "stress", "formation", "alpha_T",
+    # PINN extreme-segment voltage-drop features (maps to NASA voltage-drop during discharge)
+    "dV30", "dV60", "dV90", "dV120",
+    # Curve entropy features (degradation pattern complexity)
+    "E30", "E60", "E90", "E120",
 )
 NASA_FEATURE_NAMES = FEATURE_NAMES
 SEEDS = (42, 123, 456, 2026, 3407)
 TRANSFER_EPOCHS = 80
-FINETUNE_EPOCHS = 40
+FINETUNE_EPOCHS = 80  # increased: encoder needs time to adapt from GEO latent space to NASA
 SEQ_LEN = 16
 
 
@@ -297,12 +301,21 @@ def finetune_nasa(
     batch_size: int = 512,
     patience: int = 20,
 ) -> tuple[TransferRULModel, int, float]:
-    """Create a NASA target-side model by transferring the shared encoder weights."""
+    """Create a NASA target-side model by transferring the shared encoder weights.
+
+    Only the encoder backbone (not the RUL head) is transferred.  The head is
+    kept at random init so it is calibrated for the target RUL range from the
+    start; copying the GEO-trained head (calibrated for 0-1200 cycle RUL) into
+    a NASA model (0-130 cycle RUL) would put predictions 9× too high and the
+    finetune budget cannot recover from that initialisation error.
+    """
     nasa_model = TransferRULModel(n_input_nasa, latent_dim=64, rul_scale=source_model.rul_scale)
-    # Transfer shared encoder and RUL head weights
+    # Transfer encoder backbone only — exclude domain-specific in_proj layers
     encoder_state = {k: v for k, v in source_model.encoder.state_dict().items() if "in_proj" not in k}
     nasa_model.encoder.load_state_dict(encoder_state, strict=False)
-    nasa_model.rul_head.load_state_dict(source_model.rul_head.state_dict())
+    # RUL head is deliberately NOT copied: GEO head is calibrated for 0-1200 cycle
+    # outputs; NASA strict14 targets are 0-130 cycles, so transferring the head
+    # would start predictions ~9× too high.  Random init converges much faster.
     if freeze_encoder:
         for name, param in nasa_model.encoder.named_parameters():
             if "in_proj" not in name:
@@ -346,6 +359,54 @@ def finetune_nasa(
 
 
 # ---------------------------------------------------------------------------
+# Synthetic smoke-test helpers
+# ---------------------------------------------------------------------------
+
+
+def make_synthetic_battery_series(
+    name: str,
+    n_cycles: int = 80,
+    n_features: int | None = None,
+    rng: np.random.Generator | None = None,
+    status: str = "event_observed",
+) -> "BatterySeries":
+    """Return a minimal BatterySeries with realistic shapes for smoke-testing."""
+    from src.data.battery_strict import BatterySeries, FEATURE_NAMES
+    if rng is None:
+        rng = np.random.default_rng(hash(name) % (2**32))
+    n_feat = n_features or len(FEATURE_NAMES)
+    t = np.arange(n_cycles, dtype=np.float64)
+    features = rng.normal(0, 1, (n_cycles, n_feat)).astype(np.float64)
+    rul = np.maximum(float(n_cycles - 1) - t, 0.0)
+    target_mask = np.ones(n_cycles, dtype=bool)
+    zeros_f = np.zeros(n_cycles, dtype=np.float64)
+    zeros_b = np.zeros(n_cycles, dtype=bool)
+    return BatterySeries(
+        name=name,
+        protocol="synthetic",
+        eol_ah=1.4,
+        status=status,
+        life_cycle=float(n_cycles - 1),
+        observed_end=n_cycles - 1,
+        cycle_index=t.astype(int),
+        capacity_raw=np.ones(n_cycles) * 2.0,
+        capacity_clean=np.ones(n_cycles) * 2.0,
+        features=features,
+        feature_names=tuple(FEATURE_NAMES[:n_feat]),
+        soh=np.ones(n_cycles),
+        rul=rul,
+        target_mask=target_mask,
+        lower_bound_rul=zeros_f.copy(),
+        future_delta_5=zeros_f.copy(),
+        future_delta_10=zeros_f.copy(),
+        future_mask_5=zeros_b.copy(),
+        future_mask_10=zeros_b.copy(),
+        init_capacity=2.0,
+        metadata={},
+    )
+
+
+# ---------------------------------------------------------------------------
 # Main experiment
 # ---------------------------------------------------------------------------
 
@@ -359,9 +420,10 @@ def run_transfer_experiment(
     transfer_epochs: int = TRANSFER_EPOCHS,
     finetune_epochs: int = FINETUNE_EPOCHS,
     quick: bool = False,
+    synthetic: bool = False,
 ) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
-    if quick:
+    if quick or synthetic:
         seeds = seeds[:1]
         transfer_epochs = min(transfer_epochs, 8)
         finetune_epochs = min(finetune_epochs, 8)
@@ -378,10 +440,19 @@ def run_transfer_experiment(
           f"(train={int((geo_windows.split=='train').sum())}, "
           f"val={int((geo_windows.split=='validation').sum())})", flush=True)
 
-    # 2. Load NASA target cells
-    mat_dir = data_dir / "nasa_battery" / "5. Battery Data Set"
-    raws = {name: load_battery_mat(mat_dir / f"{name}.mat") for name in BATTERY_NAMES}
-    series = [materialize_battery(raws[name], "strict14") for name in BATTERY_NAMES]
+    # 2. Load NASA target cells (or generate synthetic stand-ins for smoke tests)
+    if synthetic:
+        print("Using synthetic NASA battery series (smoke-test mode)", flush=True)
+        from src.data.battery_strict import FEATURE_NAMES as _FN
+        rng_synth = np.random.default_rng(0)
+        series = [
+            make_synthetic_battery_series(f"SYNTH_{c}", n_cycles=60, rng=rng_synth)
+            for c in ["A", "B", "C", "D"]
+        ]
+    else:
+        mat_dir = data_dir / "nasa_battery" / "5. Battery Data Set"
+        raws = {name: load_battery_mat(mat_dir / f"{name}.mat") for name in BATTERY_NAMES}
+        series = [materialize_battery(raws[name], "strict14") for name in BATTERY_NAMES]
 
     # 3. Pre-train source model (per seed)
     n_geo_feat = len(GEO_FEATURE_NAMES)
@@ -505,6 +576,8 @@ def main() -> None:
     parser.add_argument("--transfer-epochs", type=int, default=TRANSFER_EPOCHS)
     parser.add_argument("--finetune-epochs", type=int, default=FINETUNE_EPOCHS)
     parser.add_argument("--quick", action="store_true")
+    parser.add_argument("--synthetic", action="store_true",
+                        help="Use synthetic NASA battery series for smoke testing")
     args = parser.parse_args()
     device = args.device if torch.cuda.is_available() else "cpu"
     if device == "cpu":
@@ -514,7 +587,8 @@ def main() -> None:
     result = run_transfer_experiment(
         Path(args.data_root), Path(args.output), device, seeds,
         n_geo=args.n_geo, transfer_epochs=args.transfer_epochs,
-        finetune_epochs=args.finetune_epochs, quick=args.quick,
+        finetune_epochs=args.finetune_epochs,
+        quick=args.quick, synthetic=args.synthetic,
     )
     write_json(Path(args.output) / "run_metadata.json", {"elapsed_sec": time.time() - t0, "device": device})
 

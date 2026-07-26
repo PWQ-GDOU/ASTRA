@@ -66,6 +66,15 @@ def simulate_geo_battery(
         "formation": np.zeros(n_cycles),
         "alpha_T": np.zeros(n_cycles),
         "Tamb": np.zeros(n_cycles),
+        # PINN extreme-segment voltage-drop features (from governing_equations.md)
+        "dV30": np.zeros(n_cycles),
+        "dV60": np.zeros(n_cycles),
+        "dV90": np.zeros(n_cycles),
+        "dV120": np.zeros(n_cycles),
+        "E30": np.zeros(n_cycles),
+        "E60": np.zeros(n_cycles),
+        "E90": np.zeros(n_cycles),
+        "E120": np.zeros(n_cycles),
     }
 
     for n in range(n_cycles):
@@ -98,6 +107,25 @@ def simulate_geo_battery(
         records["formation"][n] = formation
         records["alpha_T"][n] = alpha_T
         records["Tamb"][n] = Tamb
+        # PINN voltage-drop features (three-exponential model, governing_equations.md)
+        delta_rint = max(rint - params.Rbase, 0.0)
+        Tcell_excess = max(Tcell - 25.0, 0.0)
+        Af = 0.0075 + 0.058 * aging + 0.0055 * F_DOD + 0.22 * delta_rint
+        tau_f = 12.0 + 60.0 * aging + 3.8 * F_DOD
+        Am = 0.0035 + 0.028 * aging + 0.0022 * F_DOD + 0.00055 * Tcell_excess
+        tau_m = 76.0 + 155.0 * aging + 12.0 * F_DOD
+        At = 0.0012 + 0.018 * aging ** 2 + 0.0015 * F_DOD
+        tau_t = 240.0 + 260.0 * aging
+        def dV(t): return (Af*(1-np.exp(-t/tau_f)) + Am*(1-np.exp(-t/tau_m)) + At*(1-np.exp(-t/tau_t)))
+        for label, t_end in [("dV30", 30.0), ("dV60", 60.0), ("dV90", 90.0), ("dV120", 120.0)]:
+            records[label][n] = dV(t_end)
+        def curve_entropy(t_end):
+            ts = np.linspace(0.01, t_end, 60)
+            vals = np.array([dV(t) for t in ts]) + 1e-10
+            vals = vals / vals.sum()
+            return float(-np.sum(vals * np.log(vals)))
+        for label, t_end in [("E30", 30.0), ("E60", 60.0), ("E90", 90.0), ("E120", 120.0)]:
+            records[label][n] = curve_entropy(t_end)
         if soh <= params.failSOH:
             # Truncate at first failure
             for key in records:
@@ -155,6 +183,10 @@ def save_multi_trajectory_csv(
         "shadow_min", "F_DOD", "stress", "RUL",
         "formation", "alpha_T", "Tamb",
         "kdeg", "orbit_phase_offset", "initial_soh", "tau_thermal",
+        # PINN voltage-drop features (tri-exponential model)
+        "dV30", "dV60", "dV90", "dV120",
+        # Curve entropy features
+        "E30", "E60", "E90", "E120",
     ]
     with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
@@ -182,6 +214,16 @@ def save_multi_trajectory_csv(
                     "orbit_phase_offset": params.orbit_phase_offset,
                     "initial_soh": params.initial_soh,
                     "tau_thermal": params.tau_thermal,
+                    # PINN voltage-drop features
+                    "dV30": float(records["dV30"][i]),
+                    "dV60": float(records["dV60"][i]),
+                    "dV90": float(records["dV90"][i]),
+                    "dV120": float(records["dV120"][i]),
+                    # Curve entropy features
+                    "E30": float(records["E30"][i]),
+                    "E60": float(records["E60"][i]),
+                    "E90": float(records["E90"][i]),
+                    "E120": float(records["E120"][i]),
                 }
                 writer.writerow(row)
 

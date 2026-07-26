@@ -61,9 +61,11 @@ from src.models.nozzle_multitrajectory import WeibullRULLoss
 SEEDS = (42, 123, 456, 2026, 3407)
 SEQ_LEN = 30
 VAL_FRACTION = 0.20
-EPOCH_BUDGET = 120
+EPOCH_BUDGET = 120          # final training epoch ceiling
+SELECTION_EPOCH_BUDGET = 60 # inner selection uses shorter budget (early stopping guards quality)
 WEIBULL_ETA = 100.0   # characteristic life ≈ cap cycles for turbofan
 WEIBULL_BETA = 3.0    # shape: steeper than bearing (β=2.5) for turbofan degradation
+WEIBULL_ALPHA = 0.25  # hybrid weight: 0.25*weibull + 0.75*smooth_l1
 
 
 @dataclass(frozen=True)
@@ -193,7 +195,9 @@ def train_model(
     ).to(device)
     x = torch.as_tensor(train_windows.X, dtype=torch.float32, device=device)
     y = torch.as_tensor(train_windows.Y, dtype=torch.float32, device=device)
-    age_s = (y.max() - y).clamp(min=0.0)  # elapsed life approximation
+    # Absolute elapsed life: age = RUL_CAP - RUL (correct on truncated DS03/04/07/08
+    # where y.max() < RUL_CAP and the batch-max proxy would under-estimate age)
+    age_s = (RUL_CAP - y).clamp(min=0.0)
     weibull_loss = WeibullRULLoss(eta=WEIBULL_ETA, beta=WEIBULL_BETA)
     opt = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=1.0e-4)
     batches = math.ceil(max(len(train_windows), 1) / batch_size)
@@ -214,10 +218,11 @@ def train_model(
         for start in range(0, len(order), batch_size):
             idx = order[start : start + batch_size]
             out: RULOutput = model(x[idx])
-            # Weibull-weighted loss: near-EOL predictions get higher weight
+            # Hybrid loss: Weibull-weighted near-EOL term + smooth L1
+            # WEIBULL_ALPHA=0.25 keeps the smooth-L1 dominant on truncated datasets
             w_loss = weibull_loss(out.rul, y[idx], age_s[idx], rul_scale=RUL_CAP)
             h_loss = F.smooth_l1_loss(out.rul / RUL_CAP, y[idx] / RUL_CAP, beta=0.05)
-            loss = 0.5 * w_loss + 0.5 * h_loss
+            loss = (1.0 - WEIBULL_ALPHA) * h_loss + WEIBULL_ALPHA * w_loss
             if out.degradation is not None:
                 # Auxiliary degradation task: normalised elapsed time as proxy
                 age_proxy = (1.0 - y[idx] / RUL_CAP).clamp(0, 1)
@@ -274,7 +279,7 @@ def run_dataset_benchmark(
     train_units = dev_units[:-n_val]
     val_units = dev_units[-n_val:]
 
-    # --- Inner candidate selection on train/val units ---
+    # --- Inner candidate selection on train/val units (SELECTION_EPOCH_BUDGET, not full) ---
     selection_rows = []
     for candidate in candidates:
         scaler = fit_scaler(train_units, candidate.feature_set,
@@ -283,21 +288,40 @@ def run_dataset_benchmark(
         val_w = make_windows(val_units, scaler, seq_len=candidate.seq_len)
         scores, epochs_list = [], []
         for seed in seeds:
-            model, ep, _ = train_model(candidate, train_w, val_w, device, seed, epochs=epochs)
+            model, ep, _ = train_model(
+                candidate, train_w, val_w, device, seed,
+                epochs=SELECTION_EPOCH_BUDGET,
+            )
             pred = predict(model, val_w, device)
             scores.append(rmse(val_w.Y, pred))
             epochs_list.append(ep)
+        mean_val_rmse = float(np.mean(scores))
+        # Scale frozen_epochs up to full budget proportionally
+        # e.g. median_best_epoch=45 of 60 → (45/60)*full_epochs
+        median_ep = int(np.median(epochs_list))
+        scale_factor = epochs / SELECTION_EPOCH_BUDGET if SELECTION_EPOCH_BUDGET > 0 else 1.0
+        scaled_ep = max(10, int(round(median_ep * scale_factor)))
         selection_rows.append({
             "candidate": asdict(candidate),
-            "val_rmse": float(np.mean(scores)),
-            "median_best_epoch": int(np.median(epochs_list)),
+            "val_rmse": mean_val_rmse,
+            "val_rmse_std": float(np.std(scores)),
+            "median_best_epoch_sel": median_ep,
+            "median_best_epoch_final": scaled_ep,
         })
-        print(f"  [{dataset_name}] {candidate.name}: val_rmse={np.mean(scores):.3f}", flush=True)
+        print(
+            f"  [{dataset_name}] {candidate.name}: "
+            f"val_rmse={mean_val_rmse:.3f}±{np.std(scores):.3f}",
+            flush=True,
+        )
 
     selected = min(selection_rows, key=lambda r: r["val_rmse"])
     selected_candidate = Candidate(**selected["candidate"])
-    frozen_epochs = selected["median_best_epoch"]
-    print(f"  [{dataset_name}] selected: {selected_candidate.name} epochs={frozen_epochs}", flush=True)
+    frozen_epochs = selected["median_best_epoch_final"]
+    print(
+        f"  [{dataset_name}] selected: {selected_candidate.name} "
+        f"frozen_epochs={frozen_epochs}",
+        flush=True,
+    )
 
     # --- Final training on all dev units, evaluation on test units ---
     all_dev_scaler = fit_scaler(dev_units, selected_candidate.feature_set,
@@ -311,6 +335,11 @@ def run_dataset_benchmark(
                                   device, seed, epochs=frozen_epochs)
         seed_predictions.append(predict(model, test_windows, device))
     ensemble = np.mean(np.stack(seed_predictions), axis=0)
+
+    # Per-seed metrics for transparency
+    per_seed_rmse = [
+        float(rmse(test_windows.Y, sp)) for sp in seed_predictions
+    ]
 
     # Baselines
     from sklearn.linear_model import Ridge as SklearnRidge
@@ -331,9 +360,16 @@ def run_dataset_benchmark(
         "selected_candidate": asdict(selected_candidate),
         "frozen_epochs": frozen_epochs,
         "seed_ids": list(seeds),
+        "per_seed_test_rmse": per_seed_rmse,
+        "ensemble_test_rmse": float(rmse(test_windows.Y, ensemble)),
         "metrics": metrics,
         "candidate_selection": selection_rows,
         "scaler": all_dev_scaler.as_dict(),
+        "loss_config": {
+            "weibull_alpha": WEIBULL_ALPHA,
+            "weibull_eta": WEIBULL_ETA,
+            "weibull_beta": WEIBULL_BETA,
+        },
     }
     write_json(out_dir / f"{dataset_name}_report.json", result)
     return result
@@ -347,7 +383,10 @@ def run_dataset_benchmark(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-dir", default=None, help="Directory with N-CMAPSS .h5 files")
-    parser.add_argument("--datasets", nargs="+", default=["DS01", "DS02", "DS03", "DS04"])
+    parser.add_argument(
+        "--datasets", nargs="+",
+        default=["DS01", "DS02", "DS03", "DS04", "DS05", "DS06", "DS07", "DS08"],
+    )
     parser.add_argument("--output", default="outputs/ncmapss_strict_v1")
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--seeds", default=",".join(str(s) for s in SEEDS))
@@ -381,8 +420,16 @@ def main() -> None:
     else:
         data_dir = Path(args.data_dir)
         for ds_name in args.datasets:
-            h5_candidates = list(data_dir.glob(f"{ds_name}.h5")) + \
-                            list(data_dir.glob(f"**/{ds_name}.h5"))
+            # Match both bare "DS01.h5" and NASA naming "N-CMAPSS_DS01-005.h5"
+            h5_candidates = (
+                list(data_dir.glob(f"{ds_name}.h5"))
+                + list(data_dir.glob(f"**/{ds_name}.h5"))
+                + list(data_dir.glob(f"*{ds_name}*.h5"))
+                + list(data_dir.glob(f"**/*{ds_name}*.h5"))
+            )
+            # Deduplicate while preserving order
+            seen: set = set()
+            h5_candidates = [p for p in h5_candidates if not (str(p) in seen or seen.add(str(p)))]
             if not h5_candidates:
                 print(f"[{ds_name}] .h5 file not found in {data_dir}, skipping", flush=True)
                 continue
@@ -397,19 +444,41 @@ def main() -> None:
 
     # Summary across datasets
     if all_results:
-        macro = {}
-        for method in ["selected_neural", "ridge"]:
-            scores = [
-                next(m["rmse"] for m in r["metrics"] if m["name"] == method)
-                for r in all_results
-            ]
-            macro[method] = {"mean_rmse": float(np.mean(scores)), "per_dataset": scores}
+        macro: dict = {}
+        for method in ["selected_neural", "ridge", "mean_baseline"]:
+            rmse_scores = []
+            nasa_scores = []
+            for r in all_results:
+                m = next((m for m in r["metrics"] if m["name"] == method), None)
+                if m:
+                    rmse_scores.append(m["rmse"])
+                    nasa_scores.append(m["nasa_score"])
+            if rmse_scores:
+                macro[method] = {
+                    "mean_rmse": float(np.mean(rmse_scores)),
+                    "per_dataset": rmse_scores,
+                    "mean_nasa_score": float(np.mean(nasa_scores)),
+                }
+
+        # Per-seed ensemble stability (neural only)
+        all_per_seed = [r.get("per_seed_test_rmse", []) for r in all_results]
+        if all(all_per_seed):
+            per_seed_means = np.mean(all_per_seed, axis=0).tolist()
+            macro["selected_neural"]["per_seed_mean_rmse"] = per_seed_means
+            macro["selected_neural"]["per_seed_std_rmse"] = float(np.std(per_seed_means))
+
         summary = {
             "schema": "ncmapss_strict_summary_v1",
             "datasets": [r["dataset"] for r in all_results],
             "macro": macro,
             "seed_ids": list(seeds),
             "scheduler_epoch_budget": int(epochs),
+            "selection_epoch_budget": SELECTION_EPOCH_BUDGET,
+            "loss_config": {
+                "weibull_alpha": WEIBULL_ALPHA,
+                "weibull_eta": WEIBULL_ETA,
+                "weibull_beta": WEIBULL_BETA,
+            },
         }
         write_json(out_dir / "NCMAPSS_SUMMARY.json", summary)
         write_json(out_dir / "run_metadata.json", {

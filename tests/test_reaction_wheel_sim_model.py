@@ -42,10 +42,12 @@ class TestReactionWheelSimulationModel(unittest.TestCase):
     def test_windows_are_group_local_and_cover_common_endpoint(self) -> None:
         x, y, group, scale, endpoints, mean, std = _make_windows(self.table, ["1", "2"], target_scale=31.0)
         self.assertEqual(x.shape[1], SEQ_LEN)
-        self.assertEqual(x.shape[2], len(ALIGNED_OPERATIONAL_FEATURES))
+        # +1 for normalised cycle-position column appended by _make_windows
+        self.assertEqual(x.shape[2], len(ALIGNED_OPERATIONAL_FEATURES) + 1)
         self.assertEqual(int(endpoints.min()), SEQ_LEN - 1)
         self.assertEqual(set(group.tolist()), {"1", "2"})
         self.assertAlmostEqual(scale, 31.0)
+        # mean / std are fitted on original features only (no cycle-pos)
         self.assertEqual(mean.shape[0], len(ALIGNED_OPERATIONAL_FEATURES))
         self.assertEqual(std.shape[0], len(ALIGNED_OPERATIONAL_FEATURES))
 

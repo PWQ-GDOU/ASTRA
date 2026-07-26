@@ -137,8 +137,17 @@ def _make_windows(
     xs, ys, group_values, endpoints = [], [], [], []
     for group, (features, target) in zip(groups, trajectories):
         normalized = (features - mean) / scale
-        for endpoint in range(SEQ_LEN - 1, len(features)):
-            xs.append(normalized[endpoint - SEQ_LEN + 1 : endpoint + 1])
+        n = len(features)
+        for endpoint in range(SEQ_LEN - 1, n):
+            win = normalized[endpoint - SEQ_LEN + 1 : endpoint + 1]  # (SEQ_LEN, n_feat)
+            # Append normalised cycle position as the last feature column.
+            # Ridge has direct access to endpoint/target_scale; giving the GRU
+            # the same information (absolute life fraction per timestep) puts
+            # both on equal footing and allows the neural model to learn the
+            # residual degradation pattern above the linear lifecycle trend.
+            cyc_pos = np.arange(endpoint - SEQ_LEN + 1, endpoint + 1, dtype=np.float32) / max(target_scale, 1.0)
+            win = np.concatenate([win, cyc_pos[:, None]], axis=-1)
+            xs.append(win)
             ys.append(target[endpoint])
             group_values.append(group)
             endpoints.append(endpoint)

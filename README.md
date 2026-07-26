@@ -65,18 +65,20 @@ FD002窗口60模型的三个固定seed（42/123/456）单模型`test_raw RMSE=25
 
 严格协议入口：`scripts/exp_ncmapss_strict.py`
 
-- 数据：DS01–DS08，每个文件含 80 个 dev 单元和 20 个 test 单元，完全 unit-disjoint。
+- 数据：DS01–DS08（全部8个子集），每个文件含 80 个 dev 单元和 20 个 test 单元，完全 unit-disjoint。
 - 预处理：train-only scaler；条件感知归一化（ConditionNormLayer FILM）；RUL cap=125。
-- 模型候选：条件感知 MultiScale TCN、BiGRU+Attention、3层 Transformer+退化头、Physics-Informed GRU。
-- 实验协议：dev 集最后 20% 单元作为 inner validation；固定五 seed；等权集成；无 test 标签参与选择。
-- 指标：RMSE、MAE、NRMSE、NASA 非对称分数（与 C-MAPSS 一致）。
+- 模型候选（8个）：条件感知 MultiScale TCN、BiGRU+Attention（h=128）、Transformer（large/base）、Physics-Informed GRU 等。
+- 训练：inner selection 使用 `SELECTION_EPOCH_BUDGET=60`（速度2×），final 训练按比例缩放至完整 budget。
+- 损失：`(1-0.25)*smooth_l1 + 0.25*WeibullRULLoss(eta=100, beta=3.0)`；age 用 `RUL_CAP - y`（截断数据集正确估计）。
+- 实验协议：dev 集最后 20% 单元作为 inner validation；固定五 seed（42,123,456,2026,3407）；等权集成；无 test 标签参与选择。
+- 指标：RMSE、MAE、NRMSE、NASA 非对称分数，逐 seed 方差，macro across datasets。
 
 ```bash
-# 有数据后运行
+# 有数据后自动运行（远端 daemon 已配置）
 python scripts/exp_ncmapss_strict.py \
   --data-dir path/to/ncmapss/ \
-  --datasets DS01 DS02 DS03 DS04 \
-  --output outputs/ncmapss_strict_v1 --device cuda:0
+  --datasets DS01 DS02 DS03 DS04 DS05 DS06 DS07 DS08 \
+  --output outputs/ncmapss_strict_v1 --device cuda:0 --epochs 200
 
 # 无需数据的 synthetic smoke test
 python scripts/exp_ncmapss_strict.py --synthetic --output /tmp/smoke
@@ -88,9 +90,30 @@ python scripts/exp_ncmapss_strict.py --synthetic --output /tmp/smoke
 https://phm-datasets.s3.amazonaws.com/NASA/17.+Turbofan+Engine+Degradation+Simulation+Data+Set+2.zip
 ```
 
-解压后将 DS01.h5–DS08.h5 放入 `data/processed/ncmapss/`。
-
 > 注意：C-MAPSS论文对测试RUL是否同步应用RUL cap并不总是说明清楚，因此raw和cap125必须分栏报告，不能直接混比。
+
+## GEO卫星→NASA电池 跨域迁移（v2 结果）
+
+**协议**：GEO 卫星 PINN-ODE 仿真（60 轨迹，LHC 采样）预训练共享编码器 → NASA strict14 目标域 LOO fine-tune 对照。
+
+**关键设计**：
+- 仅迁移编码器主干权重，**不迁移 RUL 头**（GEO RUL 范围 0–1200 cycle，NASA strict14 RUL 范围 0–130 cycle，9× 量程差异，迁移头会使初始预测偏高9×）。
+- GEO 特征17维（9基础 + dV30/60/90/120 + E30/60/90/120 PINN voltage-drop 极端段特征）。
+- 源域预训练：150 epoch；目标域 fine-tune：100 epoch；5 seed 等权集成。
+
+| 评估电芯 | Transfer RMSE | Scratch RMSE | Δ（正=迁移更好） |
+|----------|:------------:|:------------:|:--------------:|
+| B0005 | 13.274 | 8.654 | −4.62 |
+| **B0006** | **7.036** | 7.117 | **+0.08** ✓ |
+| B0007 | right-censored | right-censored | — |
+| **B0018** | **15.112** | 19.906 | **+4.79** ✓ |
+| **宏平均（3 event cells）** | **11.807** | **11.892** | **+0.085** ✓ |
+
+说明：
+- Transfer 整体略优于 Scratch（B0006+B0018 均有改善；B0005 较弱）。
+- 源域 val RMSE ≈ 127.6 cycle（GEO 仿真多样性高，绝对误差大但相对误差合理）。
+- 对照：v1（未修复 RUL 头）Transfer=56.94 vs Scratch=12.60，完全失效；修复后恢复至竞争水平。
+- 入口：`scripts/exp_geo_to_nasa_transfer.py`；支持 `--synthetic` smoke test。
 
 ## 主实验总表（竞赛四条线）
 

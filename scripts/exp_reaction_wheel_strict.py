@@ -185,6 +185,29 @@ def _window_sets(
     return train_set, other_set, scaler
 
 
+def _append_cycle_pos(ws: FemtoWindowSet) -> FemtoWindowSet:
+    """Append normalised cycle position as the last feature column.
+
+    Ridge already has this information via `endpoints/rul_scale` in
+    `_regression_matrix`.  Without it the GRU cannot learn absolute position
+    in the degradation trajectory from the feature sequence alone when trained
+    on only a handful of bearings.  Adding it puts both on equal footing.
+    """
+    # age: (N,) in [0, 1+ε]
+    age = ws.endpoints.astype(np.float32) / max(float(ws.rul_scale), 1.0)
+    # broadcast to (N, seq_len, 1) and concatenate along feature axis
+    age_col = np.tile(age[:, None, None], (1, ws.X.shape[1], 1))
+    return FemtoWindowSet(
+        X=np.concatenate([ws.X, age_col], axis=-1).astype(np.float32),
+        rul=ws.rul,
+        life_fraction=ws.life_fraction,
+        bearings=ws.bearings,
+        endpoints=ws.endpoints,
+        feature_names=ws.feature_names + ("cycle_pos_norm",),
+        rul_scale=ws.rul_scale,
+    )
+
+
 def train_model(
     candidate: Candidate,
     train_set: FemtoWindowSet,
@@ -278,6 +301,8 @@ def _train_ensemble(
         common_endpoint=common_endpoint,
         rul_scale=scale,
     )
+    train_set = _append_cycle_pos(train_set)
+    test_set = _append_cycle_pos(test_set)
     seed_predictions = []
     seed_metrics = []
     parameter_count = None
@@ -424,6 +449,8 @@ def _select_outer(
             train_set, val_set, _ = _window_sets(
                 fit, [val], candidate, common_endpoint=common_endpoint, rul_scale=scale
             )
+            train_set = _append_cycle_pos(train_set)
+            val_set = _append_cycle_pos(val_set)
             predictions = []
             for seed in seeds:
                 model, best_epoch, _ = train_model(
