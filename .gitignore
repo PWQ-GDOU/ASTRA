@@ -111,7 +111,7 @@ exp_battery_opt_v2.py
 exp_battery_opt_v3.py
 exp_transfer.py
 fix_*.py
-gen_*.py
+gen_legacy_*.py
 generate_*.py
 greybox_model.py
 mamba_encoder.py
