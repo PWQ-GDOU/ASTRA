@@ -55,10 +55,15 @@ from src.models.ncmapss_strict import (
 )
 
 
+from src.models.nozzle_multitrajectory import WeibullRULLoss
+
+
 SEEDS = (42, 123, 456, 2026, 3407)
 SEQ_LEN = 30
-VAL_FRACTION = 0.20   # fraction of dev units used for checkpoint selection
+VAL_FRACTION = 0.20
 EPOCH_BUDGET = 120
+WEIBULL_ETA = 100.0   # characteristic life ≈ cap cycles for turbofan
+WEIBULL_BETA = 3.0    # shape: steeper than bearing (β=2.5) for turbofan degradation
 
 
 @dataclass(frozen=True)
@@ -78,6 +83,8 @@ CANDIDATES = (
     Candidate("physics_gru_phys_cond", "physics_gru", "physical_with_conditions"),
     Candidate("ms_tcn_full_cond", "ms_tcn", "full_with_conditions"),
     Candidate("transformer_full_cond", "transformer", "full_with_conditions"),
+    Candidate("bigru_full_cond", "bigru_attn", "full_with_conditions", hidden=128),
+    Candidate("transformer_large_phys", "transformer", "physical_with_conditions", hidden=128),
 )
 
 
@@ -186,6 +193,8 @@ def train_model(
     ).to(device)
     x = torch.as_tensor(train_windows.X, dtype=torch.float32, device=device)
     y = torch.as_tensor(train_windows.Y, dtype=torch.float32, device=device)
+    age_s = (y.max() - y).clamp(min=0.0)  # elapsed life approximation
+    weibull_loss = WeibullRULLoss(eta=WEIBULL_ETA, beta=WEIBULL_BETA)
     opt = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=1.0e-4)
     batches = math.ceil(max(len(train_windows), 1) / batch_size)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
@@ -205,7 +214,10 @@ def train_model(
         for start in range(0, len(order), batch_size):
             idx = order[start : start + batch_size]
             out: RULOutput = model(x[idx])
-            loss = F.smooth_l1_loss(out.rul / RUL_CAP, y[idx] / RUL_CAP, beta=0.05)
+            # Weibull-weighted loss: near-EOL predictions get higher weight
+            w_loss = weibull_loss(out.rul, y[idx], age_s[idx], rul_scale=RUL_CAP)
+            h_loss = F.smooth_l1_loss(out.rul / RUL_CAP, y[idx] / RUL_CAP, beta=0.05)
+            loss = 0.5 * w_loss + 0.5 * h_loss
             if out.degradation is not None:
                 # Auxiliary degradation task: normalised elapsed time as proxy
                 age_proxy = (1.0 - y[idx] / RUL_CAP).clamp(0, 1)
