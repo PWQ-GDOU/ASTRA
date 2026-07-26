@@ -352,17 +352,38 @@ def select_candidate(
     device: str,
     seeds: Sequence[int],
     epochs: int,
+    inner_val_fraction: float = 0.0,
 ) -> dict:
+    """Select best candidate for the given outer holdout.
+
+    When ``inner_val_fraction > 0`` a fixed random subset of development
+    trajectories is used as the inner validation set (fast mode).
+    When ``inner_val_fraction == 0`` full rotating inner LOO is used (slow,
+    ≈39× more training runs).
+    """
     development = [t for t in all_trajectories if t.manifest.trajectory_id != holdout_id]
     rows = []
+    # --- Build inner train/val split once for all candidates ---
+    if inner_val_fraction > 0.0 and len(development) > 1:
+        rng_inner = np.random.default_rng(42)
+        n_val = max(1, int(len(development) * inner_val_fraction))
+        perm = rng_inner.permutation(len(development))
+        inner_val = [development[i] for i in perm[:n_val]]
+        inner_fit = [development[i] for i in perm[n_val:]] or development
+        inner_folds = [(inner_fit, inner_val)]   # single fixed split
+    else:
+        # Full rotating inner LOO
+        inner_folds = [
+            ([t for t in development if t.manifest.trajectory_id != val.manifest.trajectory_id]
+             or development,
+             [val])
+            for val in development
+        ]
     for candidate in candidates:
         scores, epoch_list = [], []
-        for val in development:
-            fit = [t for t in development if t.manifest.trajectory_id != val.manifest.trajectory_id]
-            if not fit:
-                fit = development
+        for fit, val_list in inner_folds:
             fw, scaler = _windows(fit, candidate)
-            vw, _ = _windows([val], candidate, scaler=scaler)
+            vw, _ = _windows(val_list, candidate, scaler=scaler)
             seed_preds = []
             for seed in seeds:
                 model, ep, _ = train_model(candidate, fw, vw, device, seed, epochs=epochs)
@@ -400,11 +421,15 @@ def run_benchmark(
     seeds: Sequence[int],
     candidates: Sequence[Candidate],
     epochs: int,
+    inner_val_fraction: float = 0.20,
 ) -> dict:
     selections = []
     for holdout in [t.manifest.trajectory_id for t in trajectories]:
         print(f"[select] outer={holdout}", flush=True)
-        selections.append(select_candidate(trajectories, holdout, candidates, device, seeds, epochs))
+        selections.append(select_candidate(
+            trajectories, holdout, candidates, device, seeds, epochs,
+            inner_val_fraction=inner_val_fraction,
+        ))
 
     config = {
         "schema": "nozzle_multitrajectory_config_v1",
@@ -583,6 +608,10 @@ def main() -> None:
     parser.add_argument("--epochs", type=int, default=EPOCH_BUDGET)
     parser.add_argument("--quick", action="store_true")
     parser.add_argument("--synthetic", action="store_true", help="Use synthetic data for smoke test")
+    parser.add_argument(
+        "--inner-val-fraction", type=float, default=0.20,
+        help="Fraction of dev trajectories used as fixed inner validation (0=full LOO, default 0.20)",
+    )
     args = parser.parse_args()
 
     device = args.device if torch.cuda.is_available() else "cpu"
@@ -605,7 +634,8 @@ def main() -> None:
 
     out_dir = Path(args.output)
     t0 = time.time()
-    result = run_benchmark(trajectories, out_dir, device, seeds, candidates, epochs)
+    result = run_benchmark(trajectories, out_dir, device, seeds, candidates, epochs,
+                           inner_val_fraction=args.inner_val_fraction)
     write_json(out_dir / "run_metadata.json", {
         "elapsed_sec": time.time() - t0,
         "device": device,
