@@ -92,7 +92,61 @@ https://phm-datasets.s3.amazonaws.com/NASA/17.+Turbofan+Engine+Degradation+Simul
 
 > 注意：C-MAPSS论文对测试RUL是否同步应用RUL cap并不总是说明清楚，因此raw和cap125必须分栏报告，不能直接混比。
 
-## GEO卫星→NASA电池 跨域迁移（v2 结果）
+## 喷管多工况烧蚀退化 Benchmark
+
+### 仿真器（减阶物理 ODE）
+
+`src/data/nozzle_sim_ode.py` — 基于 COMSOL 20秒 C/C 喉衬烧蚀轨迹校准的减阶物理 ODE 仿真器。
+
+**物理机制（三耦合方程）**：
+1. 固体温度上升（半无限厚壁导热）：`T_s(t) = T_in - (T_in-T_s0)/(1+t/τ)^n`，校准于 COMSOL 实测
+2. 对流热流（Dittus-Boelter scaling）：`Q = h_eff × (T_in - T_s)`，`h∝mdot^0.8`
+3. 氧化烧蚀速率：`r_dot ∝ Q × P^0.4`，校准系数 `k_ab = 1.74e-11 m³/J`
+
+**校准结果**：
+- 参考运行20秒深度：0.2572 mm（COMSOL 目标 0.2585 mm，误差 <0.5%）
+- 参考运行失效时间（0.5mm阈值）：58.3秒
+
+**工况参数空间（LHC 采样）**：
+
+| 参数 | 范围 | 物理意义 |
+|------|------|---------|
+| `T_in_K` | 920–1320 K | 燃气入口温度（不同推进剂/O/F比） |
+| `p_ch0_Pa` | 0.8–2.0 MPa | 初始燃烧室压力（不同推力级别） |
+| `mdot_factor` | 0.65–1.35 | 质量流率倍率 |
+| `k_ab_factor` | 0.70–1.40 | 烧蚀化学系数（材料/工艺变化） |
+| `dt0_mm` | 12–20 mm | 初始喉径 |
+
+```bash
+# 服务器上生成40条轨迹（0.1秒完成）
+python scripts/gen_nozzle_multitrajectory.py \
+    --n-traj 40 --output data/processed/nozzle_multitrajectory \
+    --failure-depth-mm 0.5 --t-max-s 300
+
+# 运行多工况 benchmark（服务器）
+python scripts/exp_nozzle_multitrajectory.py \
+    --data data/processed/nozzle_multitrajectory/nozzle_sim_40traj.csv \
+    --output outputs/nozzle_multitrajectory_v1 \
+    --epochs 60 --inner-val-fraction 0.20 --device cuda:0
+```
+
+**40条轨迹数据集特性**：
+- 寿命范围：25–135秒（条件多样性充分）
+- 工况组数：22个不同条件（T_in/P/mdot分箱）
+- 全部 run-to-failure（无截尾），split: train/val/test = 26/6/8
+
+### Benchmark 协议
+
+- **外层 LOOCV**：逐轨迹剔除作为 test（40折）
+- **内层候选选择**：固定20%开发轨迹作为 inner validation（39×加速，保留候选多样性）
+- **模型候选**：7个（GRU/MultiScale TCN/Transformer/PhysicsResidual，分 observable 和 estimated 两个特征 tier）
+- **特征 tier**：observable = (T_solid, heat_flux, pressure)；estimated = observable + depth + rate
+- **指标**：RUL RMSE（秒）、pre-failure RMSE、置信区间（bootstrap）
+- 对照基线：current-rate 物理基线、Ridge 回归
+
+> 注：纯仿真数据，结果仅作为方法学验证。接到实验喷管轨迹后将替换为真实数据集。
+
+
 
 **协议**：GEO 卫星 PINN-ODE 仿真（60 轨迹，LHC 采样）预训练共享编码器 → NASA strict14 目标域 LOO fine-tune 对照。
 
