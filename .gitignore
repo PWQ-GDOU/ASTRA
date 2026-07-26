@@ -1,0 +1,131 @@
+# ============================================================
+# ASTRA spacecraft RUL project – Git ignore rules
+# ============================================================
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.whl
+.eggs/
+pip-wheel-metadata/
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+.env
+
+# --- Model checkpoints (large binaries) ---
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.bin
+
+# --- Large output files (keep summary reports, not raw predictions) ---
+outputs/**/*.csv
+outputs/**/*.npy
+outputs/**/*.npz
+# Keep JSON reports and Markdown summaries
+!outputs/**/*.json
+!outputs/**/*.md
+
+# --- Data (raw CSVs kept; large processed/cached arrays excluded) ---
+data/processed/**/*.npy
+data/processed/**/*.npz
+data/processed/**/*.pkl
+# Keep raw input files and small CSVs
+!data/raw/
+!data/processed/cmapss/
+!data/processed/nasa_battery/
+
+# --- Literature PDFs (large, copyright-sensitive) ---
+docs/**/*.pdf
+
+# --- Node / JS ---
+node_modules/
+package-lock.json
+*.js.map
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+*.ipynb
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- IDE ---
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.kiro/
+
+# --- Logs and temp ---
+*.log
+*.tmp
+*.bak
+/tmp/
+/temp/
+
+# --- Unrelated project files in root ---
+IELTS_*.docx
+TokenEss*
+*.png
+*.docx
+patent_xml/
+speaking_audio_analysis.json
+ielts-writing-*.md
+formula_*.txt
+nozzle_analysis.png
+
+# --- Legacy/unrelated root-level scripts ---
+adaptive_ega.py
+add_fluency*.py
+add_ratio_param*.py
+analyze_audio*.py
+build_v*_server.py
+cascaded.py
+check_*.py
+contrastive_loss.py
+convert_to_voc.py
+cumulative/
+dann_train.py
+direct_cluster.py
+disable-vnc.ps1 configure-vnc.ps1
+esgmamba*.py
+exp_battery_opt.py
+exp_battery_opt_v2.py
+exp_battery_opt_v3.py
+exp_transfer.py
+fix_*.py
+gen_*.py
+generate_*.py
+greybox_model.py
+mamba_encoder.py
+mtl_train.py
+organize_repo.py
+push_to_github.py
+revin_v2.py
+run_esgmamba.sh
+sota_v5.py
+tcrscanet_template.py
+test_omml.docx
+test_v*.py
+train_*.py
+validate_synth.py
+vmamba_*.py
+wesg_*.py
+wire_ratio_voc.py
+ccswitch-setup*
+
+# --- SSH/debug temp files ---
+C:Users*
