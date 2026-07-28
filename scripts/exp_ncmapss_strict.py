@@ -193,11 +193,12 @@ def train_model(
     model = build_ncmapss_model(
         candidate.model, n_features, n_cond, candidate.hidden, candidate.dropout
     ).to(device)
-    x = torch.as_tensor(train_windows.X, dtype=torch.float32, device=device)
-    y = torch.as_tensor(train_windows.Y, dtype=torch.float32, device=device)
-    # Absolute elapsed life: age = RUL_CAP - RUL (correct on truncated DS03/04/07/08
-    # where y.max() < RUL_CAP and the batch-max proxy would under-estimate age)
-    age_s = (RUL_CAP - y).clamp(min=0.0)
+    # Keep data on CPU — move each batch to GPU at training time.
+    # DS01 has ~12 M windows; pre-loading everything to GPU causes OOM.
+    x = torch.as_tensor(train_windows.X, dtype=torch.float32)   # CPU
+    y = torch.as_tensor(train_windows.Y, dtype=torch.float32)   # CPU
+    # Absolute elapsed life (CPU tensor, sliced per batch below)
+    age_cpu = (RUL_CAP - y).clamp(min=0.0)
     weibull_loss = WeibullRULLoss(eta=WEIBULL_ETA, beta=WEIBULL_BETA)
     opt = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=1.0e-4)
     batches = math.ceil(max(len(train_windows), 1) / batch_size)
@@ -207,6 +208,7 @@ def train_model(
     rng = np.random.default_rng(seed)
     val_x = None
     if val_windows is not None:
+        # Validation set is much smaller — safe to keep on GPU
         val_x = torch.as_tensor(val_windows.X, dtype=torch.float32, device=device)
     best_state = None
     best_score = float("inf")
@@ -217,15 +219,20 @@ def train_model(
         order = rng.permutation(len(train_windows))
         for start in range(0, len(order), batch_size):
             idx = order[start : start + batch_size]
-            out: RULOutput = model(x[idx])
+            # Move batch from CPU to GPU — avoids pre-loading the full 12M-row
+            # DS01 tensor onto GPU (which causes OOM with 10.75 GiB cards).
+            xb = x[idx].to(device)
+            yb = y[idx].to(device)
+            ab = age_cpu[idx].to(device)
+            out: RULOutput = model(xb)
             # Hybrid loss: Weibull-weighted near-EOL term + smooth L1
             # WEIBULL_ALPHA=0.25 keeps the smooth-L1 dominant on truncated datasets
-            w_loss = weibull_loss(out.rul, y[idx], age_s[idx], rul_scale=RUL_CAP)
-            h_loss = F.smooth_l1_loss(out.rul / RUL_CAP, y[idx] / RUL_CAP, beta=0.05)
+            w_loss = weibull_loss(out.rul, yb, ab, rul_scale=RUL_CAP)
+            h_loss = F.smooth_l1_loss(out.rul / RUL_CAP, yb / RUL_CAP, beta=0.05)
             loss = (1.0 - WEIBULL_ALPHA) * h_loss + WEIBULL_ALPHA * w_loss
             if out.degradation is not None:
                 # Auxiliary degradation task: normalised elapsed time as proxy
-                age_proxy = (1.0 - y[idx] / RUL_CAP).clamp(0, 1)
+                age_proxy = (1.0 - yb / RUL_CAP).clamp(0, 1)
                 loss = loss + 0.1 * F.mse_loss(out.degradation, age_proxy)
             opt.zero_grad(set_to_none=True)
             loss.backward()
@@ -252,9 +259,14 @@ def train_model(
 
 
 @torch.no_grad()
-def predict(model, windows: NCMAPSSWindows, device: str) -> np.ndarray:
-    x = torch.as_tensor(windows.X, dtype=torch.float32, device=device)
-    return model(x).rul.detach().cpu().numpy().astype(np.float32)
+def predict(model, windows: NCMAPSSWindows, device: str, batch_size: int = 2048) -> np.ndarray:
+    """Predict in batches to avoid OOM on large datasets (e.g. DS01 with 12M windows)."""
+    x_cpu = torch.as_tensor(windows.X, dtype=torch.float32)
+    preds = []
+    for start in range(0, len(windows), batch_size):
+        xb = x_cpu[start : start + batch_size].to(device)
+        preds.append(model(xb).rul.detach().cpu().numpy())
+    return np.concatenate(preds).astype(np.float32)
 
 
 # ---------------------------------------------------------------------------
