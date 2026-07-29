@@ -206,10 +206,7 @@ def train_model(
         opt, T_max=max(1, max(epochs, EPOCH_BUDGET) * batches)
     )
     rng = np.random.default_rng(seed)
-    val_x = None
-    if val_windows is not None:
-        # Validation set is much smaller — safe to keep on GPU
-        val_x = torch.as_tensor(val_windows.X, dtype=torch.float32, device=device)
+    # val_x stays on CPU — predict() handles batched GPU inference
     best_state = None
     best_score = float("inf")
     best_epoch = int(epochs)
