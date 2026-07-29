@@ -243,7 +243,8 @@ def train_model(
             continue
         model.eval()
         with torch.no_grad():
-            val_pred = model(val_x).rul.detach().cpu().numpy()
+            # Batch val inference — val set can be 800K+ windows for DS01
+            val_pred = predict(model, val_windows, device)
         score = rmse(val_windows.Y, val_pred)
         if score < best_score - 1.0e-5:
             best_score, best_epoch, stale = score, epoch, 0
