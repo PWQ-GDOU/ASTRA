@@ -144,7 +144,21 @@ python scripts/exp_nozzle_multitrajectory.py \
 - **指标**：RUL RMSE（秒）、pre-failure RMSE、置信区间（bootstrap）
 - 对照基线：current-rate 物理基线、Ridge 回归
 
-> 注：纯仿真数据，结果仅作为方法学验证。接到实验喷管轨迹后将替换为真实数据集。
+### Benchmark 结果（v1，仿真数据集）
+
+选中候选：**rate_obs_w5**（PhysicsResidualRateNet，observable tier，window=5），全部40折均选中该候选。
+
+| 方法 | macro all_RMSE (s) | macro pre-failure RMSE |
+|------|:-----------------:|:---------------------:|
+| **selected_neural** | **5.471** | **5.503** |
+| ridge | 7.091 | 7.149 |
+| current_rate | 12.234 | 12.322 |
+
+- **Neural 比 Ridge 好 23%，比 current-rate 好 55%**。
+- PhysicsResidualRateNet（observable tier）在所有40折均被选中，无需估计量（深度/烧蚀率），仅用热流、温度、压力。
+- 40条轨迹全部 event-observed，5 seed 等权集成，bootstrap 95% CI 计算中。
+
+> 注：纯仿真数据（ODE减阶模型），结果用于方法学验证。接到实际喷管试车轨迹后将替换为真实数据集。
 
 
 
