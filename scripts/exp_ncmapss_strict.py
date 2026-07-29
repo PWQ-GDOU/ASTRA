@@ -281,6 +281,7 @@ def run_dataset_benchmark(
     seeds: Sequence[int],
     candidates: Sequence[Candidate],
     epochs: int,
+    stride: int = 1,
 ) -> dict:
     print(f"\n[{dataset_name}] dev={len(dev_units)} test={len(test_units)}", flush=True)
 
@@ -294,8 +295,8 @@ def run_dataset_benchmark(
     for candidate in candidates:
         scaler = fit_scaler(train_units, candidate.feature_set,
                             dataset=dataset_name, split="dev")
-        train_w = make_windows(train_units, scaler, seq_len=candidate.seq_len)
-        val_w = make_windows(val_units, scaler, seq_len=candidate.seq_len)
+        train_w = make_windows(train_units, scaler, seq_len=candidate.seq_len, stride=stride)
+        val_w = make_windows(val_units, scaler, seq_len=candidate.seq_len, stride=stride)
         scores, epochs_list = [], []
         for seed in seeds:
             model, ep, _ = train_model(
@@ -336,8 +337,8 @@ def run_dataset_benchmark(
     # --- Final training on all dev units, evaluation on test units ---
     all_dev_scaler = fit_scaler(dev_units, selected_candidate.feature_set,
                                 dataset=dataset_name, split="dev")
-    dev_windows = make_windows(dev_units, all_dev_scaler, seq_len=selected_candidate.seq_len)
-    test_windows = make_windows(test_units, all_dev_scaler, seq_len=selected_candidate.seq_len)
+    dev_windows = make_windows(dev_units, all_dev_scaler, seq_len=selected_candidate.seq_len, stride=stride)
+    test_windows = make_windows(test_units, all_dev_scaler, seq_len=selected_candidate.seq_len, stride=1)  # test: stride=1 for complete coverage
 
     seed_predictions = []
     for seed in seeds:
@@ -403,6 +404,10 @@ def main() -> None:
     parser.add_argument("--epochs", type=int, default=EPOCH_BUDGET)
     parser.add_argument("--quick", action="store_true")
     parser.add_argument("--synthetic", action="store_true")
+    parser.add_argument(
+        "--stride", type=int, default=1,
+        help="Window stride for make_windows (default 1; use 50 for DS01 which has 4.9M rows)",
+    )
     args = parser.parse_args()
 
     device = args.device if torch.cuda.is_available() else "cpu"
@@ -423,9 +428,9 @@ def main() -> None:
         print("Using synthetic data for smoke test", flush=True)
         synth = make_synthetic_units(n_dev=6, n_test=2, rng_seed=42, dataset_name="SYNTH")
         result = run_dataset_benchmark(
-            "SYNTH", synth["dev"], synth["test"],
-            out_dir, device, seeds, candidates, epochs
-        )
+                "SYNTH", synth["dev"], synth["test"],
+                out_dir, device, seeds, candidates, epochs, stride=args.stride
+            )
         all_results.append(result)
     else:
         data_dir = Path(args.data_dir)
@@ -448,7 +453,7 @@ def main() -> None:
             splits = load_ncmapss_h5(h5_path, dataset_name=ds_name)
             result = run_dataset_benchmark(
                 ds_name, splits["dev"], splits["test"],
-                out_dir, device, seeds, candidates, epochs
+                out_dir, device, seeds, candidates, epochs, stride=args.stride
             )
             all_results.append(result)
 
