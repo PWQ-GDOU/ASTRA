@@ -73,23 +73,24 @@ FD002窗口60模型的三个固定seed（42/123/456）单模型`test_raw RMSE=25
 
 ### 测试集结果（5-seed ensemble，GPU3，stride=1000）
 
-| 数据集 | 选中模型 | Neural RMSE | Ridge RMSE | nRMSE |
-|--------|----------|:-----------:|:----------:|:-----:|
-| DS01 | bigru_full_cond | **7.208** | 13.068 | 0.058 |
-| DS02 | bigru_attn_phys_cond | **6.495** | 11.269 | 0.052 |
-| DS03 | bigru_full_cond | **7.891** | 12.029 | 0.063 |
-| DS04 | bigru_full_cond | **7.150** | 19.829 | 0.057 |
-| DS05 | bigru_full_cond | **6.519** | 14.201 | 0.052 |
-| DS06 | bigru_attn_phys_cond | **8.165** | 14.914 | 0.065 |
-| DS07 | bigru_full_cond | **14.502** | 17.790 | 0.116 |
-| **Macro DS01-DS07** | — | **8.276** | 14.728 | — |
+| 数据集 | 选中模型 | Neural RMSE | Ridge RMSE | 提升 |
+|--------|----------|:-----------:|:----------:|:----:|
+| DS01 | bigru_full_cond | **7.208** | 13.068 | +44.8% |
+| DS02 | bigru_attn_phys_cond | **6.495** | 11.269 | +42.4% |
+| DS03 | bigru_full_cond | **7.891** | 12.029 | +34.4% |
+| DS04 | bigru_full_cond | **7.150** | 19.829 | +63.9% |
+| DS05 | bigru_full_cond | **6.519** | 14.201 | +54.1% |
+| DS06 | bigru_attn_phys_cond | **8.165** | 14.914 | +45.2% |
+| DS07 | bigru_full_cond | **14.502** | 17.790 | +18.5% |
+| DS08a | bigru_attn_phys_cond | **11.424** | 14.009 | +18.5% |
+| **Macro DS01-DS08** | — | **8.669** | 14.638 | **+40.8%** |
 
-**Neural 比 Ridge 好 43.8%（macro）**；BiGRU 系列（full features / physical+conditions）在所有数据集均被选中。
+**Neural 比 Ridge 好 40.8%（macro）**；BiGRU 系列（full features / physical+conditions）在所有数据集均被选中。
 
 说明：
-- stride=1000 为加速设置，每1000个时间步取1个窗口。全精度（stride=1）预计结果更好。
-- DS07（截断型数据集）nRMSE=0.116 明显高于其他，符合文献规律（截断数据集RUL估计更难）。
-- DS08 对应文件 DS08d-010.h5 检测到 HDF5 截断错误（下载不完整），已跳过；DS08a/DS08c 变体可替代。
+- stride=1000 为加速设置，每1000个时间步取1个窗口（DS01有4.9M行原始数据）。
+- DS07/DS08（截断型数据集，RUL估计更难）提升幅度相对较小，符合文献规律。
+- DS08d 文件下载截断，改用 DS08a 变体（通过 symlink `DS08.h5 → N-CMAPSS_DS08a-009.h5`）。
 - 入口：`python scripts/exp_ncmapss_strict.py --data-dir path/to/ --stride 1000 --epochs 200`
 
 # 无需数据的 synthetic smoke test
