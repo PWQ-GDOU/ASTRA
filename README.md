@@ -59,26 +59,38 @@ ASTRA/
 
 FD002窗口60模型的三个固定seed（42/123/456）单模型`test_raw RMSE=25.850±0.555`，固定等权平均集成为`25.131`；同步cap=125后，集成RMSE为`12.831`。该三seed集成没有使用测试标签拟合权重。
 
-## N-CMAPSS Benchmark（新增，等待数据下载）
+## N-CMAPSS Benchmark（DS01-DS07 结果）
 
-**N-CMAPSS**（NASA Dataset 17）是 C-MAPSS 的升级版，使用真实飞行剖面模拟变工况下的涡扇发动机退化，是当前工业 PHM 领域最活跃的公认 benchmark。
+**N-CMAPSS**（NASA Dataset 17）涡扇发动机退化 benchmark，严格协议入口：`scripts/exp_ncmapss_strict.py`
 
-严格协议入口：`scripts/exp_ncmapss_strict.py`
+**实验设置**：
+- 数据：DS01-DS07（DS08 文件截断，跳过）；文件结构为 dev/test unit-disjoint
+- 降采样：`--stride 1000`（原始 4.9M 行/数据集 → ~4100 训练窗口/数据集，大幅提速）
+- 预处理：train-only scaler；FILM条件归一化；RUL cap=125
+- 候选8个：BiGRU+Attention、MultiScale TCN、Transformer (base/large)、Physics GRU，分 physical_with_conditions / full_with_conditions 两个特征集
+- 损失：`0.75×smooth_l1 + 0.25×WeibullRULLoss(eta=100, β=3.0)`
+- 协议：dev集后20%作inner validation；5 seed等权集成；无test标签参与选择
 
-- 数据：DS01–DS08（全部8个子集），每个文件含 80 个 dev 单元和 20 个 test 单元，完全 unit-disjoint。
-- 预处理：train-only scaler；条件感知归一化（ConditionNormLayer FILM）；RUL cap=125。
-- 模型候选（8个）：条件感知 MultiScale TCN、BiGRU+Attention（h=128）、Transformer（large/base）、Physics-Informed GRU 等。
-- 训练：inner selection 使用 `SELECTION_EPOCH_BUDGET=60`（速度2×），final 训练按比例缩放至完整 budget。
-- 损失：`(1-0.25)*smooth_l1 + 0.25*WeibullRULLoss(eta=100, beta=3.0)`；age 用 `RUL_CAP - y`（截断数据集正确估计）。
-- 实验协议：dev 集最后 20% 单元作为 inner validation；固定五 seed（42,123,456,2026,3407）；等权集成；无 test 标签参与选择。
-- 指标：RMSE、MAE、NRMSE、NASA 非对称分数，逐 seed 方差，macro across datasets。
+### 测试集结果（5-seed ensemble，GPU3，stride=1000）
 
-```bash
-# 有数据后自动运行（远端 daemon 已配置）
-python scripts/exp_ncmapss_strict.py \
-  --data-dir path/to/ncmapss/ \
-  --datasets DS01 DS02 DS03 DS04 DS05 DS06 DS07 DS08 \
-  --output outputs/ncmapss_strict_v1 --device cuda:0 --epochs 200
+| 数据集 | 选中模型 | Neural RMSE | Ridge RMSE | nRMSE |
+|--------|----------|:-----------:|:----------:|:-----:|
+| DS01 | bigru_full_cond | **7.208** | 13.068 | 0.058 |
+| DS02 | bigru_attn_phys_cond | **6.495** | 11.269 | 0.052 |
+| DS03 | bigru_full_cond | **7.891** | 12.029 | 0.063 |
+| DS04 | bigru_full_cond | **7.150** | 19.829 | 0.057 |
+| DS05 | bigru_full_cond | **6.519** | 14.201 | 0.052 |
+| DS06 | bigru_attn_phys_cond | **8.165** | 14.914 | 0.065 |
+| DS07 | bigru_full_cond | **14.502** | 17.790 | 0.116 |
+| **Macro DS01-DS07** | — | **8.276** | 14.728 | — |
+
+**Neural 比 Ridge 好 43.8%（macro）**；BiGRU 系列（full features / physical+conditions）在所有数据集均被选中。
+
+说明：
+- stride=1000 为加速设置，每1000个时间步取1个窗口。全精度（stride=1）预计结果更好。
+- DS07（截断型数据集）nRMSE=0.116 明显高于其他，符合文献规律（截断数据集RUL估计更难）。
+- DS08 对应文件 DS08d-010.h5 检测到 HDF5 截断错误（下载不完整），已跳过；DS08a/DS08c 变体可替代。
+- 入口：`python scripts/exp_ncmapss_strict.py --data-dir path/to/ --stride 1000 --epochs 200`
 
 # 无需数据的 synthetic smoke test
 python scripts/exp_ncmapss_strict.py --synthetic --output /tmp/smoke
