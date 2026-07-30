@@ -59,12 +59,12 @@ ASTRA/
 
 FD002窗口60模型的三个固定seed（42/123/456）单模型`test_raw RMSE=25.850±0.555`，固定等权平均集成为`25.131`；同步cap=125后，集成RMSE为`12.831`。该三seed集成没有使用测试标签拟合权重。
 
-## N-CMAPSS Benchmark（DS01-DS07 结果）
+## N-CMAPSS Benchmark（DS01-DS08 完整结果）
 
 **N-CMAPSS**（NASA Dataset 17）涡扇发动机退化 benchmark，严格协议入口：`scripts/exp_ncmapss_strict.py`
 
 **实验设置**：
-- 数据：DS01-DS07（DS08 文件截断，跳过）；文件结构为 dev/test unit-disjoint
+- 数据：DS01-DS08（全部8个子集）；DS08d 文件截断，改用 DS08a 变体（symlink）；文件结构为 dev/test unit-disjoint
 - 降采样：`--stride 1000`（原始 4.9M 行/数据集 → ~4100 训练窗口/数据集，大幅提速）
 - 预处理：train-only scaler；FILM条件归一化；RUL cap=125
 - 候选8个：BiGRU+Attention、MultiScale TCN、Transformer (base/large)、Physics GRU，分 physical_with_conditions / full_with_conditions 两个特征集
@@ -157,21 +157,32 @@ python scripts/exp_nozzle_multitrajectory.py \
 - **指标**：RUL RMSE（秒）、pre-failure RMSE、置信区间（bootstrap）
 - 对照基线：current-rate 物理基线、Ridge 回归
 
-### Benchmark 结果（v1，仿真数据集）
+### Benchmark 结果（v2，预定义split，服务器仿真数据集）
 
-选中候选：**rate_obs_w5**（PhysicsResidualRateNet，observable tier，window=5），全部40折均选中该候选。
+**协议**：预定义 train/val/test 轨迹分组（26/6/8），内层选择在 train→val 上完成，最终模型在 train+val 上训练，test 只评估一次。5 seed 等权集成，无 test 标签参与选择。
 
-| 方法 | macro all_RMSE (s) | macro pre-failure RMSE |
-|------|:-----------------:|:---------------------:|
-| **selected_neural** | **5.471** | **5.503** |
-| ridge | 7.091 | 7.149 |
-| current_rate | 12.234 | 12.322 |
+选中候选：**rate_obs_w5**（PhysicsResidualRateNet，observable tier，window=5）。  
+内层选择 val RMSE=11.23s，各候选对比：transformer=30.2s，ms=35.0s，gru=38.1s。
 
-- **Neural 比 Ridge 好 23%，比 current-rate 好 55%**。
-- PhysicsResidualRateNet（observable tier）在所有40折均被选中，无需估计量（深度/烧蚀率），仅用热流、温度、压力。
-- 40条轨迹全部 event-observed，5 seed 等权集成，bootstrap 95% CI 计算中。
+| 方法 | Test RMSE (s) | MAE (s) | nRMSE | 相对 Ridge |
+|------|:-------------:|:-------:|:-----:|:---------:|
+| **rate_obs_w5 (neural)** | **10.98** | **7.68** | **0.0845** | **+2.3%** ✓ |
+| Ridge | 11.23 | 8.85 | 0.0865 | — |
+| current_rate | 20.22 | 12.92 | 0.1556 | −80% |
+| mean_baseline | 31.99 | 26.74 | 0.2462 | −185% |
 
-> 注：纯仿真数据（ODE减阶模型），结果用于方法学验证。接到实际喷管试车轨迹后将替换为真实数据集。
+- **Neural 比 Ridge 好 2.3%，比 current-rate 好 45.7%**。
+- 各 seed 测试 RMSE：9.89 / 12.25 / 9.57 / 11.33 / 12.32s（均值10.98s，std±1.17s）。
+- PhysicsResidualRateNet（observable tier）在内层选择中以显著优势胜出（RMSE差距 >18s vs GRU），无需估计量（深度/烧蚀率），仅用热流、温度、压力。
+- 数据集：40条轨迹（ODE减阶仿真，COMSOL校准），22个工况组，寿命25–135s，全部 run-to-failure。
+
+入口：`scripts/run_nozzle_mt_fast.py --data data/processed/nozzle_multitrajectory/nozzle_sim_40traj.csv --output outputs/nozzle_mt_v2 --device cuda:1`
+
+---
+
+**v1 参考结果（全轨迹LOO，40折，已停止运行）**：neural macro RMSE=5.471s vs ridge=7.091s（+23%）。v1 LOO 因计算代价过高（预计60h+）中止，v2 预定义split为正式结果。
+
+> 注：纯仿真数据（ODE减阶模型，COMSOL 20秒校准），结果用于方法学验证。接到实际喷管试车轨迹后将替换为真实数据集。
 
 
 
