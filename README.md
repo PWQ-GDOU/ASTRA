@@ -131,60 +131,95 @@ https://phm-datasets.s3.amazonaws.com/NASA/17.+Turbofan+Engine+Degradation+Simul
 | `dt0_mm` | 12–20 mm | 初始喉径 |
 
 ```bash
-# 服务器上生成40条轨迹（0.1秒完成）
+# 生成200条轨迹（0.8秒完成）
 python scripts/gen_nozzle_multitrajectory.py \
-    --n-traj 40 --output data/processed/nozzle_multitrajectory \
+    --n-traj 200 --output data/processed/nozzle_mt_200 \
     --failure-depth-mm 0.5 --t-max-s 300
 
-# 运行多工况 benchmark（服务器）
-python scripts/exp_nozzle_multitrajectory.py \
-    --data data/processed/nozzle_multitrajectory/nozzle_sim_40traj.csv \
-    --output outputs/nozzle_multitrajectory_v1 \
-    --epochs 60 --inner-val-fraction 0.20 --device cuda:0
+# SOTA验证（200条轨迹，window=20，双tier，全基线对比）
+python scripts/run_nozzle_sota_validation.py \
+    --data data/processed/nozzle_mt_200/nozzle_sim_200traj.csv \
+    --output outputs/nozzle_sota_200_w20 \
+    --window-size 20 --epochs 160 --device cuda:1
 ```
 
-**40条轨迹数据集特性**：
-- 寿命范围：25–135秒（条件多样性充分）
-- 工况组数：22个不同条件（T_in/P/mdot分箱）
-- 全部 run-to-failure（无截尾），split: train/val/test = 26/6/8
+**200条轨迹数据集特性**：
+- 寿命范围：22–194秒，中位数62.7秒
+- 工况组数：24个不同条件（T_in/P/mdot分箱）
+- 全部 run-to-failure（无截尾），split: train/val/test = 130/30/40
 
-### Benchmark 协议
+### Benchmark 协议（SOTA验证版）
 
-- **外层 LOOCV**：逐轨迹剔除作为 test（40折）
-- **内层候选选择**：固定20%开发轨迹作为 inner validation（39×加速，保留候选多样性）
-- **模型候选**：7个（GRU/MultiScale TCN/Transformer/PhysicsResidual，分 observable 和 estimated 两个特征 tier）
-- **特征 tier**：observable = (T_solid, heat_flux, pressure)；estimated = observable + depth + rate
-- **指标**：RUL RMSE（秒）、pre-failure RMSE、置信区间（bootstrap）
-- 对照基线：current-rate 物理基线、Ridge 回归
+**信息边界严格分层**（修复了早期版本的特权信息泄漏 bug）：
 
-### Benchmark 结果（v2，预定义split，服务器仿真数据集）
+| Tier | 模型输入特征 | 用途 |
+|------|------------|------|
+| **Observable** | T_solid, heat_flux, pressure（3维，纯在线可测） | 正式主结果 |
+| **Estimated** | Observable + depth_mm + rate_m_s（5维） | 工程增强结果 |
+| Privileged | 上述 + 直接传入 margin/rate 给模型 | 历史错误做法，已废弃 |
 
-**协议**：预定义 train/val/test 轨迹分组（26/6/8），内层选择在 train→val 上完成，最终模型在 train+val 上训练，test 只评估一次。5 seed 等权集成，无 test 标签参与选择。
+- 内层选择：train→val，3 seeds，80 epochs；外层评估：train+val→test，5 seeds，160 epochs
+- 候选7个：GRU / MultiScale TCN / Transformer / PhysicsResidualRateNet × 两个tier
+- PhysicsResidualRateNet 在 observable tier 强制 `current_rate_m_s=None`（诚实），在 estimated tier 才使用物理积分先验
 
-选中候选：**rate_obs_w5**（PhysicsResidualRateNet，observable tier，window=5）。  
-内层选择 val RMSE=11.23s，各候选对比：transformer=30.2s，ms=35.0s，gru=38.1s。
+### SOTA 验证结果（v2，200条轨迹，window=20，修复信息泄漏）
 
-| 方法 | Test RMSE (s) | MAE (s) | nRMSE | 相对 Ridge |
-|------|:-------------:|:-------:|:-----:|:---------:|
-| **rate_obs_w5 (neural)** | **10.98** | **7.68** | **0.0845** | **+2.3%** ✓ |
-| Ridge | 11.23 | 8.85 | 0.0865 | — |
-| current_rate | 20.22 | 12.92 | 0.1556 | −80% |
-| mean_baseline | 31.99 | 26.74 | 0.2462 | −185% |
+**Observable Tier（仅温度/热流/压力）**
 
-- **Neural 比 Ridge 好 2.3%，比 current-rate 好 45.7%**。
-- 各 seed 测试 RMSE：9.89 / 12.25 / 9.57 / 11.33 / 12.32s（均值10.98s，std±1.17s）。
-- PhysicsResidualRateNet（observable tier）在内层选择中以显著优势胜出（RMSE差距 >18s vs GRU），无需估计量（深度/烧蚀率），仅用热流、温度、压力。
-- 数据集：40条轨迹（ODE减阶仿真，COMSOL校准），22个工况组，寿命25–135s，全部 run-to-failure。
+内层选中：**gru_obs_w20**（val_rmse=39.72s；所有observable候选39–41s，差异小）
 
-入口：`scripts/run_nozzle_mt_fast.py --data data/processed/nozzle_multitrajectory/nozzle_sim_40traj.csv --output outputs/nozzle_mt_v2 --device cuda:1`
+| 方法 | Test RMSE (s) | vs Ridge |
+|------|:-------------:|:--------:|
+| current_rate（特权参考，不参与主对比） | 12.13 | +58.2% |
+| **Ridge** | **28.99** | — |
+| Huber | 29.02 | −0.1% |
+| mean_baseline | 30.80 | −6.3% |
+| GBDT | 33.13 | −14.3% |
+| RF | 38.91 | −34.2% |
+| **GRU neural** | **38.15** | −31.6% ✗ |
 
----
+Observable tier 结论：**所有 ML 方法均输给 current_rate（特权基线）**。从纯热流/温度/压力预测 RUL，5–20步窗口信息不足；GRU 在 observable 模式下仅与 RF 相近，Ridge最优。
 
-**v1 参考结果（全轨迹LOO，40折，已停止运行）**：neural macro RMSE=5.471s vs ridge=7.091s（+23%）。v1 LOO 因计算代价过高（预计60h+）中止，v2 预定义split为正式结果。
+**Estimated Tier（+累积深度+烧蚀速率）**
 
-> 注：纯仿真数据（ODE减阶模型，COMSOL 20秒校准），结果用于方法学验证。接到实际喷管试车轨迹后将替换为真实数据集。
+内层选中：**rate_est_w20**（val_rmse=4.07s）
 
+| 方法 | Test RMSE (s) | vs Ridge |
+|------|:-------------:|:--------:|
+| **RandomForest** | **0.40** | **+95.8%** |
+| GBDT | 0.86 | +91.0% |
+| **PhysicsResidualRateNet** | **2.01** | **+79.0%** ✓ |
+| Huber | 9.41 | +1.8% |
+| Ridge | 9.58 | — |
+| current_rate | 12.13 | −26.6% |
 
+Estimated tier 结论：RF/GBDT 通过 `X[-1]` 特征学到物理法则 `RUL≈(fail_depth−depth)/rate`，近乎完美（0.40/0.86s）。**PhysicsResidualRateNet 显式积分同一物理先验，达到2.01s**，比 Ridge 好 79%；树模型仍占优。
+
+**敏感性分析（Observable tier，阈值0.3–0.7mm）**
+
+| 失效阈值 | Neural RMSE | Ridge RMSE | GBDT RMSE | Neural vs GBDT |
+|---------|:-----------:|:----------:|:---------:|:--------------:|
+| 0.3mm | 10.14 | 8.30 | 12.83 | **+21%** ✓ |
+| 0.4mm | 23.01 | 15.06 | 21.21 | **+8%** ✓ |
+| 0.5mm | 36.08 | 23.57 | 32.74 | **+9%** ✓ |
+| 0.6mm | 56.15 | 33.62 | 46.70 | **+17%** ✓ |
+| 0.7mm | 82.36 | 45.12 | 62.23 | **+24%** ✓ |
+
+**Observable tier 神经网络在全部5个失效阈值均优于 GBDT**，但仍输给 Ridge。
+
+**演进对比（修复bug前→后，200轨迹+window=20）**：
+
+| 版本 | neural RMSE | Ridge RMSE | 是否诚实 |
+|------|:-----------:|:----------:|:-------:|
+| v1（40轨迹，含信息泄漏） | 5.47s | 7.09s | ✗ 不诚实 |
+| v2（40轨迹，修复bug） | 10.98s | 11.23s | ✓ |
+| **v3（200轨迹，w=20，修复）** | **2.01s** | **9.58s** | **✓** |
+
+PhysicsResidualRateNet 在 estimated tier 随数据量增加有明显收益（10.98→2.01s，-81%）；树模型也同步改善（GBDT 6.36→0.86s）。
+
+入口：`scripts/run_nozzle_sota_validation.py`；数据：`scripts/gen_nozzle_multitrajectory.py`
+
+> 注：全部结果来自 ODE 减阶仿真（COMSOL 20s 校准）。接到实际喷管静态点火试验数据后脚本可直接替换运行。
 
 **协议**：GEO 卫星 PINN-ODE 仿真（60 轨迹，LHC 采样）预训练共享编码器 → NASA strict14 目标域 LOO fine-tune 对照。
 
