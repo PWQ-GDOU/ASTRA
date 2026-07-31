@@ -258,7 +258,8 @@ Physics-Observable tier 结论：Ridge/Huber 用代理特征后 RMSE 从28.99→
 | 域 | 协议 | 主指标 | 结果 |
 |----|------|--------|------|
 | 源域：喷嘴烧蚀 | 前40训练 / 后20评估 | Pure TCN / PCG-TCN / MultiScale RMSE | **2.501 / 2.674 / 3.819**（冻结） |
-| 目标域：NASA电池（clean strict14 v2 canonical） | 嵌套电芯级 LOOCV；B0007 right-censored | selected neural / selected method blend RMSE | **12.024 / 12.797*** |
+| 目标域：NASA电池（clean strict14 v2） | 嵌套电芯级 LOOCV；B0007 right-censored | selected neural / selected method blend RMSE | **12.024 / 12.797** |
+| 目标域：NASA电池（rel80，80% SOH） | 嵌套电芯级 LOOCV；全4电芯event-observed | neural / Ridge macro RMSE | **19.73 / 23.24（neural +15.1%）** |
 | 目标域：反作用轮代理 | FEMTO轴承 LOO，振动特征 | 归一化 RMSE / 相对 RMSE | **0.331 / 0.661** |
 | 公开基准：C-MAPSS | 严格协议（见上表） | FD002 三seed集成 cap125 | **12.831** |
 | 迁移：喷嘴→电池 | few-shot 1/2 电池 | scratch → transfer RMSE | 35.2→**27.7** / 33.7→**28.9** |

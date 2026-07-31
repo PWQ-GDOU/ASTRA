@@ -41,7 +41,9 @@ PRIMARY_CELLS = ("B0005", "B0006", "B0007", "B0018")   # LOOCV target
 AUX_EVENT_CELLS = (
     "B0042", "B0043", "B0044", "B0046", "B0047", "B0048",  # ~1.5-1.7Ah initial, similar chemistry
 )
-AUX_CENSORED_CELLS = ()  # keep disabled to avoid domain shift
+AUX_CENSORED_CELLS = (   # short right-censored cells — censored loss only, no exact RUL
+    "B0025", "B0027", "B0028", "B0029", "B0030", "B0031", "B0032",
+)
 MIN_CYCLES    = 15   # skip cells with < MIN_CYCLES observed cycles
 SEEDS         = (42, 123, 456, 2026, 3407)
 NRMSE_CYCLES  = 100.0
