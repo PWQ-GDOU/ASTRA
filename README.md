@@ -152,70 +152,79 @@ python scripts/run_nozzle_sota_validation.py \
 
 **信息边界严格分层**（修复了早期版本的特权信息泄漏 bug）：
 
-| Tier | 模型输入特征 | 用途 |
+| Tier | 模型输入特征 | 备注 |
 |------|------------|------|
-| **Observable** | T_solid, heat_flux, pressure（3维，纯在线可测） | 正式主结果 |
-| **Estimated** | Observable + depth_mm + rate_m_s（5维） | 工程增强结果 |
-| Privileged | 上述 + 直接传入 margin/rate 给模型 | 历史错误做法，已废弃 |
+| **Observable** | T_solid, heat_flux, pressure（3维） | 纯在线可测 |
+| **Physics-Observable** | 上述 + depth_proxy + rate_proxy（5维） | 从∫Q·P^0.4·dt 推算，仍属可观测 |
+| **Estimated** | Observable + depth_mm + rate_m_s（5维） | 需要直接测量/估算烧蚀量 |
+| ~~Privileged~~ | ~~直接传入 margin/rate 给模型~~ | ~~历史错误做法，已废弃~~ |
 
-- 内层选择：train→val，3 seeds，80 epochs；外层评估：train+val→test，5 seeds，160 epochs
-- 候选7个：GRU / MultiScale TCN / Transformer / PhysicsResidualRateNet × 两个tier
-- PhysicsResidualRateNet 在 observable tier 强制 `current_rate_m_s=None`（诚实），在 estimated tier 才使用物理积分先验
+- 内层选择：train→val，3 seeds，80 epochs；外层：train+val→test，5 seeds，160 epochs
+- 候选7个（GRU/MS-TCN/Transformer/PhysicsResidualRateNet），各tier独立选
+- physics_observable tier中，`make_windows()` 用代理深度和代理速率替换真实仿真值
 
-### SOTA 验证结果（v2，200条轨迹，window=20，修复信息泄漏）
+### SOTA 验证结果（v3，200条轨迹，window=20，3-tier，修复信息泄漏）
 
-**Observable Tier（仅温度/热流/压力）**
+**Observable Tier（仅T/Q/P，3维）**
 
-内层选中：**gru_obs_w20**（val_rmse=39.72s；所有observable候选39–41s，差异小）
+选中：**gru_obs_w20**（val=39.72s）
 
-| 方法 | Test RMSE (s) | vs Ridge |
-|------|:-------------:|:--------:|
-| current_rate（特权参考，不参与主对比） | 12.13 | +58.2% |
+| 方法 | RMSE (s) | vs Ridge |
+|------|:--------:|:--------:|
+| current_rate（真实特权参考） | 12.13 | +58.2% |
 | **Ridge** | **28.99** | — |
 | Huber | 29.02 | −0.1% |
-| mean_baseline | 30.80 | −6.3% |
 | GBDT | 33.13 | −14.3% |
-| RF | 38.91 | −34.2% |
-| **GRU neural** | **38.15** | −31.6% ✗ |
+| GRU neural | 38.15 | −31.6% ✗ |
 
-Observable tier 结论：**所有 ML 方法均输给 current_rate（特权基线）**。从纯热流/温度/压力预测 RUL，5–20步窗口信息不足；GRU 在 observable 模式下仅与 RF 相近，Ridge最优。
+**Physics-Observable Tier（+depth_proxy + rate_proxy，5维，从热流积分推导）**
 
-**Estimated Tier（+累积深度+烧蚀速率）**
+选中：**rate_phys_w20**（val=38.47s）
 
-内层选中：**rate_est_w20**（val_rmse=4.07s）
+| 方法 | RMSE (s) | vs Ridge |
+|------|:--------:|:--------:|
+| **Huber** | **27.29** | **+1.2%** |
+| **Ridge** | **27.62** | — |
+| GBDT | 32.53 | −17.8% |
+| RF | 34.07 | −23.4% |
+| current_rate（代理版） | 30.18 | −9.3% |
+| PhysicsResidualRateNet | 37.90 | −37.2% ✗ |
 
-| 方法 | Test RMSE (s) | vs Ridge |
-|------|:-------------:|:--------:|
+Physics-Observable tier 结论：Ridge/Huber 用代理特征后 RMSE 从28.99→27.62s（**+5% 改善**）。神经网络没有明显改善——代理深度的 k_ab 是固定校准值，但各轨迹实际 k_ab_factor 在0.7–1.4范围变化，导致物理积分先验噪声大。Ridge 的最小二乘能有效修正这一系统偏差；神经网络物理分支无法自适应。
+
+**Estimated Tier（+true depth_mm + rate_m_s，5维）**
+
+选中：**rate_est_w20**（val=4.07s）
+
+| 方法 | RMSE (s) | vs Ridge |
+|------|:--------:|:--------:|
 | **RandomForest** | **0.40** | **+95.8%** |
 | GBDT | 0.86 | +91.0% |
 | **PhysicsResidualRateNet** | **2.01** | **+79.0%** ✓ |
-| Huber | 9.41 | +1.8% |
 | Ridge | 9.58 | — |
 | current_rate | 12.13 | −26.6% |
 
-Estimated tier 结论：RF/GBDT 通过 `X[-1]` 特征学到物理法则 `RUL≈(fail_depth−depth)/rate`，近乎完美（0.40/0.86s）。**PhysicsResidualRateNet 显式积分同一物理先验，达到2.01s**，比 Ridge 好 79%；树模型仍占优。
+**阈值敏感性（physics_observable tier，0.3–0.7mm）**
 
-**敏感性分析（Observable tier，阈值0.3–0.7mm）**
+| 失效阈值 | Neural | Ridge | GBDT | Neural vs GBDT |
+|---------|:------:|:-----:|:----:|:--------------:|
+| 0.3mm | 9.54 | 8.30 | 12.83 | **+26%** ✓ |
+| 0.4mm | 21.93 | 15.06 | 21.21 | **+3%** ✓ |
+| 0.5mm | 40.27 | 23.57 | 32.74 | −23% ✗ |
+| 0.6mm | 60.44 | 33.62 | 46.70 | −29% ✗ |
+| 0.7mm | 84.85 | 45.12 | 62.23 | −36% ✗ |
 
-| 失效阈值 | Neural RMSE | Ridge RMSE | GBDT RMSE | Neural vs GBDT |
-|---------|:-----------:|:----------:|:---------:|:--------------:|
-| 0.3mm | 10.14 | 8.30 | 12.83 | **+21%** ✓ |
-| 0.4mm | 23.01 | 15.06 | 21.21 | **+8%** ✓ |
-| 0.5mm | 36.08 | 23.57 | 32.74 | **+9%** ✓ |
-| 0.6mm | 56.15 | 33.62 | 46.70 | **+17%** ✓ |
-| 0.7mm | 82.36 | 45.12 | 62.23 | **+24%** ✓ |
+神经网络在低阈值（短寿命，≤0.4mm）下优于 GBDT，在高阈值（长寿命）下劣势扩大。
 
-**Observable tier 神经网络在全部5个失效阈值均优于 GBDT**，但仍输给 Ridge。
+**版本演进对比**：
 
-**演进对比（修复bug前→后，200轨迹+window=20）**：
-
-| 版本 | neural RMSE | Ridge RMSE | 是否诚实 |
-|------|:-----------:|:----------:|:-------:|
-| v1（40轨迹，含信息泄漏） | 5.47s | 7.09s | ✗ 不诚实 |
-| v2（40轨迹，修复bug） | 10.98s | 11.23s | ✓ |
-| **v3（200轨迹，w=20，修复）** | **2.01s** | **9.58s** | **✓** |
-
-PhysicsResidualRateNet 在 estimated tier 随数据量增加有明显收益（10.98→2.01s，-81%）；树模型也同步改善（GBDT 6.36→0.86s）。
+| 版本 | Tier | neural RMSE | Best classical | 是否诚实 |
+|------|------|:-----------:|:--------------:|:-------:|
+| v1（40轨迹，信息泄漏） | leaked | 5.47s | Ridge 7.09s | ✗ |
+| v2（40轨迹，修复） | estimated | 10.98s | Ridge 11.23s | ✓ |
+| v3（200轨迹，w=20） | estimated | **2.01s** | RF **0.40s** | ✓ |
+| v3（200轨迹，w=20） | physics_obs | 37.90s | Huber **27.29s** | ✓ |
+| v3（200轨迹，w=20） | observable | 38.15s | Ridge **28.99s** | ✓ |
 
 入口：`scripts/run_nozzle_sota_validation.py`；数据：`scripts/gen_nozzle_multitrajectory.py`
 

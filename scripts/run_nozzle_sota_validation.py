@@ -89,7 +89,7 @@ def train_one(cand, train_w, device, seed, epochs):
     observable benchmark).  For estimated tier they ARE passed (legitimate
     because depth/rate are included as input features in X)."""
     seed_all(seed)
-    use_phys = (cand.feature_tier == "estimated")   # KEY FIX
+    use_phys = cand.feature_tier in ("estimated", "physics_observable")   # KEY FIX
     model = build_nozzle_mt_model(cand.model, train_w.X.shape[-1],
                                   cand.hidden, cand.dropout, RUL_SCALE).to(device)
     x     = torch.as_tensor(train_w.X,               dtype=torch.float32, device=device)
@@ -288,7 +288,7 @@ def _inner_select(tier_label, candidates, train_trajs, val_trajs, device,
     for cand in candidates:
         tw, sc = _windows(train_trajs, cand)
         vw, _  = _windows(val_trajs,   cand, sc)
-        use_phys = (cand.feature_tier == "estimated")
+        use_phys = cand.feature_tier in ("estimated", "physics_observable")
         seed_scores = []
         for s in inner_seeds:
             m = train_one(cand, tw, device, s, inner_epochs)
@@ -312,7 +312,7 @@ def _eval_tier(tier_label, cand, dev_trajs, test_trajs, device, seeds, epochs):
     dev_w, sc  = _windows(dev_trajs, cand)
     test_w, _  = _windows(test_trajs, cand, sc)
     truth      = test_w.rul_s
-    use_phys   = (cand.feature_tier == "estimated")
+    use_phys = cand.feature_tier in ("estimated", "physics_observable")
 
     print(f"\n=== {tier_label} — Neural ({cand.name}, {len(seeds)} seeds) ===", flush=True)
     seed_preds = []
@@ -365,29 +365,48 @@ def _eval_tier(tier_label, cand, dev_trajs, test_trajs, device, seeds, epochs):
 # ── main validation ───────────────────────────────────────────────────────────
 def run_sota_validation(data_path, split_map, train_trajs_obs, val_trajs_obs, test_trajs_obs,
                         train_trajs_est, val_trajs_est, test_trajs_est,
+                        train_trajs_phys, val_trajs_phys, test_trajs_phys,
                         out_dir, device, seeds=SEEDS, epochs=EPOCH_FINAL,
                         window_size=20):
-    """Run SOTA validation for BOTH observable and estimated tiers.
-    Inner selection picks best model/tier on train→val; final eval on train+val→test."""
+    """Run SOTA validation for three feature tiers.
+    physics_observable = T/Q/P + depth_proxy + rate_proxy (derived from integration).
+    Inner selection picks best model on train→val; final eval on train+val→test."""
     out_dir.mkdir(parents=True, exist_ok=True)
     INNER_SEEDS  = seeds[:3]
     INNER_EPOCHS = min(epochs, 80)
     candidates   = make_candidates(window_size)
 
     # ── Inner selection ────────────────────────────────────────────────────
-    obs_cands = [c for c in candidates if c.feature_tier == "observable"]
-    est_cands = [c for c in candidates if c.feature_tier == "estimated"]
-    OBS_CAND = _inner_select("observable", obs_cands, train_trajs_obs, val_trajs_obs,
-                             device, INNER_SEEDS, INNER_EPOCHS)
-    EST_CAND = _inner_select("estimated",  est_cands, train_trajs_est, val_trajs_est,
-                             device, INNER_SEEDS, INNER_EPOCHS)
+    obs_cands  = [c for c in candidates if c.feature_tier == "observable"]
+    est_cands  = [c for c in candidates if c.feature_tier == "estimated"]
+    phys_cands = [Candidate(c.name.replace("obs","phys"), c.model,
+                            "physics_observable", c.window_size, c.hidden, c.dropout)
+                  for c in obs_cands]
+    OBS_CAND  = _inner_select("observable",         obs_cands,  train_trajs_obs,  val_trajs_obs,
+                              device, INNER_SEEDS, INNER_EPOCHS)
+    PHYS_CAND = _inner_select("physics_observable", phys_cands, train_trajs_phys, val_trajs_phys,
+                              device, INNER_SEEDS, INNER_EPOCHS)
+    EST_CAND  = _inner_select("estimated",          est_cands,  train_trajs_est,  val_trajs_est,
+                              device, INNER_SEEDS, INNER_EPOCHS)
 
-    dev_trajs_obs = train_trajs_obs + val_trajs_obs
-    dev_trajs_est = train_trajs_est + val_trajs_est
+    dev_trajs_obs  = train_trajs_obs  + val_trajs_obs
+    dev_trajs_phys = train_trajs_phys + val_trajs_phys
+    dev_trajs_est  = train_trajs_est  + val_trajs_est
 
     # ── Tier 1: observable (honest: no margin/rate in model) ──────────────
     obs_metrics, obs_baselines, obs_test_w, obs_truth, obs_seed_preds = \
         _eval_tier("OBSERVABLE TIER", OBS_CAND, dev_trajs_obs, test_trajs_obs,
+                   device, seeds, epochs)
+
+
+    # ── Tier 1: observable (raw T/Q/P only) ──────────────────────────────
+    obs_metrics, obs_baselines, obs_test_w, obs_truth, obs_seed_preds = \
+        _eval_tier("OBSERVABLE TIER", OBS_CAND, dev_trajs_obs, test_trajs_obs,
+                   device, seeds, epochs)
+
+    # ── Tier 1b: physics_observable (T/Q/P + depth_proxy + rate_proxy) ──
+    phys_metrics, phys_baselines, phys_test_w, phys_truth, phys_seed_preds = \
+        _eval_tier("PHYSICS-OBSERVABLE TIER", PHYS_CAND, dev_trajs_phys, test_trajs_phys,
                    device, seeds, epochs)
 
     # ── Tier 2: estimated (legitimate: depth+rate in X window) ───────────
@@ -395,22 +414,22 @@ def run_sota_validation(data_path, split_map, train_trajs_obs, val_trajs_obs, te
         _eval_tier("ESTIMATED TIER", EST_CAND, dev_trajs_est, test_trajs_est,
                    device, seeds, epochs)
 
-    # ── Forecast-origin (observable tier, per-trajectory life fraction) ──
-    print("\n=== Forecast-origin analysis (observable tier) ===", flush=True)
-    traj_map_obs = {t.manifest.trajectory_id: t for t in test_trajs_obs}
+    # ── Forecast-origin (physics_observable tier) ─────────────────────────
+    print("\n=== Forecast-origin analysis (physics_observable tier) ===", flush=True)
+    traj_map_phys = {t.manifest.trajectory_id: t for t in test_trajs_phys}
     origin_results = {}
     for origin in (0.2, 0.4, 0.6, 0.8):
-        mask_arr = np.zeros(len(obs_test_w), dtype=bool)
-        for i, (tid, t_ep) in enumerate(zip(obs_test_w.trajectory_ids,
-                                            obs_test_w.endpoint_time_s)):
-            traj = traj_map_obs.get(tid)
-            life = float(traj.time_s[-1]) if traj is not None else float(obs_test_w.endpoint_time_s.max())
+        mask_arr = np.zeros(len(phys_test_w), dtype=bool)
+        for i, (tid, t_ep) in enumerate(zip(phys_test_w.trajectory_ids,
+                                            phys_test_w.endpoint_time_s)):
+            traj = traj_map_phys.get(tid)
+            life = float(traj.time_s[-1]) if traj is not None else float(phys_test_w.endpoint_time_s.max())
             mask_arr[i] = float(t_ep) / max(life, 1.) <= origin
         n = int(mask_arr.sum())
         row = {"n": n}
         if n >= 3:
-            t_sub = obs_truth[mask_arr]
-            for name, pred in obs_baselines.items():
+            t_sub = phys_truth[mask_arr]
+            for name, pred in phys_baselines.items():
                 row[f"{name}_rmse"] = rmse(t_sub, pred[mask_arr])
         origin_results[f"@{int(origin*100)}pct"] = row
         if n >= 3:
@@ -419,8 +438,8 @@ def run_sota_validation(data_path, split_map, train_trajs_obs, val_trajs_obs, te
                   f"ridge={row.get('ridge_rmse',float('nan')):.3f}  "
                   f"gbdt={row.get('gbdt_rmse',float('nan')):.3f}", flush=True)
 
-    # ── Threshold sensitivity (observable tier, 3 seeds) ─────────────────
-    print("\n=== Threshold sensitivity (observable tier, 3 seeds) ===", flush=True)
+    # ── Threshold sensitivity (physics_observable tier, 3 seeds) ──────────
+    print("\n=== Threshold sensitivity (physics_observable tier, 3 seeds) ===", flush=True)
     thr_results = threshold_sensitivity(None, device, seeds, epochs,
                                         thresholds=(0.3, 0.4, 0.5, 0.6, 0.7),
                                         window_size=window_size)
@@ -431,18 +450,20 @@ def run_sota_validation(data_path, split_map, train_trajs_obs, val_trajs_obs, te
     print("="*65, flush=True)
     classical_keys = ["gbdt", "random_forest", "ridge", "huber"]
 
-    for tier_label, metrics in [("Observable", obs_metrics), ("Estimated", est_metrics)]:
+    for tier_label, metrics in [("Observable (raw T/Q/P)", obs_metrics),
+                                 ("Physics-Observable (+proxy depth/rate)", phys_metrics),
+                                 ("Estimated (+true depth/rate)", est_metrics)]:
         best_cls = min(classical_keys, key=lambda k: metrics[k]["rmse"])
         beat_all = all(metrics["neural_ensemble"]["rmse"] <= metrics[k]["rmse"]
                        for k in classical_keys)
         beat_curr = metrics["neural_ensemble"]["rmse"] <= metrics["current_rate"]["rmse"]
         print(f"\n  [{tier_label}]", flush=True)
-        print(f"    Neural RMSE     : {metrics['neural_ensemble']['rmse']:.4f}s", flush=True)
-        print(f"    Best classical  : {best_cls} = {metrics[best_cls]['rmse']:.4f}s", flush=True)
+        print(f"    Neural RMSE         : {metrics['neural_ensemble']['rmse']:.4f}s", flush=True)
+        print(f"    Best classical      : {best_cls} = {metrics[best_cls]['rmse']:.4f}s", flush=True)
         print(f"    Beats all classical : {'YES ✓' if beat_all else 'NO ✗'}", flush=True)
         print(f"    Beats current_rate  : {'YES ✓' if beat_curr else 'NO ✗'}", flush=True)
 
-    print("\n  [Threshold sensitivity — neural always best?]", flush=True)
+    print("\n  [Threshold sensitivity (physics_observable) — neural always best?]", flush=True)
     n_best = sum(1 for v in thr_results.values()
                  if "error" not in v and v["neural_rmse"] < min(v["ridge_rmse"], v["gbdt_rmse"]))
     n_total = sum(1 for v in thr_results.values() if "error" not in v)
@@ -450,34 +471,35 @@ def run_sota_validation(data_path, split_map, train_trajs_obs, val_trajs_obs, te
     print("="*65, flush=True)
 
     result = {
-        "schema": "nozzle_sota_validation_v2",
-        "bug_fix": "observable tier now passes current_rate_m_s=None, depth_margin_mm=None to model",
-        "protocol": "predefined_split; honest tier separation; 5-seed ensemble",
-        "n_test_obs": len(test_trajs_obs),
-        "n_test_est": len(test_trajs_est),
+        "schema": "nozzle_sota_validation_v3",
+        "protocol": "predefined_split; 3-tier honest separation; 5-seed ensemble",
+        "n_test": len(test_trajs_phys),
         "observable_tier": {
             "n_features": int(obs_test_w.X.shape[-1]),
             "metrics": obs_metrics,
             "per_seed_rmse": [float(rmse(obs_truth, p)) for p in obs_seed_preds],
+        },
+        "physics_observable_tier": {
+            "n_features": int(phys_test_w.X.shape[-1]),
+            "metrics": phys_metrics,
+            "per_seed_rmse": [float(rmse(phys_truth, p)) for p in phys_seed_preds],
         },
         "estimated_tier": {
             "n_features": int(est_test_w.X.shape[-1]),
             "metrics": est_metrics,
             "per_seed_rmse": [float(rmse(est_truth, p)) for p in est_seed_preds],
         },
-        "forecast_origin_obs": origin_results,
-        "threshold_sensitivity_obs": thr_results,
+        "forecast_origin_phys": origin_results,
+        "threshold_sensitivity_phys": thr_results,
         "seed_ids": list(seeds),
     }
     write_json(out_dir / "SOTA_VALIDATION_REPORT.json", result)
 
-    # combined predictions CSV (observable tier)
-    obs_ensemble = obs_baselines["neural_ensemble"]
-    with (out_dir / "predictions_obs.csv").open("w", newline="", encoding="utf-8") as f:
-        rows2 = [{"window_idx": i, "time_s": float(obs_test_w.endpoint_time_s[i]),
-                  "true_rul_s": float(obs_truth[i]) if np.isfinite(obs_truth[i]) else None,
-                  **{f"obs_{n}": float(p[i]) for n, p in obs_baselines.items()}}
-                 for i in range(len(obs_test_w))]
+    with (out_dir / "predictions_phys.csv").open("w", newline="", encoding="utf-8") as f:
+        rows2 = [{"window_idx": i, "time_s": float(phys_test_w.endpoint_time_s[i]),
+                  "true_rul_s": float(phys_truth[i]) if np.isfinite(phys_truth[i]) else None,
+                  **{n: float(p[i]) for n, p in phys_baselines.items()}}
+                 for i in range(len(phys_test_w))]
         if rows2:
             w2 = csv.DictWriter(f, fieldnames=list(rows2[0]))
             w2.writeheader(); w2.writerows(rows2)
@@ -513,20 +535,24 @@ def main():
         te = [t for t in all_t.values() if split_map.get(t.manifest.trajectory_id) == "test"]
         return tr, va, te
 
-    obs_all = load_nozzle_trajectories(data_path, feature_tier="observable")
-    est_all = load_nozzle_trajectories(data_path, feature_tier="estimated")
-    tr_obs, va_obs, te_obs = _split(obs_all)
-    tr_est, va_est, te_est = _split(est_all)
+    obs_all  = load_nozzle_trajectories(data_path, feature_tier="observable")
+    phys_all = load_nozzle_trajectories(data_path, feature_tier="physics_observable")
+    est_all  = load_nozzle_trajectories(data_path, feature_tier="estimated")
+    tr_obs,  va_obs,  te_obs  = _split(obs_all)
+    tr_phys, va_phys, te_phys = _split(phys_all)
+    tr_est,  va_est,  te_est  = _split(est_all)
     print(f"Window size: {ws}  Epochs: {epochs}  Seeds: {list(seeds)}", flush=True)
-    print(f"Observable tier: train={len(tr_obs)} val={len(va_obs)} test={len(te_obs)}", flush=True)
-    print(f"Estimated  tier: train={len(tr_est)} val={len(va_est)} test={len(te_est)}", flush=True)
+    print(f"Observable         : train={len(tr_obs)}  val={len(va_obs)}  test={len(te_obs)}", flush=True)
+    print(f"Physics-observable : train={len(tr_phys)} val={len(va_phys)} test={len(te_phys)}", flush=True)
+    print(f"Estimated          : train={len(tr_est)}  val={len(va_est)}  test={len(te_est)}", flush=True)
 
     out_dir = Path(args.output)
     t0 = time.time()
     run_sota_validation(
         data_path, split_map,
-        train_trajs_obs=tr_obs, val_trajs_obs=va_obs, test_trajs_obs=te_obs,
-        train_trajs_est=tr_est, val_trajs_est=va_est, test_trajs_est=te_est,
+        train_trajs_obs=tr_obs,   val_trajs_obs=va_obs,   test_trajs_obs=te_obs,
+        train_trajs_est=tr_est,   val_trajs_est=va_est,   test_trajs_est=te_est,
+        train_trajs_phys=tr_phys, val_trajs_phys=va_phys, test_trajs_phys=te_phys,
         out_dir=out_dir, device=device, seeds=seeds, epochs=epochs,
         window_size=ws,
     )
