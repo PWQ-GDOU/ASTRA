@@ -152,6 +152,13 @@ def _read_fd(data_root: str, fd: str):
     return tr, te, rul
 
 
+def _read_dataset_files(train_file: str, test_file: str, rul_file: str):
+    tr = pd.read_csv(train_file, sep=r"\s+", header=None).values
+    te = pd.read_csv(test_file, sep=r"\s+", header=None).values
+    rul = pd.read_csv(rul_file, sep=r"\s+", header=None).values.reshape(-1)
+    return tr, te, rul
+
+
 def _split_units(units: np.ndarray, val_ratio: float, split_seed: int):
     units = np.asarray(units, dtype=np.int64)
     rng = np.random.default_rng(split_seed)
@@ -186,8 +193,10 @@ def _make_windows(raw: np.ndarray, units: np.ndarray, indices: np.ndarray,
 
 def load_cmapss(data_root: str, fd: str, seq_len: int = 30,
                 rul_cap: float = 125.0, val_ratio: float = 0.2,
-                split_seed: int = 2026, sensor_mode: str = "all24") -> CMapssData:
-    tr, te, official_rul = _read_fd(data_root, fd)
+                split_seed: int = 2026, sensor_mode: str = "all24",
+                dataset_files: tuple[str, str, str] | None = None) -> CMapssData:
+    tr, te, official_rul = (_read_dataset_files(*dataset_files)
+                            if dataset_files else _read_fd(data_root, fd))
     indices = _feature_indices(sensor_mode)
     units = np.unique(tr[:, 0]).astype(np.int64)
     train_units, val_units = _split_units(units, val_ratio, split_seed)
@@ -551,10 +560,14 @@ def train_one(model: nn.Module, data: CMapssData, seed: int, device: str,
     return result
 
 
-def main():
+def create_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-root", default="data/processed")
     parser.add_argument("--fd", default="FD002")
+    parser.add_argument("--dataset-id")
+    parser.add_argument("--train-file")
+    parser.add_argument("--test-file")
+    parser.add_argument("--rul-file")
     parser.add_argument("--model",
                         choices=["v2", "multiscale", "condition", "ttsnet"],
                         default="v2")
@@ -564,6 +577,7 @@ def main():
                         default="all24")
     parser.add_argument("--seq-len", type=int, default=30)
     parser.add_argument("--rul-cap", type=float, default=125.0)
+    parser.add_argument("--val-ratio", type=float, default=0.2)
     parser.add_argument("--split-seed", type=int, default=2026)
     parser.add_argument("--seeds", default="42")
     parser.add_argument("--epochs", type=int, default=300)
@@ -573,11 +587,24 @@ def main():
     parser.add_argument("--over-weight", type=float, default=0.02)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--output", default="outputs/clean_benchmark")
-    args = parser.parse_args()
+    return parser
 
+
+def main():
+    args = create_parser().parse_args()
+    if not 0.0 < args.val_ratio < 1.0:
+        raise ValueError("--val-ratio must be between 0 and 1")
+
+    supplied = [args.train_file, args.test_file, args.rul_file]
+    if any(supplied) and not all(supplied):
+        raise ValueError("--train-file, --test-file and --rul-file must be provided together")
+    dataset_id = args.dataset_id or args.fd
+    safe_dataset_id = "".join(c if c.isalnum() or c in "-_" else "_" for c in dataset_id)
     data = load_cmapss(args.data_root, args.fd, args.seq_len, args.rul_cap,
-                       split_seed=args.split_seed, sensor_mode=args.sensor_mode)
-    print(f"FD={args.fd} model={args.model} sensors={args.sensor_mode}", flush=True)
+                       val_ratio=args.val_ratio, split_seed=args.split_seed,
+                       sensor_mode=args.sensor_mode,
+                       dataset_files=tuple(supplied) if all(supplied) else None)
+    print(f"dataset={dataset_id} model={args.model} sensors={args.sensor_mode}", flush=True)
     print(f"train={data.X_train.shape} val={data.X_val.shape} "
           f"test={data.X_test.shape} train_units={len(data.train_units)} "
           f"val_units={len(data.val_units)}", flush=True)
@@ -591,15 +618,16 @@ def main():
         result = train_one(model, data, seed, args.device, args.epochs,
                            args.batch_size, args.lr, args.over_weight,
                            args.patience)
-        result.update({"fd": args.fd, "model": args.model,
+        result.update({"dataset_id": dataset_id, "fd": args.fd, "model": args.model,
                        "sensor_mode": args.sensor_mode,
                        "seq_len": args.seq_len, "rul_cap": args.rul_cap,
+                       "val_ratio": args.val_ratio,
                        "split_seed": args.split_seed})
         all_results.append(result)
-        path = Path(args.output) / f"{args.fd}_{args.model}_{args.sensor_mode}_s{seed}.json"
+        path = Path(args.output) / f"{safe_dataset_id}_{args.model}_{args.sensor_mode}_s{seed}.json"
         path.write_text(json.dumps(result, ensure_ascii=False, indent=2))
         checkpoint_path = Path(args.output) / (
-            f"{args.fd}_{args.model}_{args.sensor_mode}_s{seed}.pt"
+            f"{safe_dataset_id}_{args.model}_{args.sensor_mode}_s{seed}.pt"
         )
         torch.save({
             "model": model.state_dict(),
@@ -611,9 +639,10 @@ def main():
             "train_units": data.train_units,
             "val_units": data.val_units,
             "config": {
-                "fd": args.fd, "model": args.model,
+                "dataset_id": dataset_id, "fd": args.fd, "model": args.model,
                 "sensor_mode": args.sensor_mode,
                 "seq_len": args.seq_len, "rul_cap": args.rul_cap,
+                "val_ratio": args.val_ratio,
                 "split_seed": args.split_seed, "seed": seed,
             },
         }, checkpoint_path)
@@ -636,7 +665,7 @@ def main():
             [r["test_score_cap"] for r in all_results]
         )),
     }
-    (Path(args.output) / f"{args.fd}_{args.model}_{args.sensor_mode}_summary.json").write_text(
+    (Path(args.output) / f"{safe_dataset_id}_{args.model}_{args.sensor_mode}_summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2))
 
 
