@@ -1,0 +1,74 @@
+{
+  "schema": "cross_component_transfer_v3",
+  "generated_at_utc": "2026-08-19T14:08:23Z",
+  "source": {
+    "name": "strict 200 multi-trajectory nozzle ablation",
+    "input": "health = 1 - normalized_depth, normalized per source trajectory",
+    "split": "trajectory train/validation/source-test",
+    "pretraining_selection": "source validation only; source test audit only"
+  },
+  "targets": {
+    "battery": {
+      "protocol": "strict14",
+      "event_observed_outer_folds": [
+        "B0005",
+        "B0006",
+        "B0018"
+      ],
+      "right_censored_diagnostic": "B0007",
+      "score_target": "raw remaining discharge cycles"
+    },
+    "rw_proxy": {
+      "protocol": "six-bearing outer LOO",
+      "target": "FEMTO mechanical degradation proxy, ordinal remaining measurements",
+      "rms_calibration": "fine-tuning training-prefix RMS only; no holdout or full-life min/max"
+    }
+  },
+  "model": {
+    "source_target_input_projection": "domain-specific and independently initialized",
+    "shared_component": "two-layer GRU degradation encoder",
+    "target_head": "independently initialized",
+    "main_transfer": "pretrained encoder, target projection, and head all fine-tuned",
+    "ablation": "pretrained frozen encoder",
+    "cycle_pos": "removed from main protocol"
+  },
+  "fairness": {
+    "arms": [
+      "transfer",
+      "scratch",
+      "frozen_encoder_ablation",
+      "ridge",
+      "time_trend"
+    ],
+    "neural_target_epoch_budget": 180,
+    "early_stopping": "same chronological validation for transfer, scratch, and frozen ablation",
+    "seeds": [
+      42,
+      123,
+      456,
+      2026,
+      3407
+    ],
+    "trial_selection": "SHA-256-derived explicit seed, not Python hash()"
+  },
+  "run": {
+    "smoke": false,
+    "source_epochs": 180,
+    "target_epochs": 180,
+    "seeds": [
+      42,
+      123,
+      456,
+      2026,
+      3407
+    ],
+    "trials_per_n": 3,
+    "early_frac": 0.2
+  },
+  "acceptance": {
+    "minimum_macro_rmse_improvement_pct": 5.0,
+    "majority_outer_folds_better_than_scratch": true,
+    "single_fold_only_is_not_positive_evidence": true,
+    "battery_and_rw_proxy_assessed_separately": true
+  }
+}

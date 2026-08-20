@@ -251,6 +251,27 @@ Physics-Observable tier 结论：Ridge/Huber 用代理特征后 RMSE 从28.99→
 - 对照：v1（未修复 RUL 头）Transfer=56.94 vs Scratch=12.60，完全失效；修复后恢复至竞争水平。
 - 入口：`scripts/exp_geo_to_nasa_transfer.py`；支持 `--synthetic` smoke test。
 
+## 核心跨领域迁移 v3（可审计协议）
+
+独立入口：`scripts/exp_cross_transfer_v3.py`。完整产物位于
+`outputs/cross_component_transfer_v3/`，正式汇总见 `FINAL_RESULTS_TABLE.md`。
+旧的 `cross_component_transfer_v2fix` 和更早的 few-shot 迁移数字保留为历史/diagnostic，
+不再作为 v3 的正向证据。
+
+| 链路 | N | Transfer RMSE | Scratch RMSE | 相对提升 | Outer-fold 胜出 | 判定 |
+|---|---:|---:|---:|---:|---:|---|
+| 喷嘴 → NASA strict14 电池 | 1 | 51.119 | 50.098 | -2.04% | 1/3 | diagnostic |
+| 喷嘴 → NASA strict14 电池 | 2 | 46.213 | 47.128 | +1.94% | 1/3 | diagnostic |
+| 喷嘴 → FEMTO 机械退化代理 | 1 | 883.687 | 988.699 | +10.62% | 5/6 | positive evidence |
+| 喷嘴 → FEMTO 机械退化代理 | 2 | 768.201 | 835.456 | +8.05% | 5/6 | positive evidence |
+| 喷嘴 → FEMTO 机械退化代理 | 3 | 1212.669 | 1193.792 | -1.58% | 2/6 | diagnostic |
+
+接收线是 macro RMSE 相对 scratch 至少改善 5%，且多数 outer folds 胜出。电池
+B0005/B0006/B0018 才进入精确 RMSE；B0007 是 right-censored 诊断，不计入
+macro。FEMTO 六轴承是机械退化代理，不是真实反作用轮遥测，因此不能表述为真实
+反作用轮验证。v3 运行完成 `78/78` cells、`0` failures，使用固定 seeds
+`42, 123, 456, 2026, 3407` 和每个 N 三个显式 trial。
+
 ## 主实验总表（竞赛四条线）
 
 统一入口：`scripts/exp_main_suite.py`（约5分钟，GPU2）。结果目录：`outputs/main_suite/`。
@@ -262,8 +283,8 @@ Physics-Observable tier 结论：Ridge/Huber 用代理特征后 RMSE 从28.99→
 | 目标域：NASA电池（rel80，80% SOH） | 嵌套电芯级 LOOCV；全4电芯event-observed | neural / Ridge macro RMSE | **19.73 / 23.24（neural +15.1%）** |
 | 目标域：反作用轮代理 | FEMTO轴承 LOO，振动特征 | 归一化 RMSE / 相对 RMSE | **0.331 / 0.661** |
 | 公开基准：C-MAPSS | 严格协议（见上表） | FD002 三seed集成 cap125 | **12.831** |
-| 迁移：喷嘴→电池 | few-shot 1/2 电池 | scratch → transfer RMSE | 35.2→**27.7** / 33.7→**28.9** |
-| 迁移：喷嘴→轴承代理 | few-shot 1/2 轴承 | scratch → transfer RMSE | 224.3→223.7 / 216.0→284.4 |
+| 历史迁移：喷嘴→电池 | 旧 few-shot 1/2 | scratch → transfer RMSE | 35.2→27.7 / 33.7→28.9（diagnostic） |
+| 历史迁移：喷嘴→轴承代理 | 旧 few-shot 1/2 | scratch → transfer RMSE | 224.3→223.7 / 216.0→284.4（diagnostic） |
 
 说明：
 - 电池优化仅改电池入口和电池输出目录，**未重训喷管/C-MAPSS/轴承**；喷管数字保持冻结。
@@ -279,6 +300,9 @@ Physics-Observable tier 结论：Ridge/Huber 用代理特征后 RMSE 从28.99→
 - 喷管未重训，数字冻结 2.501/2.674/3.819。
 - 轴承代理、迁移主实验数字见 `outputs/main_suite/`。
 - 历史 JSON：`outputs/main_suite/MAIN_REPORT.json`、`outputs/battery_opt_v3/BATTERY_OPT_V3_REPORT.json`、`outputs/battery_b0007_confirm/BATTERY_B0007_CONFIRM_REPORT.json`。clean strict14 使用 `scripts/exp_battery_strict.py` 的独立输出目录。
+- v3 的详细 raw RMSE、MAE、bias、normalized RMSE、每个 outer fold、数据哈希和
+  赛事评分边界见 `FINAL_RESULTS_TABLE.md`。仓库中没有可核验的官方赛事评分规则；
+  此前约 `79/100` 仍只是非官方估算，不是正式成绩。
 
 ## 反作用轮仿真域（新增，独立于 FEMTO proxy）
 

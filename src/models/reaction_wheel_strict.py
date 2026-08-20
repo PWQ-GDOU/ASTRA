@@ -86,6 +86,66 @@ class TinyTransformerRUL(nn.Module):
         return ReactionWheelOutput(self.head(z).squeeze(-1))
 
 
+class DeepMultiScaleRUL(nn.Module):
+    """Deeper multi-scale TCN with hidden=128 and three dilation levels."""
+    def __init__(self, n_features: int, hidden: int = 128, dropout: float = 0.1):
+        super().__init__()
+        branch = max(32, hidden // 4)
+        self.branch = branch
+        self.proj = nn.Conv1d(n_features, branch * 4, 1)
+        self.branches = nn.ModuleList([
+            nn.Sequential(
+                CausalBlock(branch, kernel, 1, dropout),
+                CausalBlock(branch, kernel, 2, dropout),
+                CausalBlock(branch, kernel, 4, dropout),
+            )
+            for kernel in (3, 5, 7, 9)
+        ])
+        self.norm = nn.LayerNorm(branch * 4)
+        self.head = nn.Sequential(
+            nn.Linear(branch * 4, hidden),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden, 64),
+            nn.GELU(),
+            nn.Linear(64, 1),
+        )
+
+    def forward(self, x: torch.Tensor) -> ReactionWheelOutput:
+        h = self.proj(x.transpose(1, 2))
+        outputs = []
+        for branch_x, block in zip(torch.split(h, self.branch, dim=1), self.branches):
+            outputs.append(block(branch_x))
+        z = self.norm(torch.cat(outputs, dim=1).transpose(1, 2)).mean(dim=1)
+        return ReactionWheelOutput(self.head(z).squeeze(-1))
+
+
+class LargeGRURUL(nn.Module):
+    """Two-layer GRU with hidden=128 and a larger MLP head."""
+    def __init__(self, n_features: int, hidden: int = 128, dropout: float = 0.1):
+        super().__init__()
+        self.encoder = nn.GRU(
+            n_features,
+            hidden,
+            num_layers=2,
+            batch_first=True,
+            dropout=dropout,
+            bidirectional=False,
+        )
+        self.head = nn.Sequential(
+            nn.Linear(hidden, hidden),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden, 64),
+            nn.GELU(),
+            nn.Linear(64, 1),
+        )
+
+    def forward(self, x: torch.Tensor) -> ReactionWheelOutput:
+        h, _ = self.encoder(x)
+        return ReactionWheelOutput(self.head(h[:, -1]).squeeze(-1))
+
+
 def build_reaction_wheel_model(name: str, n_features: int) -> nn.Module:
     key = name.lower()
     if key in {"gru", "lstm"}:
@@ -94,6 +154,10 @@ def build_reaction_wheel_model(name: str, n_features: int) -> nn.Module:
         return MultiScaleRUL(n_features)
     if key in {"transformer", "tiny_transformer"}:
         return TinyTransformerRUL(n_features)
+    if key in {"deep_ms", "deep_multiscale", "dms"}:
+        return DeepMultiScaleRUL(n_features)
+    if key in {"large_gru", "gru_large"}:
+        return LargeGRURUL(n_features)
     raise ValueError(f"Unknown reaction-wheel model: {name}")
 
 

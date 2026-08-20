@@ -1,0 +1,95 @@
+{
+  "schema": "reaction_wheel_sim_initial_config",
+  "archive_sha256": "b628deb89634cf8732cd96bb62d675b820aedb0aa337fd36082db53bfebca8fe",
+  "protocol": "tracks 1-3 train, track 4 validation, track 5 test; operational aligned-cycle features",
+  "feature_tier": "operational",
+  "seq_len": 20,
+  "scheduler_epoch_budget": 120,
+  "seed_ids": [
+    42,
+    123,
+    456,
+    2026,
+    3407
+  ],
+  "selection": {
+    "train_groups": [
+      "1",
+      "2",
+      "3"
+    ],
+    "validation_groups": [
+      "4"
+    ],
+    "selected": {
+      "name": "gru_operational_l20",
+      "model": "gru"
+    },
+    "fixed_epochs": 46,
+    "candidate_rows": [
+      {
+        "candidate": {
+          "name": "gru_operational_l20",
+          "model": "gru"
+        },
+        "validation_rmse": 6.153448581695557,
+        "validation_seed_rmse": [
+          4.617596626281738,
+          6.195516586303711,
+          6.9670538902282715,
+          6.685739040374756,
+          6.301336765289307
+        ],
+        "median_best_epoch": 46,
+        "n_train": 843,
+        "n_validation": 281,
+        "validation_endpoints": [
+          19,
+          299
+        ]
+      },
+      {
+        "candidate": {
+          "name": "ms_operational_l20",
+          "model": "ms"
+        },
+        "validation_rmse": 13.714436340332032,
+        "validation_seed_rmse": [
+          10.772438049316406,
+          10.509488105773926,
+          14.782161712646484,
+          22.645065307617188,
+          9.863028526306152
+        ],
+        "median_best_epoch": 15,
+        "n_train": 843,
+        "n_validation": 281,
+        "validation_endpoints": [
+          19,
+          299
+        ]
+      },
+      {
+        "candidate": {
+          "name": "transformer_operational_l20",
+          "model": "transformer"
+        },
+        "validation_rmse": 13.671414375305176,
+        "validation_seed_rmse": [
+          13.748559951782227,
+          11.32785415649414,
+          10.895902633666992,
+          21.757356643676758,
+          10.627398490905762
+        ],
+        "median_best_epoch": 22,
+        "n_train": 843,
+        "n_validation": 281,
+        "validation_endpoints": [
+          19,
+          299
+        ]
+      }
+    ]
+  }
+}

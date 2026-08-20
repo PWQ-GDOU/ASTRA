@@ -1,0 +1,9 @@
+{
+  "updated_at_utc": "2026-08-19T17:19:14Z",
+  "schema": "cross_component_transfer_v3",
+  "status": "completed",
+  "completed_cells": 78,
+  "total_cells": 78,
+  "smoke": false,
+  "report": "outputs/cross_component_transfer_v3/CROSS_TRANSFER_V3_REPORT.json"
+}

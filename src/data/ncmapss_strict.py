@@ -230,21 +230,22 @@ def load_ncmapss_h5(
         raise FileNotFoundError(path)
     splits: dict[str, list[NCMAPSSUnit]] = {}
     with h5py.File(path, "r") as f:
-        available_keys = list(f.keys())
         for split in ("dev", "test"):
             W_key = f"W_{split}"
             Xs_key = f"X_s_{split}"
             Xv_key = f"X_v_{split}"
-            T_key = f"T_{split}"
+            # A_{split}: [unit, cycle, Fc, hs]  — unit_id is column 0
+            # T_{split}: turbine/fan degradation modifiers — NOT unit info
+            A_key = f"A_{split}"
             Y_key = f"Y_{split}"
             if Xs_key not in f:
                 continue
             W = np.asarray(f[W_key], dtype=np.float64)
             X_s = np.asarray(f[Xs_key], dtype=np.float64)
             X_v = np.asarray(f[Xv_key], dtype=np.float64)
-            T = np.asarray(f[T_key], dtype=np.float64)
+            A = np.asarray(f[A_key], dtype=np.float64)
             Y = np.asarray(f[Y_key], dtype=np.float64).ravel()
-            unit_col = T[:, 0].astype(int)
+            unit_col = A[:, 0].astype(int)   # column 0 = unit id
             unique_units = sorted(set(unit_col.tolist()))
             units = []
             for uid in unique_units:

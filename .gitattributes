@@ -1,0 +1,3 @@
+data/processed/femto_bearing.zip filter=lfs diff=lfs merge=lfs -text
+data/processed/ncmapss/N-CMAPSS_full.zip filter=lfs diff=lfs merge=lfs -text
+data/raw/competition/reaction_wheel_comsol_degradation.zip filter=lfs diff=lfs merge=lfs -text

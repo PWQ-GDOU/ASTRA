@@ -1,0 +1,233 @@
+{
+  "schema": "cross_component_transfer_v1",
+  "sources": [
+    "GEO_battery",
+    "nozzle"
+  ],
+  "target": "FEMTO bearing (reaction-wheel proxy)",
+  "early_frac": 0.2,
+  "n_shots": [
+    1,
+    2,
+    3
+  ],
+  "n_trials": 2,
+  "seeds": [
+    42,
+    123,
+    456,
+    2026,
+    3407
+  ],
+  "results": {
+    "GEO_battery": {
+      "Bearing1_1": {
+        "1": {
+          "transfer_rmse": 847.6,
+          "scratch_rmse": 937.0,
+          "gain_pct": 9.5
+        },
+        "2": {
+          "transfer_rmse": 718.1,
+          "scratch_rmse": 1017.8,
+          "gain_pct": 29.4
+        },
+        "3": {
+          "transfer_rmse": 701.1,
+          "scratch_rmse": 970.4,
+          "gain_pct": 27.7
+        }
+      },
+      "Bearing1_2": {
+        "1": {
+          "transfer_rmse": 1634.2,
+          "scratch_rmse": 336.9,
+          "gain_pct": -385.1
+        },
+        "2": {
+          "transfer_rmse": 1915.8,
+          "scratch_rmse": 1578.6,
+          "gain_pct": -21.4
+        },
+        "3": {
+          "transfer_rmse": 1721.7,
+          "scratch_rmse": 1473.4,
+          "gain_pct": -16.9
+        }
+      },
+      "Bearing2_1": {
+        "1": {
+          "transfer_rmse": 339.2,
+          "scratch_rmse": 335.8,
+          "gain_pct": -1.0
+        },
+        "2": {
+          "transfer_rmse": 1985.4,
+          "scratch_rmse": 2053.8,
+          "gain_pct": 3.3
+        },
+        "3": {
+          "transfer_rmse": 1612.9,
+          "scratch_rmse": 1731.7,
+          "gain_pct": 6.9
+        }
+      },
+      "Bearing2_2": {
+        "1": {
+          "transfer_rmse": 1121.9,
+          "scratch_rmse": 752.5,
+          "gain_pct": -49.1
+        },
+        "2": {
+          "transfer_rmse": 896.7,
+          "scratch_rmse": 694.7,
+          "gain_pct": -29.1
+        },
+        "3": {
+          "transfer_rmse": 1938.2,
+          "scratch_rmse": 1967.6,
+          "gain_pct": 1.5
+        }
+      },
+      "Bearing3_1": {
+        "1": {
+          "transfer_rmse": 2007.9,
+          "scratch_rmse": 812.3,
+          "gain_pct": -147.2
+        },
+        "2": {
+          "transfer_rmse": 2068.5,
+          "scratch_rmse": 1701.4,
+          "gain_pct": -21.6
+        },
+        "3": {
+          "transfer_rmse": 1898.7,
+          "scratch_rmse": 1224.5,
+          "gain_pct": -55.1
+        }
+      },
+      "Bearing3_2": {
+        "1": {
+          "transfer_rmse": 1203.6,
+          "scratch_rmse": 1096.5,
+          "gain_pct": -9.8
+        },
+        "2": {
+          "transfer_rmse": 1611.8,
+          "scratch_rmse": 1679.4,
+          "gain_pct": 4.0
+        },
+        "3": {
+          "transfer_rmse": 520.3,
+          "scratch_rmse": 489.6,
+          "gain_pct": -6.3
+        }
+      }
+    },
+    "nozzle": {
+      "Bearing1_1": {
+        "1": {
+          "transfer_rmse": 1297.5,
+          "scratch_rmse": 1178.6,
+          "gain_pct": -10.1
+        },
+        "2": {
+          "transfer_rmse": 786.9,
+          "scratch_rmse": 909.6,
+          "gain_pct": 13.5
+        },
+        "3": {
+          "transfer_rmse": 831.5,
+          "scratch_rmse": 848.9,
+          "gain_pct": 2.1
+        }
+      },
+      "Bearing1_2": {
+        "1": {
+          "transfer_rmse": 1756.4,
+          "scratch_rmse": 249.3,
+          "gain_pct": -604.5
+        },
+        "2": {
+          "transfer_rmse": 1781.5,
+          "scratch_rmse": 1157.1,
+          "gain_pct": -54.0
+        },
+        "3": {
+          "transfer_rmse": 931.2,
+          "scratch_rmse": 1105.6,
+          "gain_pct": 15.8
+        }
+      },
+      "Bearing2_1": {
+        "1": {
+          "transfer_rmse": 1609.1,
+          "scratch_rmse": 334.8,
+          "gain_pct": -380.6
+        },
+        "2": {
+          "transfer_rmse": 1449.9,
+          "scratch_rmse": 1455.0,
+          "gain_pct": 0.4
+        },
+        "3": {
+          "transfer_rmse": 1955.0,
+          "scratch_rmse": 2022.8,
+          "gain_pct": 3.4
+        }
+      },
+      "Bearing2_2": {
+        "1": {
+          "transfer_rmse": 1391.8,
+          "scratch_rmse": 743.0,
+          "gain_pct": -87.3
+        },
+        "2": {
+          "transfer_rmse": 999.2,
+          "scratch_rmse": 672.0,
+          "gain_pct": -48.7
+        },
+        "3": {
+          "transfer_rmse": 1770.0,
+          "scratch_rmse": 1824.0,
+          "gain_pct": 3.0
+        }
+      },
+      "Bearing3_1": {
+        "1": {
+          "transfer_rmse": 1874.2,
+          "scratch_rmse": 802.8,
+          "gain_pct": -133.5
+        },
+        "2": {
+          "transfer_rmse": 1685.9,
+          "scratch_rmse": 1403.7,
+          "gain_pct": -20.1
+        },
+        "3": {
+          "transfer_rmse": 1454.3,
+          "scratch_rmse": 1535.2,
+          "gain_pct": 5.3
+        }
+      },
+      "Bearing3_2": {
+        "1": {
+          "transfer_rmse": 1468.7,
+          "scratch_rmse": 466.7,
+          "gain_pct": -214.7
+        },
+        "2": {
+          "transfer_rmse": 1121.6,
+          "scratch_rmse": 502.8,
+          "gain_pct": -123.1
+        },
+        "3": {
+          "transfer_rmse": 1253.1,
+          "scratch_rmse": 1033.2,
+          "gain_pct": -21.3
+        }
+      }
+    }
+  },
+  "nozzle_source_fix_note": "nozzle source re-run after fixing load_nozzle_source() to use src.data.nozzle_multitrajectory (200-trajectory strict loader) instead of English-substring column matching against the Chinese-column single-trajectory CSV, which always failed and silently skipped nozzle. GEO_battery results below are unchanged, carried over from the prior run."
+}

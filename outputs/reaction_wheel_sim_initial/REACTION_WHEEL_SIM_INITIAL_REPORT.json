@@ -1,0 +1,2119 @@
+{
+  "schema": "reaction_wheel_sim_initial_report",
+  "domain": "comsol_reaction_wheel_simulation",
+  "protocol": "tracks 1-3 train, track 4 validation, track 5 test; operational aligned-cycle features",
+  "label": "physical remaining-life cycles from supplied COMSOL aligned table",
+  "feature_tier": "operational",
+  "seq_len": 20,
+  "scheduler_epoch_budget": 120,
+  "train_groups": [
+    "1",
+    "2",
+    "3",
+    "4"
+  ],
+  "test_groups": [
+    "5"
+  ],
+  "candidate_selection": {
+    "train_groups": [
+      "1",
+      "2",
+      "3"
+    ],
+    "validation_groups": [
+      "4"
+    ],
+    "selected": {
+      "name": "gru_operational_l20",
+      "model": "gru"
+    },
+    "fixed_epochs": 46,
+    "candidate_rows": [
+      {
+        "candidate": {
+          "name": "gru_operational_l20",
+          "model": "gru"
+        },
+        "validation_rmse": 6.153448581695557,
+        "validation_seed_rmse": [
+          4.617596626281738,
+          6.195516586303711,
+          6.9670538902282715,
+          6.685739040374756,
+          6.301336765289307
+        ],
+        "median_best_epoch": 46,
+        "n_train": 843,
+        "n_validation": 281,
+        "validation_endpoints": [
+          19,
+          299
+        ]
+      },
+      {
+        "candidate": {
+          "name": "ms_operational_l20",
+          "model": "ms"
+        },
+        "validation_rmse": 13.714436340332032,
+        "validation_seed_rmse": [
+          10.772438049316406,
+          10.509488105773926,
+          14.782161712646484,
+          22.645065307617188,
+          9.863028526306152
+        ],
+        "median_best_epoch": 15,
+        "n_train": 843,
+        "n_validation": 281,
+        "validation_endpoints": [
+          19,
+          299
+        ]
+      },
+      {
+        "candidate": {
+          "name": "transformer_operational_l20",
+          "model": "transformer"
+        },
+        "validation_rmse": 13.671414375305176,
+        "validation_seed_rmse": [
+          13.748559951782227,
+          11.32785415649414,
+          10.895902633666992,
+          21.757356643676758,
+          10.627398490905762
+        ],
+        "median_best_epoch": 22,
+        "n_train": 843,
+        "n_validation": 281,
+        "validation_endpoints": [
+          19,
+          299
+        ]
+      }
+    ]
+  },
+  "selected_candidate": {
+    "name": "gru_operational_l20",
+    "model": "gru"
+  },
+  "selected_epochs": 46,
+  "target_scale_train_cycles": 271.0,
+  "ridge_alpha_selected_on": "tracks 1-3 train / track 4 validation",
+  "ridge_alpha": 0.001,
+  "ridge_validation_rmse": 3.7536377906799316,
+  "seed_ids": [
+    42,
+    123,
+    456,
+    2026,
+    3407
+  ],
+  "metrics": [
+    {
+      "name": "selected_neural",
+      "scope": "all_cycles",
+      "rmse": 8.16018009185791,
+      "mae": 6.670536994934082,
+      "bias": 5.901482105255127,
+      "n": 281
+    },
+    {
+      "name": "selected_neural",
+      "scope": "pre_failure",
+      "rmse": 8.81477165222168,
+      "mae": 7.375148296356201,
+      "bias": 7.262603759765625,
+      "n": 231
+    },
+    {
+      "name": "ridge",
+      "scope": "all_cycles",
+      "rmse": 7.107964038848877,
+      "mae": 5.31132698059082,
+      "bias": 4.887531757354736,
+      "n": 281
+    },
+    {
+      "name": "ridge",
+      "scope": "pre_failure",
+      "rmse": 7.82446813583374,
+      "mae": 6.3774261474609375,
+      "bias": 5.8618998527526855,
+      "n": 231
+    }
+  ],
+  "test_rows": [
+    {
+      "group": "5",
+      "endpoint": 19,
+      "true_rul": 231.0,
+      "selected_neural": 227.3213348388672,
+      "ridge": 245.3319549560547
+    },
+    {
+      "group": "5",
+      "endpoint": 20,
+      "true_rul": 230.0,
+      "selected_neural": 227.34017944335938,
+      "ridge": 244.0575714111328
+    },
+    {
+      "group": "5",
+      "endpoint": 21,
+      "true_rul": 229.0,
+      "selected_neural": 226.7953643798828,
+      "ridge": 242.97198486328125
+    },
+    {
+      "group": "5",
+      "endpoint": 22,
+      "true_rul": 228.0,
+      "selected_neural": 225.9304962158203,
+      "ridge": 242.1522979736328
+    },
+    {
+      "group": "5",
+      "endpoint": 23,
+      "true_rul": 227.0,
+      "selected_neural": 226.4324493408203,
+      "ridge": 241.0385284423828
+    },
+    {
+      "group": "5",
+      "endpoint": 24,
+      "true_rul": 226.0,
+      "selected_neural": 225.4069366455078,
+      "ridge": 239.98971557617188
+    },
+    {
+      "group": "5",
+      "endpoint": 25,
+      "true_rul": 225.0,
+      "selected_neural": 224.4560089111328,
+      "ridge": 238.71641540527344
+    },
+    {
+      "group": "5",
+      "endpoint": 26,
+      "true_rul": 224.0,
+      "selected_neural": 223.3183135986328,
+      "ridge": 237.79901123046875
+    },
+    {
+      "group": "5",
+      "endpoint": 27,
+      "true_rul": 223.0,
+      "selected_neural": 223.96566772460938,
+      "ridge": 237.08984375
+    },
+    {
+      "group": "5",
+      "endpoint": 28,
+      "true_rul": 222.0,
+      "selected_neural": 224.4203338623047,
+      "ridge": 235.7086944580078
+    },
+    {
+      "group": "5",
+      "endpoint": 29,
+      "true_rul": 221.0,
+      "selected_neural": 223.7478485107422,
+      "ridge": 234.816650390625
+    },
+    {
+      "group": "5",
+      "endpoint": 30,
+      "true_rul": 220.0,
+      "selected_neural": 222.38107299804688,
+      "ridge": 233.68865966796875
+    },
+    {
+      "group": "5",
+      "endpoint": 31,
+      "true_rul": 219.0,
+      "selected_neural": 222.5827178955078,
+      "ridge": 232.63644409179688
+    },
+    {
+      "group": "5",
+      "endpoint": 32,
+      "true_rul": 218.0,
+      "selected_neural": 222.1771697998047,
+      "ridge": 231.66651916503906
+    },
+    {
+      "group": "5",
+      "endpoint": 33,
+      "true_rul": 217.0,
+      "selected_neural": 221.3802490234375,
+      "ridge": 230.5845184326172
+    },
+    {
+      "group": "5",
+      "endpoint": 34,
+      "true_rul": 216.0,
+      "selected_neural": 221.47268676757812,
+      "ridge": 229.48423767089844
+    },
+    {
+      "group": "5",
+      "endpoint": 35,
+      "true_rul": 215.0,
+      "selected_neural": 218.69845581054688,
+      "ridge": 228.19268798828125
+    },
+    {
+      "group": "5",
+      "endpoint": 36,
+      "true_rul": 214.0,
+      "selected_neural": 217.29275512695312,
+      "ridge": 227.28172302246094
+    },
+    {
+      "group": "5",
+      "endpoint": 37,
+      "true_rul": 213.0,
+      "selected_neural": 216.64620971679688,
+      "ridge": 226.5648193359375
+    },
+    {
+      "group": "5",
+      "endpoint": 38,
+      "true_rul": 212.0,
+      "selected_neural": 216.71353149414062,
+      "ridge": 225.34703063964844
+    },
+    {
+      "group": "5",
+      "endpoint": 39,
+      "true_rul": 211.0,
+      "selected_neural": 215.1282196044922,
+      "ridge": 223.9588165283203
+    },
+    {
+      "group": "5",
+      "endpoint": 40,
+      "true_rul": 210.0,
+      "selected_neural": 215.15707397460938,
+      "ridge": 223.1916046142578
+    },
+    {
+      "group": "5",
+      "endpoint": 41,
+      "true_rul": 209.0,
+      "selected_neural": 215.4454803466797,
+      "ridge": 222.25860595703125
+    },
+    {
+      "group": "5",
+      "endpoint": 42,
+      "true_rul": 208.0,
+      "selected_neural": 215.37680053710938,
+      "ridge": 220.8597412109375
+    },
+    {
+      "group": "5",
+      "endpoint": 43,
+      "true_rul": 207.0,
+      "selected_neural": 214.39712524414062,
+      "ridge": 220.0159454345703
+    },
+    {
+      "group": "5",
+      "endpoint": 44,
+      "true_rul": 206.0,
+      "selected_neural": 214.07553100585938,
+      "ridge": 218.81263732910156
+    },
+    {
+      "group": "5",
+      "endpoint": 45,
+      "true_rul": 205.0,
+      "selected_neural": 213.17318725585938,
+      "ridge": 217.92710876464844
+    },
+    {
+      "group": "5",
+      "endpoint": 46,
+      "true_rul": 204.0,
+      "selected_neural": 211.55984497070312,
+      "ridge": 216.3951416015625
+    },
+    {
+      "group": "5",
+      "endpoint": 47,
+      "true_rul": 203.0,
+      "selected_neural": 212.3883056640625,
+      "ridge": 215.62579345703125
+    },
+    {
+      "group": "5",
+      "endpoint": 48,
+      "true_rul": 202.0,
+      "selected_neural": 212.2169189453125,
+      "ridge": 214.71340942382812
+    },
+    {
+      "group": "5",
+      "endpoint": 49,
+      "true_rul": 201.0,
+      "selected_neural": 209.93472290039062,
+      "ridge": 213.46592712402344
+    },
+    {
+      "group": "5",
+      "endpoint": 50,
+      "true_rul": 200.0,
+      "selected_neural": 208.83023071289062,
+      "ridge": 212.42727661132812
+    },
+    {
+      "group": "5",
+      "endpoint": 51,
+      "true_rul": 199.0,
+      "selected_neural": 209.1821746826172,
+      "ridge": 211.55197143554688
+    },
+    {
+      "group": "5",
+      "endpoint": 52,
+      "true_rul": 198.0,
+      "selected_neural": 207.1070556640625,
+      "ridge": 210.15557861328125
+    },
+    {
+      "group": "5",
+      "endpoint": 53,
+      "true_rul": 197.0,
+      "selected_neural": 206.3649139404297,
+      "ridge": 209.37692260742188
+    },
+    {
+      "group": "5",
+      "endpoint": 54,
+      "true_rul": 196.0,
+      "selected_neural": 207.5617218017578,
+      "ridge": 208.31600952148438
+    },
+    {
+      "group": "5",
+      "endpoint": 55,
+      "true_rul": 195.0,
+      "selected_neural": 207.29833984375,
+      "ridge": 207.3529052734375
+    },
+    {
+      "group": "5",
+      "endpoint": 56,
+      "true_rul": 194.0,
+      "selected_neural": 207.1097869873047,
+      "ridge": 206.10093688964844
+    },
+    {
+      "group": "5",
+      "endpoint": 57,
+      "true_rul": 193.0,
+      "selected_neural": 205.84921264648438,
+      "ridge": 205.0109100341797
+    },
+    {
+      "group": "5",
+      "endpoint": 58,
+      "true_rul": 192.0,
+      "selected_neural": 204.95852661132812,
+      "ridge": 203.92381286621094
+    },
+    {
+      "group": "5",
+      "endpoint": 59,
+      "true_rul": 191.0,
+      "selected_neural": 201.88705444335938,
+      "ridge": 202.71412658691406
+    },
+    {
+      "group": "5",
+      "endpoint": 60,
+      "true_rul": 190.0,
+      "selected_neural": 201.7683563232422,
+      "ridge": 202.03297424316406
+    },
+    {
+      "group": "5",
+      "endpoint": 61,
+      "true_rul": 189.0,
+      "selected_neural": 201.35244750976562,
+      "ridge": 200.95620727539062
+    },
+    {
+      "group": "5",
+      "endpoint": 62,
+      "true_rul": 188.0,
+      "selected_neural": 202.4832000732422,
+      "ridge": 199.88690185546875
+    },
+    {
+      "group": "5",
+      "endpoint": 63,
+      "true_rul": 187.0,
+      "selected_neural": 201.62985229492188,
+      "ridge": 198.71083068847656
+    },
+    {
+      "group": "5",
+      "endpoint": 64,
+      "true_rul": 186.0,
+      "selected_neural": 200.4022674560547,
+      "ridge": 197.53512573242188
+    },
+    {
+      "group": "5",
+      "endpoint": 65,
+      "true_rul": 185.0,
+      "selected_neural": 199.3998565673828,
+      "ridge": 196.52456665039062
+    },
+    {
+      "group": "5",
+      "endpoint": 66,
+      "true_rul": 184.0,
+      "selected_neural": 198.58535766601562,
+      "ridge": 195.54576110839844
+    },
+    {
+      "group": "5",
+      "endpoint": 67,
+      "true_rul": 183.0,
+      "selected_neural": 195.42376708984375,
+      "ridge": 194.37864685058594
+    },
+    {
+      "group": "5",
+      "endpoint": 68,
+      "true_rul": 182.0,
+      "selected_neural": 193.9570770263672,
+      "ridge": 193.40765380859375
+    },
+    {
+      "group": "5",
+      "endpoint": 69,
+      "true_rul": 181.0,
+      "selected_neural": 195.21873474121094,
+      "ridge": 192.18521118164062
+    },
+    {
+      "group": "5",
+      "endpoint": 70,
+      "true_rul": 180.0,
+      "selected_neural": 193.60189819335938,
+      "ridge": 191.0020294189453
+    },
+    {
+      "group": "5",
+      "endpoint": 71,
+      "true_rul": 179.0,
+      "selected_neural": 194.92303466796875,
+      "ridge": 190.35028076171875
+    },
+    {
+      "group": "5",
+      "endpoint": 72,
+      "true_rul": 178.0,
+      "selected_neural": 193.86053466796875,
+      "ridge": 188.83604431152344
+    },
+    {
+      "group": "5",
+      "endpoint": 73,
+      "true_rul": 177.0,
+      "selected_neural": 193.39501953125,
+      "ridge": 188.07138061523438
+    },
+    {
+      "group": "5",
+      "endpoint": 74,
+      "true_rul": 176.0,
+      "selected_neural": 193.3876190185547,
+      "ridge": 186.95765686035156
+    },
+    {
+      "group": "5",
+      "endpoint": 75,
+      "true_rul": 175.0,
+      "selected_neural": 190.08700561523438,
+      "ridge": 185.4715576171875
+    },
+    {
+      "group": "5",
+      "endpoint": 76,
+      "true_rul": 174.0,
+      "selected_neural": 189.62498474121094,
+      "ridge": 184.7962646484375
+    },
+    {
+      "group": "5",
+      "endpoint": 77,
+      "true_rul": 173.0,
+      "selected_neural": 189.97174072265625,
+      "ridge": 183.70321655273438
+    },
+    {
+      "group": "5",
+      "endpoint": 78,
+      "true_rul": 172.0,
+      "selected_neural": 187.5459442138672,
+      "ridge": 182.69676208496094
+    },
+    {
+      "group": "5",
+      "endpoint": 79,
+      "true_rul": 171.0,
+      "selected_neural": 186.75950622558594,
+      "ridge": 181.64495849609375
+    },
+    {
+      "group": "5",
+      "endpoint": 80,
+      "true_rul": 170.0,
+      "selected_neural": 185.0758056640625,
+      "ridge": 180.13023376464844
+    },
+    {
+      "group": "5",
+      "endpoint": 81,
+      "true_rul": 169.0,
+      "selected_neural": 184.18948364257812,
+      "ridge": 179.39341735839844
+    },
+    {
+      "group": "5",
+      "endpoint": 82,
+      "true_rul": 168.0,
+      "selected_neural": 184.39102172851562,
+      "ridge": 178.43699645996094
+    },
+    {
+      "group": "5",
+      "endpoint": 83,
+      "true_rul": 167.0,
+      "selected_neural": 183.4541778564453,
+      "ridge": 176.8729705810547
+    },
+    {
+      "group": "5",
+      "endpoint": 84,
+      "true_rul": 166.0,
+      "selected_neural": 182.13990783691406,
+      "ridge": 176.02687072753906
+    },
+    {
+      "group": "5",
+      "endpoint": 85,
+      "true_rul": 165.0,
+      "selected_neural": 179.86778259277344,
+      "ridge": 174.83338928222656
+    },
+    {
+      "group": "5",
+      "endpoint": 86,
+      "true_rul": 164.0,
+      "selected_neural": 177.65048217773438,
+      "ridge": 173.76583862304688
+    },
+    {
+      "group": "5",
+      "endpoint": 87,
+      "true_rul": 163.0,
+      "selected_neural": 175.58407592773438,
+      "ridge": 172.69068908691406
+    },
+    {
+      "group": "5",
+      "endpoint": 88,
+      "true_rul": 162.0,
+      "selected_neural": 175.37069702148438,
+      "ridge": 171.71353149414062
+    },
+    {
+      "group": "5",
+      "endpoint": 89,
+      "true_rul": 161.0,
+      "selected_neural": 174.03421020507812,
+      "ridge": 170.79563903808594
+    },
+    {
+      "group": "5",
+      "endpoint": 90,
+      "true_rul": 160.0,
+      "selected_neural": 174.0255126953125,
+      "ridge": 169.70758056640625
+    },
+    {
+      "group": "5",
+      "endpoint": 91,
+      "true_rul": 159.0,
+      "selected_neural": 174.87767028808594,
+      "ridge": 168.73147583007812
+    },
+    {
+      "group": "5",
+      "endpoint": 92,
+      "true_rul": 158.0,
+      "selected_neural": 174.7481231689453,
+      "ridge": 167.2688751220703
+    },
+    {
+      "group": "5",
+      "endpoint": 93,
+      "true_rul": 157.0,
+      "selected_neural": 173.05201721191406,
+      "ridge": 166.4567413330078
+    },
+    {
+      "group": "5",
+      "endpoint": 94,
+      "true_rul": 156.0,
+      "selected_neural": 173.3482666015625,
+      "ridge": 165.36471557617188
+    },
+    {
+      "group": "5",
+      "endpoint": 95,
+      "true_rul": 155.0,
+      "selected_neural": 171.59524536132812,
+      "ridge": 164.25283813476562
+    },
+    {
+      "group": "5",
+      "endpoint": 96,
+      "true_rul": 154.0,
+      "selected_neural": 169.99032592773438,
+      "ridge": 163.06690979003906
+    },
+    {
+      "group": "5",
+      "endpoint": 97,
+      "true_rul": 153.0,
+      "selected_neural": 167.9169158935547,
+      "ridge": 161.9225616455078
+    },
+    {
+      "group": "5",
+      "endpoint": 98,
+      "true_rul": 152.0,
+      "selected_neural": 166.78207397460938,
+      "ridge": 160.76174926757812
+    },
+    {
+      "group": "5",
+      "endpoint": 99,
+      "true_rul": 151.0,
+      "selected_neural": 165.31402587890625,
+      "ridge": 159.875732421875
+    },
+    {
+      "group": "5",
+      "endpoint": 100,
+      "true_rul": 150.0,
+      "selected_neural": 164.3854217529297,
+      "ridge": 158.9752960205078
+    },
+    {
+      "group": "5",
+      "endpoint": 101,
+      "true_rul": 149.0,
+      "selected_neural": 165.03323364257812,
+      "ridge": 157.8525390625
+    },
+    {
+      "group": "5",
+      "endpoint": 102,
+      "true_rul": 148.0,
+      "selected_neural": 161.98870849609375,
+      "ridge": 156.6371307373047
+    },
+    {
+      "group": "5",
+      "endpoint": 103,
+      "true_rul": 147.0,
+      "selected_neural": 159.989990234375,
+      "ridge": 155.4931182861328
+    },
+    {
+      "group": "5",
+      "endpoint": 104,
+      "true_rul": 146.0,
+      "selected_neural": 158.34356689453125,
+      "ridge": 154.3759307861328
+    },
+    {
+      "group": "5",
+      "endpoint": 105,
+      "true_rul": 145.0,
+      "selected_neural": 157.65896606445312,
+      "ridge": 153.17666625976562
+    },
+    {
+      "group": "5",
+      "endpoint": 106,
+      "true_rul": 144.0,
+      "selected_neural": 156.7412567138672,
+      "ridge": 152.4513702392578
+    },
+    {
+      "group": "5",
+      "endpoint": 107,
+      "true_rul": 143.0,
+      "selected_neural": 155.47804260253906,
+      "ridge": 150.79620361328125
+    },
+    {
+      "group": "5",
+      "endpoint": 108,
+      "true_rul": 142.0,
+      "selected_neural": 154.5613555908203,
+      "ridge": 149.67352294921875
+    },
+    {
+      "group": "5",
+      "endpoint": 109,
+      "true_rul": 141.0,
+      "selected_neural": 152.45480346679688,
+      "ridge": 148.8822784423828
+    },
+    {
+      "group": "5",
+      "endpoint": 110,
+      "true_rul": 140.0,
+      "selected_neural": 153.05673217773438,
+      "ridge": 147.8385772705078
+    },
+    {
+      "group": "5",
+      "endpoint": 111,
+      "true_rul": 139.0,
+      "selected_neural": 152.76954650878906,
+      "ridge": 146.6897735595703
+    },
+    {
+      "group": "5",
+      "endpoint": 112,
+      "true_rul": 138.0,
+      "selected_neural": 152.43417358398438,
+      "ridge": 145.6868896484375
+    },
+    {
+      "group": "5",
+      "endpoint": 113,
+      "true_rul": 137.0,
+      "selected_neural": 152.5312042236328,
+      "ridge": 144.72279357910156
+    },
+    {
+      "group": "5",
+      "endpoint": 114,
+      "true_rul": 136.0,
+      "selected_neural": 150.20529174804688,
+      "ridge": 143.20465087890625
+    },
+    {
+      "group": "5",
+      "endpoint": 115,
+      "true_rul": 135.0,
+      "selected_neural": 147.7913360595703,
+      "ridge": 142.34022521972656
+    },
+    {
+      "group": "5",
+      "endpoint": 116,
+      "true_rul": 134.0,
+      "selected_neural": 144.97787475585938,
+      "ridge": 141.2865753173828
+    },
+    {
+      "group": "5",
+      "endpoint": 117,
+      "true_rul": 133.0,
+      "selected_neural": 143.3787841796875,
+      "ridge": 139.87625122070312
+    },
+    {
+      "group": "5",
+      "endpoint": 118,
+      "true_rul": 132.0,
+      "selected_neural": 141.90005493164062,
+      "ridge": 139.00393676757812
+    },
+    {
+      "group": "5",
+      "endpoint": 119,
+      "true_rul": 131.0,
+      "selected_neural": 141.9607696533203,
+      "ridge": 137.92684936523438
+    },
+    {
+      "group": "5",
+      "endpoint": 120,
+      "true_rul": 130.0,
+      "selected_neural": 139.57351684570312,
+      "ridge": 136.73944091796875
+    },
+    {
+      "group": "5",
+      "endpoint": 121,
+      "true_rul": 129.0,
+      "selected_neural": 138.67076110839844,
+      "ridge": 135.87677001953125
+    },
+    {
+      "group": "5",
+      "endpoint": 122,
+      "true_rul": 128.0,
+      "selected_neural": 138.62879943847656,
+      "ridge": 134.7809600830078
+    },
+    {
+      "group": "5",
+      "endpoint": 123,
+      "true_rul": 127.0,
+      "selected_neural": 139.73207092285156,
+      "ridge": 133.59007263183594
+    },
+    {
+      "group": "5",
+      "endpoint": 124,
+      "true_rul": 126.0,
+      "selected_neural": 136.57730102539062,
+      "ridge": 132.3969268798828
+    },
+    {
+      "group": "5",
+      "endpoint": 125,
+      "true_rul": 125.0,
+      "selected_neural": 136.24978637695312,
+      "ridge": 131.379638671875
+    },
+    {
+      "group": "5",
+      "endpoint": 126,
+      "true_rul": 124.0,
+      "selected_neural": 135.46871948242188,
+      "ridge": 130.25201416015625
+    },
+    {
+      "group": "5",
+      "endpoint": 127,
+      "true_rul": 123.0,
+      "selected_neural": 132.72442626953125,
+      "ridge": 129.24099731445312
+    },
+    {
+      "group": "5",
+      "endpoint": 128,
+      "true_rul": 122.0,
+      "selected_neural": 131.64785766601562,
+      "ridge": 128.01034545898438
+    },
+    {
+      "group": "5",
+      "endpoint": 129,
+      "true_rul": 121.0,
+      "selected_neural": 129.9749755859375,
+      "ridge": 127.12296295166016
+    },
+    {
+      "group": "5",
+      "endpoint": 130,
+      "true_rul": 120.0,
+      "selected_neural": 127.7159423828125,
+      "ridge": 126.03363037109375
+    },
+    {
+      "group": "5",
+      "endpoint": 131,
+      "true_rul": 119.0,
+      "selected_neural": 128.12759399414062,
+      "ridge": 124.67540740966797
+    },
+    {
+      "group": "5",
+      "endpoint": 132,
+      "true_rul": 118.0,
+      "selected_neural": 125.60261535644531,
+      "ridge": 123.1307144165039
+    },
+    {
+      "group": "5",
+      "endpoint": 133,
+      "true_rul": 117.0,
+      "selected_neural": 123.45347595214844,
+      "ridge": 122.33810424804688
+    },
+    {
+      "group": "5",
+      "endpoint": 134,
+      "true_rul": 116.0,
+      "selected_neural": 121.92491149902344,
+      "ridge": 121.42662811279297
+    },
+    {
+      "group": "5",
+      "endpoint": 135,
+      "true_rul": 115.0,
+      "selected_neural": 121.74327087402344,
+      "ridge": 120.2087173461914
+    },
+    {
+      "group": "5",
+      "endpoint": 136,
+      "true_rul": 114.0,
+      "selected_neural": 120.59706115722656,
+      "ridge": 118.96867370605469
+    },
+    {
+      "group": "5",
+      "endpoint": 137,
+      "true_rul": 113.0,
+      "selected_neural": 118.97563171386719,
+      "ridge": 117.8263168334961
+    },
+    {
+      "group": "5",
+      "endpoint": 138,
+      "true_rul": 112.0,
+      "selected_neural": 116.7055892944336,
+      "ridge": 116.56554412841797
+    },
+    {
+      "group": "5",
+      "endpoint": 139,
+      "true_rul": 111.0,
+      "selected_neural": 116.36319732666016,
+      "ridge": 115.87808990478516
+    },
+    {
+      "group": "5",
+      "endpoint": 140,
+      "true_rul": 110.0,
+      "selected_neural": 114.1661605834961,
+      "ridge": 114.47645568847656
+    },
+    {
+      "group": "5",
+      "endpoint": 141,
+      "true_rul": 109.0,
+      "selected_neural": 114.56922912597656,
+      "ridge": 113.8583984375
+    },
+    {
+      "group": "5",
+      "endpoint": 142,
+      "true_rul": 108.0,
+      "selected_neural": 114.64588928222656,
+      "ridge": 112.59011840820312
+    },
+    {
+      "group": "5",
+      "endpoint": 143,
+      "true_rul": 107.0,
+      "selected_neural": 110.8425521850586,
+      "ridge": 110.91204071044922
+    },
+    {
+      "group": "5",
+      "endpoint": 144,
+      "true_rul": 106.0,
+      "selected_neural": 109.8505630493164,
+      "ridge": 110.48627471923828
+    },
+    {
+      "group": "5",
+      "endpoint": 145,
+      "true_rul": 105.0,
+      "selected_neural": 109.43251037597656,
+      "ridge": 109.50415802001953
+    },
+    {
+      "group": "5",
+      "endpoint": 146,
+      "true_rul": 104.0,
+      "selected_neural": 109.00115966796875,
+      "ridge": 108.0287857055664
+    },
+    {
+      "group": "5",
+      "endpoint": 147,
+      "true_rul": 103.0,
+      "selected_neural": 108.53645324707031,
+      "ridge": 107.38837432861328
+    },
+    {
+      "group": "5",
+      "endpoint": 148,
+      "true_rul": 102.0,
+      "selected_neural": 108.2531509399414,
+      "ridge": 106.3191909790039
+    },
+    {
+      "group": "5",
+      "endpoint": 149,
+      "true_rul": 101.0,
+      "selected_neural": 107.71257019042969,
+      "ridge": 105.10477447509766
+    },
+    {
+      "group": "5",
+      "endpoint": 150,
+      "true_rul": 100.0,
+      "selected_neural": 106.7068862915039,
+      "ridge": 104.19377899169922
+    },
+    {
+      "group": "5",
+      "endpoint": 151,
+      "true_rul": 99.0,
+      "selected_neural": 105.37672424316406,
+      "ridge": 102.95356750488281
+    },
+    {
+      "group": "5",
+      "endpoint": 152,
+      "true_rul": 98.0,
+      "selected_neural": 103.3728256225586,
+      "ridge": 101.87446594238281
+    },
+    {
+      "group": "5",
+      "endpoint": 153,
+      "true_rul": 97.0,
+      "selected_neural": 102.20492553710938,
+      "ridge": 100.7362289428711
+    },
+    {
+      "group": "5",
+      "endpoint": 154,
+      "true_rul": 96.0,
+      "selected_neural": 99.29498291015625,
+      "ridge": 99.75540924072266
+    },
+    {
+      "group": "5",
+      "endpoint": 155,
+      "true_rul": 95.0,
+      "selected_neural": 98.2813491821289,
+      "ridge": 98.91154479980469
+    },
+    {
+      "group": "5",
+      "endpoint": 156,
+      "true_rul": 94.0,
+      "selected_neural": 97.0811538696289,
+      "ridge": 97.67522430419922
+    },
+    {
+      "group": "5",
+      "endpoint": 157,
+      "true_rul": 93.0,
+      "selected_neural": 95.75022888183594,
+      "ridge": 96.45162200927734
+    },
+    {
+      "group": "5",
+      "endpoint": 158,
+      "true_rul": 92.0,
+      "selected_neural": 94.40769958496094,
+      "ridge": 95.55986022949219
+    },
+    {
+      "group": "5",
+      "endpoint": 159,
+      "true_rul": 91.0,
+      "selected_neural": 93.40657043457031,
+      "ridge": 94.53040313720703
+    },
+    {
+      "group": "5",
+      "endpoint": 160,
+      "true_rul": 90.0,
+      "selected_neural": 93.02317810058594,
+      "ridge": 93.55838775634766
+    },
+    {
+      "group": "5",
+      "endpoint": 161,
+      "true_rul": 89.0,
+      "selected_neural": 91.52606964111328,
+      "ridge": 92.51567077636719
+    },
+    {
+      "group": "5",
+      "endpoint": 162,
+      "true_rul": 88.0,
+      "selected_neural": 91.14061737060547,
+      "ridge": 91.56916809082031
+    },
+    {
+      "group": "5",
+      "endpoint": 163,
+      "true_rul": 87.0,
+      "selected_neural": 90.02763366699219,
+      "ridge": 90.77665710449219
+    },
+    {
+      "group": "5",
+      "endpoint": 164,
+      "true_rul": 86.0,
+      "selected_neural": 89.62659454345703,
+      "ridge": 89.93437194824219
+    },
+    {
+      "group": "5",
+      "endpoint": 165,
+      "true_rul": 85.0,
+      "selected_neural": 88.87889099121094,
+      "ridge": 88.25434875488281
+    },
+    {
+      "group": "5",
+      "endpoint": 166,
+      "true_rul": 84.0,
+      "selected_neural": 89.4706039428711,
+      "ridge": 87.98860931396484
+    },
+    {
+      "group": "5",
+      "endpoint": 167,
+      "true_rul": 83.0,
+      "selected_neural": 87.23479461669922,
+      "ridge": 86.86095428466797
+    },
+    {
+      "group": "5",
+      "endpoint": 168,
+      "true_rul": 82.0,
+      "selected_neural": 85.25714111328125,
+      "ridge": 85.71607971191406
+    },
+    {
+      "group": "5",
+      "endpoint": 169,
+      "true_rul": 81.0,
+      "selected_neural": 83.57637023925781,
+      "ridge": 84.46783447265625
+    },
+    {
+      "group": "5",
+      "endpoint": 170,
+      "true_rul": 80.0,
+      "selected_neural": 81.59464263916016,
+      "ridge": 83.41276550292969
+    },
+    {
+      "group": "5",
+      "endpoint": 171,
+      "true_rul": 79.0,
+      "selected_neural": 81.15804290771484,
+      "ridge": 82.42342376708984
+    },
+    {
+      "group": "5",
+      "endpoint": 172,
+      "true_rul": 78.0,
+      "selected_neural": 80.43336486816406,
+      "ridge": 81.4935302734375
+    },
+    {
+      "group": "5",
+      "endpoint": 173,
+      "true_rul": 77.0,
+      "selected_neural": 77.16081237792969,
+      "ridge": 79.42163848876953
+    },
+    {
+      "group": "5",
+      "endpoint": 174,
+      "true_rul": 76.0,
+      "selected_neural": 77.0367202758789,
+      "ridge": 78.91124725341797
+    },
+    {
+      "group": "5",
+      "endpoint": 175,
+      "true_rul": 75.0,
+      "selected_neural": 76.68708801269531,
+      "ridge": 77.76707458496094
+    },
+    {
+      "group": "5",
+      "endpoint": 176,
+      "true_rul": 74.0,
+      "selected_neural": 76.89009094238281,
+      "ridge": 76.43084716796875
+    },
+    {
+      "group": "5",
+      "endpoint": 177,
+      "true_rul": 73.0,
+      "selected_neural": 76.14505767822266,
+      "ridge": 75.19246673583984
+    },
+    {
+      "group": "5",
+      "endpoint": 178,
+      "true_rul": 72.0,
+      "selected_neural": 74.93330383300781,
+      "ridge": 74.5037612915039
+    },
+    {
+      "group": "5",
+      "endpoint": 179,
+      "true_rul": 71.0,
+      "selected_neural": 74.61631774902344,
+      "ridge": 73.43180084228516
+    },
+    {
+      "group": "5",
+      "endpoint": 180,
+      "true_rul": 70.0,
+      "selected_neural": 74.68311309814453,
+      "ridge": 72.31224060058594
+    },
+    {
+      "group": "5",
+      "endpoint": 181,
+      "true_rul": 69.0,
+      "selected_neural": 73.67506408691406,
+      "ridge": 71.8954849243164
+    },
+    {
+      "group": "5",
+      "endpoint": 182,
+      "true_rul": 68.0,
+      "selected_neural": 71.84150695800781,
+      "ridge": 70.43362426757812
+    },
+    {
+      "group": "5",
+      "endpoint": 183,
+      "true_rul": 67.0,
+      "selected_neural": 71.22334289550781,
+      "ridge": 69.43343353271484
+    },
+    {
+      "group": "5",
+      "endpoint": 184,
+      "true_rul": 66.0,
+      "selected_neural": 70.22341918945312,
+      "ridge": 68.0837173461914
+    },
+    {
+      "group": "5",
+      "endpoint": 185,
+      "true_rul": 65.0,
+      "selected_neural": 69.87371826171875,
+      "ridge": 67.06815338134766
+    },
+    {
+      "group": "5",
+      "endpoint": 186,
+      "true_rul": 64.0,
+      "selected_neural": 67.92987823486328,
+      "ridge": 65.76131439208984
+    },
+    {
+      "group": "5",
+      "endpoint": 187,
+      "true_rul": 63.0,
+      "selected_neural": 66.93892669677734,
+      "ridge": 64.88574981689453
+    },
+    {
+      "group": "5",
+      "endpoint": 188,
+      "true_rul": 62.0,
+      "selected_neural": 65.14634704589844,
+      "ridge": 63.65788650512695
+    },
+    {
+      "group": "5",
+      "endpoint": 189,
+      "true_rul": 61.0,
+      "selected_neural": 64.35018157958984,
+      "ridge": 62.80194091796875
+    },
+    {
+      "group": "5",
+      "endpoint": 190,
+      "true_rul": 60.0,
+      "selected_neural": 62.79865646362305,
+      "ridge": 61.769657135009766
+    },
+    {
+      "group": "5",
+      "endpoint": 191,
+      "true_rul": 59.0,
+      "selected_neural": 62.00602340698242,
+      "ridge": 60.72922897338867
+    },
+    {
+      "group": "5",
+      "endpoint": 192,
+      "true_rul": 58.0,
+      "selected_neural": 61.25658416748047,
+      "ridge": 59.52256393432617
+    },
+    {
+      "group": "5",
+      "endpoint": 193,
+      "true_rul": 57.0,
+      "selected_neural": 59.31563186645508,
+      "ridge": 58.16822814941406
+    },
+    {
+      "group": "5",
+      "endpoint": 194,
+      "true_rul": 56.0,
+      "selected_neural": 59.44451141357422,
+      "ridge": 56.928855895996094
+    },
+    {
+      "group": "5",
+      "endpoint": 195,
+      "true_rul": 55.0,
+      "selected_neural": 58.6417121887207,
+      "ridge": 56.416141510009766
+    },
+    {
+      "group": "5",
+      "endpoint": 196,
+      "true_rul": 54.0,
+      "selected_neural": 58.0988655090332,
+      "ridge": 55.367469787597656
+    },
+    {
+      "group": "5",
+      "endpoint": 197,
+      "true_rul": 53.0,
+      "selected_neural": 57.65264892578125,
+      "ridge": 53.91177749633789
+    },
+    {
+      "group": "5",
+      "endpoint": 198,
+      "true_rul": 52.0,
+      "selected_neural": 56.24132537841797,
+      "ridge": 52.989234924316406
+    },
+    {
+      "group": "5",
+      "endpoint": 199,
+      "true_rul": 51.0,
+      "selected_neural": 54.69038772583008,
+      "ridge": 51.66594314575195
+    },
+    {
+      "group": "5",
+      "endpoint": 200,
+      "true_rul": 50.0,
+      "selected_neural": 52.92323684692383,
+      "ridge": 50.558650970458984
+    },
+    {
+      "group": "5",
+      "endpoint": 201,
+      "true_rul": 49.0,
+      "selected_neural": 51.7305793762207,
+      "ridge": 49.66338348388672
+    },
+    {
+      "group": "5",
+      "endpoint": 202,
+      "true_rul": 48.0,
+      "selected_neural": 50.78518295288086,
+      "ridge": 48.47591018676758
+    },
+    {
+      "group": "5",
+      "endpoint": 203,
+      "true_rul": 47.0,
+      "selected_neural": 49.56934356689453,
+      "ridge": 47.52790832519531
+    },
+    {
+      "group": "5",
+      "endpoint": 204,
+      "true_rul": 46.0,
+      "selected_neural": 48.25292205810547,
+      "ridge": 46.55998992919922
+    },
+    {
+      "group": "5",
+      "endpoint": 205,
+      "true_rul": 45.0,
+      "selected_neural": 46.9565315246582,
+      "ridge": 45.8046875
+    },
+    {
+      "group": "5",
+      "endpoint": 206,
+      "true_rul": 44.0,
+      "selected_neural": 46.736366271972656,
+      "ridge": 44.44708251953125
+    },
+    {
+      "group": "5",
+      "endpoint": 207,
+      "true_rul": 43.0,
+      "selected_neural": 45.7293586730957,
+      "ridge": 43.18035125732422
+    },
+    {
+      "group": "5",
+      "endpoint": 208,
+      "true_rul": 42.0,
+      "selected_neural": 44.568538665771484,
+      "ridge": 42.5256462097168
+    },
+    {
+      "group": "5",
+      "endpoint": 209,
+      "true_rul": 41.0,
+      "selected_neural": 43.39290237426758,
+      "ridge": 41.24900817871094
+    },
+    {
+      "group": "5",
+      "endpoint": 210,
+      "true_rul": 40.0,
+      "selected_neural": 42.45415496826172,
+      "ridge": 39.97135543823242
+    },
+    {
+      "group": "5",
+      "endpoint": 211,
+      "true_rul": 39.0,
+      "selected_neural": 41.02702713012695,
+      "ridge": 39.28562545776367
+    },
+    {
+      "group": "5",
+      "endpoint": 212,
+      "true_rul": 38.0,
+      "selected_neural": 40.354793548583984,
+      "ridge": 38.215415954589844
+    },
+    {
+      "group": "5",
+      "endpoint": 213,
+      "true_rul": 37.0,
+      "selected_neural": 39.65035629272461,
+      "ridge": 37.034793853759766
+    },
+    {
+      "group": "5",
+      "endpoint": 214,
+      "true_rul": 36.0,
+      "selected_neural": 38.9868049621582,
+      "ridge": 35.52772521972656
+    },
+    {
+      "group": "5",
+      "endpoint": 215,
+      "true_rul": 35.0,
+      "selected_neural": 37.916893005371094,
+      "ridge": 34.78721618652344
+    },
+    {
+      "group": "5",
+      "endpoint": 216,
+      "true_rul": 34.0,
+      "selected_neural": 36.688934326171875,
+      "ridge": 33.81571578979492
+    },
+    {
+      "group": "5",
+      "endpoint": 217,
+      "true_rul": 33.0,
+      "selected_neural": 36.2860107421875,
+      "ridge": 32.6674919128418
+    },
+    {
+      "group": "5",
+      "endpoint": 218,
+      "true_rul": 32.0,
+      "selected_neural": 35.692161560058594,
+      "ridge": 31.58099937438965
+    },
+    {
+      "group": "5",
+      "endpoint": 219,
+      "true_rul": 31.0,
+      "selected_neural": 34.945068359375,
+      "ridge": 30.66018295288086
+    },
+    {
+      "group": "5",
+      "endpoint": 220,
+      "true_rul": 30.0,
+      "selected_neural": 33.343360900878906,
+      "ridge": 29.063678741455078
+    },
+    {
+      "group": "5",
+      "endpoint": 221,
+      "true_rul": 29.0,
+      "selected_neural": 32.94351577758789,
+      "ridge": 28.8898868560791
+    },
+    {
+      "group": "5",
+      "endpoint": 222,
+      "true_rul": 28.0,
+      "selected_neural": 32.08800506591797,
+      "ridge": 27.313064575195312
+    },
+    {
+      "group": "5",
+      "endpoint": 223,
+      "true_rul": 27.0,
+      "selected_neural": 31.240055084228516,
+      "ridge": 26.37220573425293
+    },
+    {
+      "group": "5",
+      "endpoint": 224,
+      "true_rul": 26.0,
+      "selected_neural": 29.305126190185547,
+      "ridge": 24.974740982055664
+    },
+    {
+      "group": "5",
+      "endpoint": 225,
+      "true_rul": 25.0,
+      "selected_neural": 28.268239974975586,
+      "ridge": 23.73017120361328
+    },
+    {
+      "group": "5",
+      "endpoint": 226,
+      "true_rul": 24.0,
+      "selected_neural": 27.173625946044922,
+      "ridge": 22.758403778076172
+    },
+    {
+      "group": "5",
+      "endpoint": 227,
+      "true_rul": 23.0,
+      "selected_neural": 26.70876121520996,
+      "ridge": 21.881755828857422
+    },
+    {
+      "group": "5",
+      "endpoint": 228,
+      "true_rul": 22.0,
+      "selected_neural": 25.789836883544922,
+      "ridge": 20.632680892944336
+    },
+    {
+      "group": "5",
+      "endpoint": 229,
+      "true_rul": 21.0,
+      "selected_neural": 24.428712844848633,
+      "ridge": 20.026782989501953
+    },
+    {
+      "group": "5",
+      "endpoint": 230,
+      "true_rul": 20.0,
+      "selected_neural": 23.633657455444336,
+      "ridge": 18.359638214111328
+    },
+    {
+      "group": "5",
+      "endpoint": 231,
+      "true_rul": 19.0,
+      "selected_neural": 22.84899139404297,
+      "ridge": 17.553672790527344
+    },
+    {
+      "group": "5",
+      "endpoint": 232,
+      "true_rul": 18.0,
+      "selected_neural": 21.9475154876709,
+      "ridge": 16.05072021484375
+    },
+    {
+      "group": "5",
+      "endpoint": 233,
+      "true_rul": 17.0,
+      "selected_neural": 21.194965362548828,
+      "ridge": 14.98393726348877
+    },
+    {
+      "group": "5",
+      "endpoint": 234,
+      "true_rul": 16.0,
+      "selected_neural": 20.293659210205078,
+      "ridge": 13.944537162780762
+    },
+    {
+      "group": "5",
+      "endpoint": 235,
+      "true_rul": 15.0,
+      "selected_neural": 19.60519790649414,
+      "ridge": 12.747651100158691
+    },
+    {
+      "group": "5",
+      "endpoint": 236,
+      "true_rul": 14.0,
+      "selected_neural": 18.820804595947266,
+      "ridge": 11.857683181762695
+    },
+    {
+      "group": "5",
+      "endpoint": 237,
+      "true_rul": 13.0,
+      "selected_neural": 17.905576705932617,
+      "ridge": 11.021197319030762
+    },
+    {
+      "group": "5",
+      "endpoint": 238,
+      "true_rul": 12.0,
+      "selected_neural": 17.41194725036621,
+      "ridge": 9.80467700958252
+    },
+    {
+      "group": "5",
+      "endpoint": 239,
+      "true_rul": 11.0,
+      "selected_neural": 16.650768280029297,
+      "ridge": 8.447896957397461
+    },
+    {
+      "group": "5",
+      "endpoint": 240,
+      "true_rul": 10.0,
+      "selected_neural": 15.872743606567383,
+      "ridge": 7.06184720993042
+    },
+    {
+      "group": "5",
+      "endpoint": 241,
+      "true_rul": 9.0,
+      "selected_neural": 15.021835327148438,
+      "ridge": 6.177429676055908
+    },
+    {
+      "group": "5",
+      "endpoint": 242,
+      "true_rul": 8.0,
+      "selected_neural": 14.143933296203613,
+      "ridge": 4.981213569641113
+    },
+    {
+      "group": "5",
+      "endpoint": 243,
+      "true_rul": 7.0,
+      "selected_neural": 13.521224975585938,
+      "ridge": 3.8208491802215576
+    },
+    {
+      "group": "5",
+      "endpoint": 244,
+      "true_rul": 6.0,
+      "selected_neural": 12.708738327026367,
+      "ridge": 2.6977899074554443
+    },
+    {
+      "group": "5",
+      "endpoint": 245,
+      "true_rul": 5.0,
+      "selected_neural": 11.752862930297852,
+      "ridge": 1.6757768392562866
+    },
+    {
+      "group": "5",
+      "endpoint": 246,
+      "true_rul": 4.0,
+      "selected_neural": 11.04362678527832,
+      "ridge": 0.6161603927612305
+    },
+    {
+      "group": "5",
+      "endpoint": 247,
+      "true_rul": 3.0,
+      "selected_neural": 10.423640251159668,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 248,
+      "true_rul": 2.0,
+      "selected_neural": 9.963187217712402,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 249,
+      "true_rul": 1.0,
+      "selected_neural": 9.250750541687012,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 250,
+      "true_rul": 0.0,
+      "selected_neural": 8.539257049560547,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 251,
+      "true_rul": 0.0,
+      "selected_neural": 7.900564670562744,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 252,
+      "true_rul": 0.0,
+      "selected_neural": 7.275272369384766,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 253,
+      "true_rul": 0.0,
+      "selected_neural": 6.861535549163818,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 254,
+      "true_rul": 0.0,
+      "selected_neural": 6.234185218811035,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 255,
+      "true_rul": 0.0,
+      "selected_neural": 5.930350303649902,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 256,
+      "true_rul": 0.0,
+      "selected_neural": 5.131584644317627,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 257,
+      "true_rul": 0.0,
+      "selected_neural": 5.0815348625183105,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 258,
+      "true_rul": 0.0,
+      "selected_neural": 4.251431465148926,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 259,
+      "true_rul": 0.0,
+      "selected_neural": 3.8878109455108643,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 260,
+      "true_rul": 0.0,
+      "selected_neural": 3.382535457611084,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 261,
+      "true_rul": 0.0,
+      "selected_neural": 2.922022819519043,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 262,
+      "true_rul": 0.0,
+      "selected_neural": 2.3344874382019043,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 263,
+      "true_rul": 0.0,
+      "selected_neural": 1.9658743143081665,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 264,
+      "true_rul": 0.0,
+      "selected_neural": 1.3637434244155884,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 265,
+      "true_rul": 0.0,
+      "selected_neural": 1.2382230758666992,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 266,
+      "true_rul": 0.0,
+      "selected_neural": 1.0236445665359497,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 267,
+      "true_rul": 0.0,
+      "selected_neural": 0.09210984408855438,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 268,
+      "true_rul": 0.0,
+      "selected_neural": 0.2921540141105652,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 269,
+      "true_rul": 0.0,
+      "selected_neural": -0.28730636835098267,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 270,
+      "true_rul": 0.0,
+      "selected_neural": -0.41663265228271484,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 271,
+      "true_rul": 0.0,
+      "selected_neural": -0.9588572382926941,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 272,
+      "true_rul": 0.0,
+      "selected_neural": -1.0650285482406616,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 273,
+      "true_rul": 0.0,
+      "selected_neural": -1.6368086338043213,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 274,
+      "true_rul": 0.0,
+      "selected_neural": -1.815574049949646,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 275,
+      "true_rul": 0.0,
+      "selected_neural": -2.015578508377075,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 276,
+      "true_rul": 0.0,
+      "selected_neural": -2.1929008960723877,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 277,
+      "true_rul": 0.0,
+      "selected_neural": -2.4732747077941895,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 278,
+      "true_rul": 0.0,
+      "selected_neural": -2.8461496829986572,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 279,
+      "true_rul": 0.0,
+      "selected_neural": -2.985692024230957,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 280,
+      "true_rul": 0.0,
+      "selected_neural": -3.1455845832824707,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 281,
+      "true_rul": 0.0,
+      "selected_neural": -3.5950984954833984,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 282,
+      "true_rul": 0.0,
+      "selected_neural": -3.7400155067443848,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 283,
+      "true_rul": 0.0,
+      "selected_neural": -3.613442897796631,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 284,
+      "true_rul": 0.0,
+      "selected_neural": -3.5654349327087402,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 285,
+      "true_rul": 0.0,
+      "selected_neural": -4.01894474029541,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 286,
+      "true_rul": 0.0,
+      "selected_neural": -3.7924962043762207,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 287,
+      "true_rul": 0.0,
+      "selected_neural": -4.054156303405762,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 288,
+      "true_rul": 0.0,
+      "selected_neural": -3.900024890899658,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 289,
+      "true_rul": 0.0,
+      "selected_neural": -3.5860486030578613,
+      "ridge": 0.0
+    },
+    {
+      "group": "5",
+      "endpoint": 290,
+      "true_rul": 0.0,
+      "selected_neural": -3.4820430278778076,
+      "ridge": 0.09133480489253998
+    },
+    {
+      "group": "5",
+      "endpoint": 291,
+      "true_rul": 0.0,
+      "selected_neural": -3.696005344390869,
+      "ridge": 0.06149232015013695
+    },
+    {
+      "group": "5",
+      "endpoint": 292,
+      "true_rul": 0.0,
+      "selected_neural": -3.6140143871307373,
+      "ridge": 0.9365493059158325
+    },
+    {
+      "group": "5",
+      "endpoint": 293,
+      "true_rul": 0.0,
+      "selected_neural": -3.7038803100585938,
+      "ridge": 1.285762071609497
+    },
+    {
+      "group": "5",
+      "endpoint": 294,
+      "true_rul": 0.0,
+      "selected_neural": -4.151373386383057,
+      "ridge": 1.5262677669525146
+    },
+    {
+      "group": "5",
+      "endpoint": 295,
+      "true_rul": 0.0,
+      "selected_neural": -3.7628605365753174,
+      "ridge": 2.160426378250122
+    },
+    {
+      "group": "5",
+      "endpoint": 296,
+      "true_rul": 0.0,
+      "selected_neural": -3.8843986988067627,
+      "ridge": 2.571014642715454
+    },
+    {
+      "group": "5",
+      "endpoint": 297,
+      "true_rul": 0.0,
+      "selected_neural": -4.050176620483398,
+      "ridge": 2.977135419845581
+    },
+    {
+      "group": "5",
+      "endpoint": 298,
+      "true_rul": 0.0,
+      "selected_neural": -4.193096160888672,
+      "ridge": 3.627631902694702
+    },
+    {
+      "group": "5",
+      "endpoint": 299,
+      "true_rul": 0.0,
+      "selected_neural": -4.8105010986328125,
+      "ridge": 4.059741020202637
+    }
+  ],
+  "archive_sha256": "b628deb89634cf8732cd96bb62d675b820aedb0aa337fd36082db53bfebca8fe",
+  "elapsed_sec": 72.09073686599731
+}

@@ -35,21 +35,27 @@ outputs/**/*.npz
 # Keep JSON reports and Markdown summaries
 !outputs/**/*.json
 !outputs/**/*.md
+/outputs/cross_component_transfer_v3/CROSS_TRANSFER_V3_CHECKPOINT.json
+/outputs/cross_component_transfer_v3/CROSS_TRANSFER_V3_PREDICTIONS.csv
+/outputs/cross_component_transfer_v3/cells/
+/outputs/cross_component_transfer_v3/pretrained/
 
 # --- Data (raw CSVs kept; large processed/cached arrays excluded) ---
 data/processed/**/*.npy
 data/processed/**/*.npz
 data/processed/**/*.pkl
-# Large generated simulation CSVs (reproducible, not tracked)
-data/processed/geo_battery_pinn/*.csv
-data/processed/ncmapss/
+# Curated CSV/ZIP inputs needed for reproducible benchmark runs are tracked.
 # Keep raw input files and small CSVs
 !data/raw/
 !data/processed/cmapss/
 !data/processed/nasa_battery/
+# Same content as data/raw/nozzle_ablation_full.csv; retain one canonical copy.
+data/raw/competition/nozzle_ablation_quasi_steady_long.csv
 
 # --- Literature PDFs (large, copyright-sensitive) ---
 docs/**/*.pdf
+!docs/competition/
+!docs/competition/*.pdf
 
 # --- Node / JS ---
 node_modules/
@@ -135,3 +141,7 @@ ccswitch-setup*
 
 # --- SSH/debug temp files ---
 C:Users*
+C*Users*
+configure-vnc.ps1
+IELTS_HANDOFF.md
+_CHATGPT_HANDOFF.md
