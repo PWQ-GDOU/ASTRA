@@ -301,8 +301,10 @@ macro。FEMTO 六轴承是机械退化代理，不是真实反作用轮遥测，
 - 轴承代理、迁移主实验数字见 `outputs/main_suite/`。
 - 历史 JSON：`outputs/main_suite/MAIN_REPORT.json`、`outputs/battery_opt_v3/BATTERY_OPT_V3_REPORT.json`、`outputs/battery_b0007_confirm/BATTERY_B0007_CONFIRM_REPORT.json`。clean strict14 使用 `scripts/exp_battery_strict.py` 的独立输出目录。
 - v3 的详细 raw RMSE、MAE、bias、normalized RMSE、每个 outer fold、数据哈希和
-  赛事评分边界见 `FINAL_RESULTS_TABLE.md`。仓库中没有可核验的官方赛事评分规则；
-  此前约 `79/100` 仍只是非官方估算，不是正式成绩。
+  赛事评分边界见 `FINAL_RESULTS_TABLE.md`。赛事方案 PDF 的基础评分为：问题建模与
+  仿真 30 分、工程实现与可复现性 50 分、算法效果与迁移能力 20 分，另有最高 5
+  分额外加分（不计入基础 100 分）。当前不宣称官方总分；FEMTO→COMSOL v5 的
+  outer-LOO 结果是探索性后验复现，仍需未见目标轨迹确认。
 
 ## 反作用轮仿真域（新增，独立于 FEMTO proxy）
 
@@ -316,6 +318,36 @@ macro。FEMTO 六轴承是机械退化代理，不是真实反作用轮遥测，
 - 当前仿真结果只能表述为“COMSOL 反作用轮仿真域结果”；不能表述为真实航天器反作用轮 SOTA。FEMTO proxy 和 COMSOL simulation 必须分别报告。
 - 数据适配器：`src/data/reaction_wheel_sim.py`；审计入口：`scripts/audit_reaction_wheel_sim.py`；初步模型入口：`scripts/exp_reaction_wheel_sim.py`；报告：`outputs/reaction_wheel_sim_audit/SIMULATION_AUDIT.json`、`outputs/reaction_wheel_sim_initial/REACTION_WHEEL_SIM_INITIAL_REPORT.json`、`docs/reaction_wheel_simulation_audit.md`。
 
+## FEMTO -> COMSOL v5 严格跨数据集迁移
+
+锁定入口：`scripts/exp_femto_ims_to_comsol_outerloo_v5.py`。它固定 FEMTO 为 source、
+COMSOL operational raw-level 特征为 target、Ridge target prior、N=2/3 的 outer-fit
+内部 group-LOO 权重选择，并拒绝会改变该条件的命令行参数。目标域是五条完整 COMSOL
+反作用轮仿真轨迹的 outer LOO；不是实飞遥测。固定五个 seed：`42, 123, 456, 2026, 3407`。
+
+- holdout 不进入 target scaler、label scale、prior、adapter、early stopping 或权重选择；target 输入不使用 full-life min/max。
+- N=2/3 的 transfer+Huber 和 matched scratch+Huber 分别通过 outer-fit groups 的 inner group LOO OOF、按轨迹等权 macro RMSE 选权；N=1 保留 chronological validation 回退。
+- transfer 与 scratch 使用相同 architecture、数据、epoch budget、seeds 和各自的 fit-only 选权规则；Ridge、linear、quadratic、Huber 都是 target-only 对照。
+
+| N | Transfer 变体 | Transfer RMSE | Matched Scratch RMSE | Ridge RMSE | 最佳趋势 RMSE | 提升 | Outer-fold 胜出 | 判定 |
+|---:|---|---:|---:|---:|---:|---:|---:|---|
+| 1 | raw transfer | 7.575 | 8.047 | 7.369 | 8.128 | +5.87% | 3/5 | diagnostic：未超过 Ridge |
+| 2 | raw transfer（Huber 选权为 1.0） | **4.974** | 5.366 | 5.289 | 6.374 | **+7.30%** | **4/5** | **strict positive evidence** |
+| 3 | transfer + Huber，fit-only inner-LOO | **6.149** | 6.577 | 9.011 | 7.263 | **+6.51%** | **3/5** | **strict positive evidence** |
+| 1,2,3 | calibrated，预声明全范围聚合 | **6.233** | 6.664 | 7.223 | 7.255 | **+6.46%** | **10/15** | **strict positive evidence** |
+
+这三个通过项均满足内部规则：相对 matched scratch 的 macro RMSE 至少改善 5%、多数
+outer folds 胜出、低于 Ridge 且低于最佳确定性趋势。完整复现从预测 CSV 独立重算后与
+报告一致，所有预测有限。由于这五条 COMSOL 轨迹已参与 v5 条件设计，`ACCEPTANCE.json`
+将本次运行标为 `exploratory_post_hoc_replication`，提交资格为
+`requires_unseen_outer_holdout_confirmation`；它是严格的探索性证据，不是盲确认，更不能
+替代真实反作用轮遥测验证。
+
+完整五 seed 产物位于
+`outputs/femto_ims_to_comsol_outerloo_v5_exploratory_fitonly_innerloo_full5x120_20260825/`；
+其中 `PROTOCOL.json`、`DATA_MANIFEST.json`、`PREFLIGHT.json`、`REPORT.json`、
+`ACCEPTANCE.json`、`OUTER_FOLD_SUMMARY.csv` 和 `PREDICTIONS.csv` 记录协议、数据哈希、
+泄漏预检、逐折审计、验收及原始预测。旧 v4、单一 `track 5` 和固定权重实验均保留为历史 diagnostic。
 ## 喷管严格协议结果（单轨迹）
 
 旧喷管数字 `2.501 / 2.674 / 3.819` 仍保留在主实验表中，但它们属于历史非严格协议：原始 train/test 有重叠，且 Pure TCN/PCG-TCN 曾使用测试集选 checkpoint。它们不再作为 SOTA 证据。
@@ -389,6 +421,61 @@ python scripts/exp_nozzle_multitrajectory.py --synthetic --output /tmp/smoke
 严格报告与审计：`outputs/nozzle_strict/NOZZLE_STRICT_REPORT.json`、`outputs/nozzle_strict/NOZZLE_STRICT_REPORT.md`、`outputs/nozzle_strict/frozen_config.json`、`docs/nozzle_public_data_audit.md`。
 
 ## 🔧 快速开始
+
+### Docker 一键复现（FEMTO/IMS → COMSOL）
+
+该入口复现当前严格的 FEMTO/IMS → COMSOL 迁移协议。镜像固定为 Python 3.11
+CPU 环境；`data/` 只读挂载，结果写入 `outputs/reproducibility/`。运行前需准备：
+`data/processed/femto_bearing.zip`、`data/processed/ims_processed/` 和
+`data/raw/competition/reaction_wheel_comsol_degradation.zip`。驱动会先校验三个输入的
+SHA-256，哈希不匹配时不会开始训练。
+
+Windows PowerShell（默认依次执行 preflight、smoke、full）：
+
+```powershell
+.\scripts\reproduce_femto_ims_to_comsol.ps1
+```
+
+Linux/macOS：
+
+```bash
+./scripts/reproduce_femto_ims_to_comsol.sh
+```
+
+仅执行数据和环境预检：
+
+```powershell
+.\scripts\reproduce_femto_ims_to_comsol.ps1 -Phase preflight
+```
+
+每次入口会生成新的 UTC run ID，不覆盖旧结果。产物位于
+`outputs/reproducibility/<run-id>/`：根目录包含环境、输入哈希和代码摘要，
+`smoke/` 是缩短验证，`full/` 是带 heartbeat、失败重试和最终报告校验的完整实验。
+Docker Desktop Linux 实跑记录见 `docs/docker_reproduction_report_20260821.md`；
+2026-08-21 的修复版完整复现已生成 120 条 macro 记录，并在第二次 full 中逐文件
+复现相同的指标和预测结果。
+
+### 工程寿命状态演示（FEMTO -> COMSOL v5）
+
+在锁定的 v5 审计产物之上，`scripts/run_engineering_demo.py` 生成完全离线可打开的
+反作用轮寿命状态回放：正常操作模式仅展示预测 RUL，只有显式切换到 audit replay 时才会
+显示留出标签及误差。该界面明确标注 COMSOL 反作用轮仿真代理、探索性后验复现和仍需未见
+outer-holdout 确认的证据边界。
+
+本地构建并直接打开 `outputs/engineering_demo/femto_ims_to_comsol_v5/index.html`：
+
+```powershell
+.\scripts\run_engineering_demo.ps1 -NoServe
+```
+
+本地服务回放：
+
+```powershell
+.\scripts\run_engineering_demo.ps1 -BindHost 127.0.0.1 -Port 8090
+```
+
+Docker Desktop：`docker compose up --build engineering-demo`，然后打开
+`http://localhost:8090/`。完整操作与审计说明见 `docs/engineering_demo.md`。
 
 ### 环境配置
 

@@ -1,0 +1,49 @@
+{
+  "schema": "astra_github_sync_manifest_v1",
+  "generated_at": "2026-08-26",
+  "repository": "https://github.com/PWQ-GDOU/ASTRA.git",
+  "source_branch": "master",
+  "remote_branch": "algorithm/main",
+  "purpose": "将 ASTRA 赛事工程、复现实验、数据材料和审计结果交接给文书部门。",
+  "workspace_policy": {
+    "project_root": "H:/项目代码目录/ZCodeProject",
+    "c_drive_project_files": false,
+    "dirty_worktree_unrelated_files_preserved": true
+  },
+  "included": {
+    "source_and_tests": ["scripts/", "src/", "tests/", "requirements.txt", "pytest.ini", "package.json"],
+    "reproduction": ["Dockerfile", ".dockerignore", "docker-compose.yml", "docker/", "scripts/reproduce_femto_ims_to_comsol.py", "scripts/reproduce_femto_ims_to_comsol.ps1", "scripts/reproduce_femto_ims_to_comsol.sh", "docs/docker_reproduction_report_20260821.md", "outputs/reproducibility/femto-ims-to-comsol-20260821T010000Z/", "outputs/reproducibility/femto-ims-to-comsol-20260821T020000Z/"],
+    "competition_materials": ["docs/competition/competition_rules.pdf", "data/raw/competition/ncmapss_ds01.zip", "data/raw/competition/reaction_wheel_comsol_degradation.zip", "data/raw/competition/nozzle_ablation_quasi_steady_long.csv", "third_party/weibull-knowledge-informed-ml-master.zip"],
+    "processed_data": ["data/processed/ims_processed/", "data/processed/femto_bearing.zip", "data/processed/ncmapss/N-CMAPSS_full.zip", "data/processed/nasa_battery/", "data/processed/nozzle_mt_200/", "data/processed/geo_battery_pinn/"],
+    "final_audit_outputs": ["outputs/cross_component_transfer_v3/CROSS_TRANSFER_V3_MACRO.csv", "outputs/cross_component_transfer_v3/CROSS_TRANSFER_V3_PREDICTIONS.csv", "outputs/cross_component_transfer_v3/CROSS_TRANSFER_V3_REPORT.json", "outputs/cross_component_transfer_v3/DATA_MANIFEST.json", "outputs/cross_component_transfer_v3/PROTOCOL.json", "outputs/cross_component_transfer_v3/SUPERVISOR_STATUS.json", "outputs/femto_ims_to_comsol_outerloo_v5_exploratory_fitonly_innerloo_full5x120_20260825/", "outputs/engineering_demo/femto_ims_to_comsol_v5/", "outputs/battery_strict_v2_canonical/", "outputs/nozzle_strict/", "outputs/ncmapss_strict_v1/", "outputs/reaction_wheel_sim_audit/"],
+    "documentation": ["README.md", "DATA_SOURCES.md", "FINAL_RESULTS_TABLE.md", "DOCUMENTATION_HANDOFF.md", "SYNC_MANIFEST.json"]
+  },
+  "excluded": {
+    "reason": "缓存、虚拟环境、模型检查点、历史 smoke/intermediate 结果或与 ASTRA 无关的个人文件不属于可复现交付物。",
+    "paths": [".zcode/", ".venv/", "node_modules/", "outputs/cross_component_transfer_v3/cells/", "outputs/cross_component_transfer_v3/pretrained_encoder/", "outputs/cross_component_transfer_v3/CROSS_TRANSFER_V3_CHECKPOINT.json", "outputs/reproducibility/femto-ims-to-comsol-20260821T000000Z/", "outputs/ 历史 smoke/intermediate 目录", "IELTS、音频分析、专利和个人工具文件"]
+  },
+  "input_sha256": {
+    "data/raw/competition/reaction_wheel_comsol_degradation.zip": "b628deb89634cf8732cd96bb62d675b820aedb0aa337fd36082db53bfebca8fe",
+    "third_party/weibull-knowledge-informed-ml-master.zip": "28d9d896ac45a605e75550ce6f703896c25183aff3a8e36c719a5c02db24e72e",
+    "data/raw/competition/ncmapss_ds01.zip": "e595250537f04bb4f374946dc85070d4635aba3d513ed32b3796a6448d239969",
+    "data/raw/competition/nozzle_ablation_quasi_steady_long.csv": "2d1b4d906b8832e84f802eea449eb1ec0d744911604bd37cbfa70241e807a7c2",
+    "docs/competition/competition_rules.pdf": "b610e21251805e5e345263cb98721ea3a5f2f0a80c00945e8795ee6e2987cf32",
+    "data/processed/femto_bearing.zip": "e21bb22bd8d54fd18ebe98b4b4e094c0c40469bda19811a2a642d5cc84ebd81f",
+    "data/processed/ncmapss/N-CMAPSS_full.zip": "121e547c56739cd7fe46468a2ec420297fd96c61a2813eb7af8e72f295060dab",
+    "data/processed/ims_processed/": "887eea9cdb541ff40de8164f1913f9a37d22b12e3c48cc0eaa2d6dc7c100f4e6"
+  },
+  "evidence_boundary": {
+    "battery": "cross_component_transfer_v3 battery N=1 and N=2 remain diagnostic; no positive transfer claim.",
+    "femto_to_comsol": "N=2, N=3 and predeclared aggregate pass the internal >=5% and majority-fold rule in the exploratory v5 replication.",
+    "comsol_status": "COMSOL is a reaction-wheel simulation proxy, not real flight telemetry.",
+    "v5_status": "exploratory_post_hoc_replication; requires unseen outer-holdout confirmation before submission-ready or operational claims.",
+    "score_status": "105/105 is an evidence-supported self-assessment upper bound, not an official committee score."
+  },
+  "docker_verification": {
+    "canonical_run": "outputs/reproducibility/femto-ims-to-comsol-20260821T010000Z/",
+    "independent_run": "outputs/reproducibility/femto-ims-to-comsol-20260821T020000Z/",
+    "full_macro_rows": 120,
+    "test_suite": "91 passed",
+    "deterministic_artifacts": ["MACRO.csv", "PREDICTIONS.csv", "PROTOCOL.json", "DATA_MANIFEST.json"]
+  }
+}

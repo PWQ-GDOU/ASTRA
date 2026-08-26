@@ -1,0 +1,24 @@
+{
+  "elapsed_sec": 4742.324168205261,
+  "phase": "all",
+  "device": "cuda:0",
+  "schema": "battery_strict_v2_run_metadata",
+  "selection_seeds": [
+    42,
+    123,
+    456,
+    2026,
+    3407
+  ],
+  "final_seeds": [
+    42,
+    123,
+    456,
+    2026,
+    3407
+  ],
+  "selection_epoch_budget": 160,
+  "blend_alpha_step": 0.01,
+  "config_sha256": "8adee3bb9c3d6da504d32c3a8e60f2b0f120ec1d8b3e5a8e692f85510203ce9d",
+  "nozzle_frozen": true
+}

@@ -20,6 +20,7 @@ inputs.
 | `data/raw/competition/ncmapss_ds01.zip` | Competition-provided N-CMAPSS DS01 archive | `e595250537f04bb4f374946dc85070d4635aba3d513ed32b3796a6448d239969` |
 | `data/raw/competition/reaction_wheel_comsol_degradation.zip` | Competition-provided reaction-wheel COMSOL degradation data | `b628deb89634cf8732cd96bb62d675b820aedb0aa337fd36082db53bfebca8fe` |
 | `data/processed/femto_bearing.zip` | FEMTO bearing data used only as the reaction-wheel mechanical-degradation proxy | `e21bb22bd8d54fd18ebe98b4b4e094c0c40469bda19811a2a642d5cc84ebd81f` |
+| `data/processed/ims_processed/` | Processed public IMS source artifact supplied in the Weibull reference archive; `2nd_test` train and `3rd_test` validation | `887eea9cdb541ff40de8164f1913f9a37d22b12e3c48cc0eaa2d6dc7c100f4e6` |
 
 The v3 experiment rechecks the nozzle, battery, and FEMTO hashes against
 `outputs/cross_component_transfer_v3/DATA_MANIFEST.json`.
@@ -40,3 +41,12 @@ and several overlapping NASA subarchives.  They are not duplicated here:
 the exact four MAT files used by the strict protocol are versioned above.
 
 Run `git lfs pull` after cloning to materialize the large LFS datasets.
+
+## Docker Reproduction
+
+`Dockerfile` pins the Python 3.11 CPU runtime and
+`docker/requirements.lock.txt` pins the experiment dependencies. The image
+contains code only: `data/` is mounted read-only and `outputs/` is mounted
+writable by `docker-compose.yml`. The reproduction driver recomputes the three
+input hashes before each run and records package versions plus a code digest in
+`REPRODUCTION_ENVIRONMENT.json`.

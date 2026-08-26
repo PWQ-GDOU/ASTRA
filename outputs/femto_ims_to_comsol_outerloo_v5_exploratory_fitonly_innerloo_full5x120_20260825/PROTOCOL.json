@@ -1,0 +1,319 @@
+{
+  "schema": "femto_ims_to_comsol_outerloo_v4",
+  "source_arms": [
+    "femto"
+  ],
+  "experiment_designation": "exploratory_post_hoc_replication",
+  "target_feature_tier": "operational",
+  "target_input_feature_transform": "raw_levels",
+  "target_protocol": "five COMSOL trajectories outer-LOO; deterministic validation rotation; N fit groups",
+  "outer_holdouts": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5"
+  ],
+  "target_adapter_alignment": {
+    "enabled": false,
+    "steps": 0,
+    "objective": "source_target_projected_and_encoded_moment_matching",
+    "source_data": "source train windows only",
+    "target_data": "outer fit-group input windows only",
+    "target_labels_used": false,
+    "validation_or_outer_holdout_used": false
+  },
+  "n_shots": [
+    1,
+    2,
+    3
+  ],
+  "schedule": {
+    "1": {
+      "1": {
+        "fit_groups": [
+          "3"
+        ],
+        "validation_groups": [
+          "2"
+        ],
+        "test_groups": [
+          "1"
+        ]
+      },
+      "2": {
+        "fit_groups": [
+          "1"
+        ],
+        "validation_groups": [
+          "3"
+        ],
+        "test_groups": [
+          "2"
+        ]
+      },
+      "3": {
+        "fit_groups": [
+          "1"
+        ],
+        "validation_groups": [
+          "4"
+        ],
+        "test_groups": [
+          "3"
+        ]
+      },
+      "4": {
+        "fit_groups": [
+          "1"
+        ],
+        "validation_groups": [
+          "5"
+        ],
+        "test_groups": [
+          "4"
+        ]
+      },
+      "5": {
+        "fit_groups": [
+          "2"
+        ],
+        "validation_groups": [
+          "1"
+        ],
+        "test_groups": [
+          "5"
+        ]
+      }
+    },
+    "2": {
+      "1": {
+        "fit_groups": [
+          "3",
+          "4"
+        ],
+        "validation_groups": [
+          "2"
+        ],
+        "test_groups": [
+          "1"
+        ]
+      },
+      "2": {
+        "fit_groups": [
+          "1",
+          "4"
+        ],
+        "validation_groups": [
+          "3"
+        ],
+        "test_groups": [
+          "2"
+        ]
+      },
+      "3": {
+        "fit_groups": [
+          "1",
+          "2"
+        ],
+        "validation_groups": [
+          "4"
+        ],
+        "test_groups": [
+          "3"
+        ]
+      },
+      "4": {
+        "fit_groups": [
+          "1",
+          "2"
+        ],
+        "validation_groups": [
+          "5"
+        ],
+        "test_groups": [
+          "4"
+        ]
+      },
+      "5": {
+        "fit_groups": [
+          "2",
+          "3"
+        ],
+        "validation_groups": [
+          "1"
+        ],
+        "test_groups": [
+          "5"
+        ]
+      }
+    },
+    "3": {
+      "1": {
+        "fit_groups": [
+          "3",
+          "4",
+          "5"
+        ],
+        "validation_groups": [
+          "2"
+        ],
+        "test_groups": [
+          "1"
+        ]
+      },
+      "2": {
+        "fit_groups": [
+          "1",
+          "4",
+          "5"
+        ],
+        "validation_groups": [
+          "3"
+        ],
+        "test_groups": [
+          "2"
+        ]
+      },
+      "3": {
+        "fit_groups": [
+          "1",
+          "2",
+          "5"
+        ],
+        "validation_groups": [
+          "4"
+        ],
+        "test_groups": [
+          "3"
+        ]
+      },
+      "4": {
+        "fit_groups": [
+          "1",
+          "2",
+          "3"
+        ],
+        "validation_groups": [
+          "5"
+        ],
+        "test_groups": [
+          "4"
+        ]
+      },
+      "5": {
+        "fit_groups": [
+          "2",
+          "3",
+          "4"
+        ],
+        "validation_groups": [
+          "1"
+        ],
+        "test_groups": [
+          "5"
+        ]
+      }
+    }
+  },
+  "target_scaler": "fit on fit_groups only",
+  "target_label_scale": "fit on fit_groups only",
+  "trend_prior": "causal linear/quadratic/Huber/Ridge prior fitted on fit_groups only; policy is recorded per run",
+  "target_prior_policy": "ridge",
+  "blend_selection": {
+    "policy": "inner_group_loo",
+    "N>=2": "fit-only inner leave-one-outer-fit-group-out OOF; equal-per-group macro RMSE",
+    "N=1": "chronological outer-validation fallback because inner group-LOO is impossible",
+    "outer_holdout_used": false,
+    "outer_validation_used_for_N>=2_weight_selection": false,
+    "tie_break": "smaller primary-model weight"
+  },
+  "transfer_residual_head": false,
+  "validation_affine_calibrated_transfer": {
+    "method": "trend_residual_transfer_affine_calibrated",
+    "adapter": "bounded affine map from raw transfer prediction to raw target RUL",
+    "fit_data": "chronological validation trajectory only",
+    "selection": "identity and bounded affine candidates compared on validation only",
+    "slope_bounds": [
+      0.5,
+      1.5
+    ],
+    "intercept_limit": "0.25 * fit-group target label scale",
+    "identity_fallback": true,
+    "outer_holdout_labels_used": false,
+    "full_life_min_max_used": false,
+    "reporting": "paired only with its validation-affine scratch counterpart; not interchangeable with raw pure transfer"
+  },
+  "ridge_calibrated_transfer": {
+    "method": "ridge_calibrated_transfer",
+    "source_transfer_weight": "selected_per_outer_fold_by_configured_fit_only_policy",
+    "target_ridge_weight": "complement_of_selected_transfer_weight",
+    "weight_grid": [
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "minimum_source_transfer_weight": 0.25,
+    "selection": "configured fit-only inner group-LOO OOF for N>=2; chronological validation fallback for N=1; never outer holdout",
+    "target_ridge_fit": "fit_groups_only; alpha selected on chronological validation",
+    "holdout_used": false,
+    "matched_scratch_method": "ridge_calibrated_scratch"
+  },
+  "calibrated_transfer": {
+    "method": "trend_residual_transfer_calibrated",
+    "source_transfer_weight": "selected_per_outer_fold_by_configured_fit_only_policy",
+    "causal_trend_weight": "complement_of_selected_transfer_weight",
+    "predeclared_fixed_source_transfer_weight": 0.5,
+    "causal_trend_family": "trend_huber",
+    "weight_policy": "fit_only_innerloo",
+    "weight_grid": [
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "minimum_source_transfer_weight": 0.25,
+    "matched_scratch_method": "trend_residual_scratch_calibrated",
+    "selection": "configured fit-only inner group-LOO OOF for N>=2; chronological validation fallback for N=1; never outer holdout",
+    "holdout_used": false
+  },
+  "target_context": {
+    "enabled": false,
+    "definition": "first observed target feature vector, repeated causally per window",
+    "labels_or_full_life_stats_used": false
+  },
+  "residual_adaptation": {
+    "blend_selection": "configured fit-only inner group-LOO OOF for N>=2; chronological validation fallback for N=1",
+    "max_blend_weight": 1.0,
+    "holdout_used": false
+  },
+  "main_transfer": "source-residual-pretrained shared encoder plus target projection and residual head; explicit short frozen warmup, low-LR unfreeze and encoder anchor; retained checkpoint is required to be post-unfreeze; residual mixture weights use fit-only inner group-LOO OOF for N>=2 and chronological validation only as the explicit N=1 fallback",
+  "transfer_warmup_epochs": 2,
+  "transfer_checkpoint_requires_unfrozen_encoder": true,
+  "encoder_anchor_weight": 0.02,
+  "residual_target": "normalized target RUL minus selected causal target trend",
+  "source_residual_target": "normalized source RUL minus source-train-only causal source trend",
+  "source_sampling": "source residual pretraining uses train-only inverse-window-count loss weights so every source trajectory has equal effective loss mass",
+  "frozen_ablation": "pretrained shared encoder frozen; target projection and residual head trainable",
+  "scratch": "same trend-residual target architecture, data, epoch budget, early stopping and seeds; every transfer hybrid has the same calibration operation applied to scratch",
+  "matched_scratch_controls": {
+    "raw_transfer": "trend_residual_scratch",
+    "transfer_huber_hybrid": "trend_residual_scratch_calibrated",
+    "transfer_affine_calibration": "trend_residual_scratch_affine_calibrated",
+    "transfer_ridge_hybrid": "ridge_calibrated_scratch",
+    "selection_rule": "fixed weights are identical; configured selection uses matched fit-only inner group-LOO OOF grids for N>=2 and the same chronological-validation fallback grids for N=1"
+  },
+  "ridge": "target-only baseline with validation-selected alpha",
+  "full_life_min_max": "never used for target input conversion",
+  "proxy_warning": "COMSOL is a reaction-wheel simulation domain, not real flight telemetry",
+  "seeds": [
+    42,
+    123,
+    456,
+    2026,
+    3407
+  ],
+  "source_epochs": 60,
+  "target_epochs": 120
+}

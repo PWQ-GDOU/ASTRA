@@ -1,0 +1,396 @@
+{
+  "schema_version": "nozzle-strict-experiment-v1",
+  "created_utc": "2026-07-24T12:13:39.755140+00:00",
+  "status": "frozen_before_test_evaluation",
+  "quick": false,
+  "quick_disclaimer": null,
+  "requested_seeds": [
+    42,
+    123,
+    456,
+    2026,
+    3407
+  ],
+  "effective_final_seeds": [
+    42,
+    123,
+    456,
+    2026,
+    3407
+  ],
+  "selection_seed": 42,
+  "protocol": {
+    "schema_version": "nozzle-strict-experiment-v1",
+    "trajectory_protocol": "chronological expanding-origin; raw-disjoint train/val/test",
+    "selection": {
+      "folds": [
+        "fold1",
+        "fold2"
+      ],
+      "partitions_available_to_trainer": [
+        "train",
+        "val"
+      ],
+      "selection_model": "physics_full",
+      "feature_tier": "state_aware",
+      "window_size": 3,
+      "objective": "macro mean validation RMSE; validation weighted RMSE then candidate id tie-break",
+      "seed_policy": "first preregistered seed only; no seed selection"
+    },
+    "final": {
+      "folds": [
+        "fold1",
+        "fold2",
+        "fold3"
+      ],
+      "locked_fold": "fold3",
+      "model_families": [
+        "lstm",
+        "tcn",
+        "transformer",
+        "physics_input",
+        "physics_full"
+      ],
+      "primary_model": "physics_full",
+      "feature_tier": "state_aware",
+      "window_size": 3,
+      "checkpoint_selection": "validation RMSE only, including an epoch-0 checkpoint",
+      "test_policy": "one prediction pass after checkpoint lock; no seed/family selection",
+      "ensemble": "fixed equal prediction average over all preregistered effective seeds"
+    },
+    "loss": {
+      "all_models": "scaled weighted smooth_l1 RUL",
+      "physics_input": "RUL term only",
+      "physics_full": [
+        "RUL smooth_l1",
+        "observed current-rate supervision after m/s to mm/s conversion",
+        "predicted_rate_mm_s * predicted_rul_s versus depth_margin_mm consistency"
+      ],
+      "rate_weight": 0.2,
+      "consistency_weight": 0.2,
+      "gradient_clip_norm": 5.0,
+      "scale_scope": "train partition only"
+    },
+    "baselines": {
+      "clock_oracle": "20-t diagnostic; excluded from ranking",
+      "current_rate": "observed current-rate depth-margin extrapolation",
+      "local_slope": "least-squares depth slope over each partition-local window",
+      "ridge": "flattened windows; train fit; validation-only alpha choice",
+      "huber": "flattened windows; train IRLS fit; validation-only alpha choice",
+      "linear_alphas": [
+        0.0,
+        0.0001,
+        0.01,
+        1.0,
+        100.0
+      ]
+    },
+    "ablations": {
+      "feature_tiers": [
+        "thermal_only",
+        "state_only",
+        "state_aware",
+        "age_aware"
+      ],
+      "window_sizes": [
+        1,
+        3,
+        5
+      ],
+      "feature_window_model": "tcn",
+      "feature_window_model_reason": "isolates input/window effects without an external physics-RUL branch",
+      "physics_models": [
+        "tcn",
+        "physics_input",
+        "physics_full"
+      ],
+      "age_aware": "diagnostic and excluded from ranking"
+    },
+    "metrics": {
+      "names": [
+        "rmse",
+        "mae",
+        "weighted_rmse",
+        "weighted_mae",
+        "nrmse"
+      ],
+      "weights": "partition-local normalized trapezoidal WindowSet.weights",
+      "nrmse_denominator": 20.0,
+      "aggregation": "single-seed mean/std plus fixed equal-prediction ensemble; fold macro is unweighted"
+    },
+    "claim_rule": {
+      "maximum_text": "task-specific strict best on this single trajectory",
+      "requirements": [
+        "preregistered primary trainable model beats every eligible baseline on locked-fold RMSE",
+        "preregistered primary trainable model beats every eligible baseline on rolling-fold macro RMSE",
+        "primary single-seed model beats every eligible baseline in a strict majority of seed-fold cells"
+      ],
+      "global_sota_allowed": false
+    }
+  },
+  "split_specs": {
+    "fold1": {
+      "name": "fold1",
+      "train": [
+        0,
+        24
+      ],
+      "val": [
+        24,
+        32
+      ],
+      "test": [
+        32,
+        40
+      ],
+      "locked": false
+    },
+    "fold2": {
+      "name": "fold2",
+      "train": [
+        0,
+        32
+      ],
+      "val": [
+        32,
+        40
+      ],
+      "test": [
+        40,
+        48
+      ],
+      "locked": false
+    },
+    "fold3": {
+      "name": "fold3",
+      "train": [
+        0,
+        40
+      ],
+      "val": [
+        40,
+        48
+      ],
+      "test": [
+        48,
+        56
+      ],
+      "locked": true
+    }
+  },
+  "hashes": {
+    "dataset_sha256": "2d1b4d906b8832e84f802eea449eb1ec0d744911604bd37cbfa70241e807a7c2",
+    "expected_dataset_sha256": "2d1b4d906b8832e84f802eea449eb1ec0d744911604bd37cbfa70241e807a7c2",
+    "script_sha256": "30b5cddad1df877c66cc9b8c4227279675cb13504aac2b4662a8ee04689a28ec",
+    "protocol_sha256": "095a0f3d92855f554d56c3e5c281fb9b33b772c680521f61a0addfb3e2bb4270",
+    "candidates_sha256": "b5e64f0c7b8984832776c9660bb4a56062444e960d02fa99322ce5dcf8fd4a6b",
+    "split_specs_sha256": "3ac8388e9047b075c6e851e917600dafe1acd5fb0426ef5777a51d02ce2a2e75"
+  },
+  "candidates": [
+    {
+      "id": "compact",
+      "hidden": 16,
+      "dropout": 0.05,
+      "lr": 0.003,
+      "weight_decay": 0.0001,
+      "patience": 16,
+      "max_epochs": 140
+    },
+    {
+      "id": "balanced",
+      "hidden": 24,
+      "dropout": 0.1,
+      "lr": 0.0015,
+      "weight_decay": 0.0001,
+      "patience": 25,
+      "max_epochs": 220
+    },
+    {
+      "id": "regularized",
+      "hidden": 32,
+      "dropout": 0.15,
+      "lr": 0.0008,
+      "weight_decay": 0.001,
+      "patience": 35,
+      "max_epochs": 300
+    }
+  ],
+  "validation_metrics": [
+    {
+      "candidate_id": "compact",
+      "model": "physics_full",
+      "seed": 42,
+      "folds": [
+        {
+          "fold": "fold1",
+          "validation_metrics": {
+            "rmse": 0.8772489184224869,
+            "mae": 0.8179376220703123,
+            "weighted_rmse": 0.8176830458901283,
+            "weighted_mae": 0.7457434323938881,
+            "nrmse": 0.04386244592112434
+          },
+          "best_epoch": 22,
+          "epochs_ran": 38,
+          "training_seconds": 2.352924022998195,
+          "parameter_count": 2738,
+          "effective_config": {
+            "id": "compact",
+            "hidden": 16,
+            "dropout": 0.05,
+            "lr": 0.003,
+            "weight_decay": 0.0001,
+            "patience": 16,
+            "max_epochs": 140
+          }
+        },
+        {
+          "fold": "fold2",
+          "validation_metrics": {
+            "rmse": 0.5533402122325353,
+            "mae": 0.42804412841796885,
+            "weighted_rmse": 0.5878143601785815,
+            "weighted_mae": 0.47991574406623844,
+            "nrmse": 0.027667010611626762
+          },
+          "best_epoch": 13,
+          "epochs_ran": 29,
+          "training_seconds": 0.7150247059762478,
+          "parameter_count": 2738,
+          "effective_config": {
+            "id": "compact",
+            "hidden": 16,
+            "dropout": 0.05,
+            "lr": 0.003,
+            "weight_decay": 0.0001,
+            "patience": 16,
+            "max_epochs": 140
+          }
+        }
+      ],
+      "macro_validation_rmse": 0.7152945653275111,
+      "macro_validation_weighted_rmse": 0.7027487030343549
+    },
+    {
+      "candidate_id": "balanced",
+      "model": "physics_full",
+      "seed": 42,
+      "folds": [
+        {
+          "fold": "fold1",
+          "validation_metrics": {
+            "rmse": 0.8446159859077976,
+            "mae": 0.790893007914225,
+            "weighted_rmse": 0.7744523011214088,
+            "weighted_mae": 0.7109672332391505,
+            "nrmse": 0.04223079929538988
+          },
+          "best_epoch": 26,
+          "epochs_ran": 51,
+          "training_seconds": 1.2266876689973287,
+          "parameter_count": 5826,
+          "effective_config": {
+            "id": "balanced",
+            "hidden": 24,
+            "dropout": 0.1,
+            "lr": 0.0015,
+            "weight_decay": 0.0001,
+            "patience": 25,
+            "max_epochs": 220
+          }
+        },
+        {
+          "fold": "fold2",
+          "validation_metrics": {
+            "rmse": 0.563726335888738,
+            "mae": 0.5207374572753908,
+            "weighted_rmse": 0.5348909457820398,
+            "weighted_mae": 0.4870780766010285,
+            "nrmse": 0.0281863167944369
+          },
+          "best_epoch": 16,
+          "epochs_ran": 41,
+          "training_seconds": 1.105413276993204,
+          "parameter_count": 5826,
+          "effective_config": {
+            "id": "balanced",
+            "hidden": 24,
+            "dropout": 0.1,
+            "lr": 0.0015,
+            "weight_decay": 0.0001,
+            "patience": 25,
+            "max_epochs": 220
+          }
+        }
+      ],
+      "macro_validation_rmse": 0.7041711608982678,
+      "macro_validation_weighted_rmse": 0.6546716234517242
+    },
+    {
+      "candidate_id": "regularized",
+      "model": "physics_full",
+      "seed": 42,
+      "folds": [
+        {
+          "fold": "fold1",
+          "validation_metrics": {
+            "rmse": 0.6560403368903154,
+            "mae": 0.4987908299763995,
+            "weighted_rmse": 0.6962788349003789,
+            "weighted_mae": 0.5360667596212245,
+            "nrmse": 0.032802016844515766
+          },
+          "best_epoch": 39,
+          "epochs_ran": 74,
+          "training_seconds": 1.9163474999950267,
+          "parameter_count": 10066,
+          "effective_config": {
+            "id": "regularized",
+            "hidden": 32,
+            "dropout": 0.15,
+            "lr": 0.0008,
+            "weight_decay": 0.001,
+            "patience": 35,
+            "max_epochs": 300
+          }
+        },
+        {
+          "fold": "fold2",
+          "validation_metrics": {
+            "rmse": 0.2812652901315927,
+            "mae": 0.2518361727396646,
+            "weighted_rmse": 0.25156718506517023,
+            "weighted_mae": 0.2074870407581329,
+            "nrmse": 0.014063264506579635
+          },
+          "best_epoch": 60,
+          "epochs_ran": 95,
+          "training_seconds": 2.734568207990378,
+          "parameter_count": 10066,
+          "effective_config": {
+            "id": "regularized",
+            "hidden": 32,
+            "dropout": 0.15,
+            "lr": 0.0008,
+            "weight_decay": 0.001,
+            "patience": 35,
+            "max_epochs": 300
+          }
+        }
+      ],
+      "macro_validation_rmse": 0.468652813510954,
+      "macro_validation_weighted_rmse": 0.4739230099827746
+    }
+  ],
+  "selected_config": {
+    "id": "regularized",
+    "hidden": 32,
+    "dropout": 0.15,
+    "lr": 0.0008,
+    "weight_decay": 0.001,
+    "patience": 35,
+    "max_epochs": 300
+  },
+  "selection_rule_applied": "macro mean validation RMSE; validation weighted RMSE then candidate id tie-break",
+  "config_hash": "767e1a8fe7299d4147e55bd6fe2f6bfd190ad29c0e15832e0433ec10c4ace7f9"
+}

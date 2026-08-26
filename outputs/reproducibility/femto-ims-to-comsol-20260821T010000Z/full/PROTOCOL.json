@@ -1,0 +1,43 @@
+{
+  "schema": "femto_ims_to_comsol_transfer_v1",
+  "source_arms": [
+    "femto",
+    "ims"
+  ],
+  "source_protocol": "source-unit-disjoint pretraining; source validation only; no COMSOL rows or labels",
+  "target_protocol": "COMSOL operational aligned-cycle features; tracks 1..N fine-tune, track 4 chronological validation, track 5 final test",
+  "target_shots": {
+    "1": [
+      "1"
+    ],
+    "2": [
+      "1",
+      "2"
+    ],
+    "3": [
+      "1",
+      "2",
+      "3"
+    ]
+  },
+  "target_feature_tier": "operational",
+  "target_scaler": "fit on target fine-tuning tracks only",
+  "target_label_scale": "fit on target fine-tuning tracks only",
+  "model": "source/target domain-specific projections + shared GRU encoder + independently initialized target head",
+  "transfer": "pretrained shared encoder copied; target projection and target head initialized independently",
+  "frozen_ablation": "shared encoder copied and frozen; target projection/head trainable",
+  "scratch": "same target architecture, data, seeds, epochs and early stopping with random initialization",
+  "ridge": "target-only baseline; alpha selected on track 4 and refit on tracks 1..N before track 5",
+  "seeds": [
+    42,
+    123,
+    456,
+    2026,
+    3407
+  ],
+  "randomness_control": "Each source and target model is constructed only after its explicit seed is set; training resets the same seed, deterministic algorithms are requested, and CPU MKLDNN is disabled.",
+  "source_epochs": 60,
+  "target_epochs": 80,
+  "test_evaluated_once_after_selection": true,
+  "proxy_warning": "COMSOL is a reaction-wheel simulation domain, not real flight telemetry"
+}

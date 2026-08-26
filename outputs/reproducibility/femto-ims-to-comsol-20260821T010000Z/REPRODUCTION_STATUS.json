@@ -1,0 +1,24 @@
+{
+  "completed": {
+    "full": {
+      "macro_rows": 120,
+      "report": "/workspace/outputs/reproducibility/femto-ims-to-comsol-20260821T010000Z/full/REPORT.json",
+      "source_arms": [
+        "femto",
+        "ims"
+      ]
+    },
+    "preflight": "passed",
+    "smoke": {
+      "macro_rows": 66,
+      "report": "/workspace/outputs/reproducibility/femto-ims-to-comsol-20260821T010000Z/smoke/REPORT.json",
+      "source_arms": [
+        "femto",
+        "ims"
+      ]
+    }
+  },
+  "output_root": "/workspace/outputs/reproducibility/femto-ims-to-comsol-20260821T010000Z",
+  "phase": "all",
+  "schema": "femto_ims_to_comsol_reproduction_result_v1"
+}

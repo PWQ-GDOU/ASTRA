@@ -1,0 +1,13 @@
+# Direct runtime/test dependencies pinned for the CPU image.
+# torch==2.3.1+cpu is installed separately from the official PyTorch CPU index.
+numpy==1.26.4
+scipy==1.13.1
+scikit-learn==1.5.1
+pandas==2.2.2
+matplotlib==3.9.1
+h5py==3.11.0
+tqdm==4.66.4
+seaborn==0.13.2
+plotly==5.22.0
+einops==0.8.0
+pytest==8.3.2

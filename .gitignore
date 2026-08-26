@@ -39,6 +39,7 @@ outputs/**/*.npz
 /outputs/cross_component_transfer_v3/CROSS_TRANSFER_V3_PREDICTIONS.csv
 /outputs/cross_component_transfer_v3/cells/
 /outputs/cross_component_transfer_v3/pretrained/
+/outputs/reproducibility/
 
 # --- Data (raw CSVs kept; large processed/cached arrays excluded) ---
 data/processed/**/*.npy
@@ -49,6 +50,11 @@ data/processed/**/*.pkl
 !data/raw/
 !data/processed/cmapss/
 !data/processed/nasa_battery/
+# Public IMS raw-download staging and temporary extraction; the compact,
+# auditable processed source lives in data/processed/ims_processed/.
+data/processed/ims_bearing.zip*
+data/processed/ims_chunks/
+data/processed/_weibull_*/
 # Same content as data/raw/nozzle_ablation_full.csv; retain one canonical copy.
 data/raw/competition/nozzle_ablation_quasi_steady_long.csv
 

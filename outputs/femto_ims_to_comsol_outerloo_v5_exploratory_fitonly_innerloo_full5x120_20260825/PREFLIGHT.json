@@ -1,0 +1,65 @@
+{
+  "schema": "femto_ims_to_comsol_outerloo_preflight_v4",
+  "inputs_exist": true,
+  "comsol_archive": "data/raw/competition/reaction_wheel_comsol_degradation.zip",
+  "comsol_sha256": "b628deb89634cf8732cd96bb62d675b820aedb0aa337fd36082db53bfebca8fe",
+  "comsol_feature_tier": "operational",
+  "comsol_groups": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5"
+  ],
+  "outer_holdouts": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5"
+  ],
+  "target_scaler_fit_only_on_fit_groups": true,
+  "target_prior_fit_only_on_fit_groups": true,
+  "blend_selection": {
+    "policy": "inner_group_loo",
+    "N>=2": "fit-only inner leave-one-outer-fit-group-out OOF; equal-per-group macro RMSE",
+    "N=1": "chronological outer-validation fallback because inner group-LOO is impossible",
+    "outer_holdout_used": false,
+    "outer_validation_used_for_N>=2_weight_selection": false
+  },
+  "full_life_min_max_used_for_target_input": false,
+  "holdout_labels_used_for_selection": false,
+  "holdout_labels_used_for_fit": false,
+  "source_names": [
+    "femto"
+  ],
+  "execution_device": "cpu",
+  "cpu_threads": 24,
+  "finite_checks": true,
+  "target_model_shape_check": {
+    "target_features": 13,
+    "sequence_length": 20
+  },
+  "transfer_warmup_epochs": 2,
+  "transfer_checkpoint_requires_unfrozen_encoder": true,
+  "validation_affine_calibration": {
+    "method": "trend_residual_transfer_affine_calibrated",
+    "selection": "chronological_validation_only",
+    "holdout_labels_used": false,
+    "slope_bounds": [
+      0.5,
+      1.5
+    ],
+    "intercept_fraction_of_train_label_scale": 0.25,
+    "identity_fallback": true
+  },
+  "target_input_feature_transform": "raw_levels",
+  "target_adapter_alignment": {
+    "enabled": false,
+    "steps": 0,
+    "source_data": "source train windows only",
+    "target_data": "outer fit-group input windows only; inner OOF fits use an inner subset only",
+    "target_labels_used": false,
+    "validation_or_outer_holdout_used": false
+  }
+}

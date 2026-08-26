@@ -1,0 +1,43 @@
+{
+  "schema": "ncmapss_strict_summary_v1",
+  "datasets": [
+    "SYNTH"
+  ],
+  "macro": {
+    "selected_neural": {
+      "mean_rmse": 35.17436218261719,
+      "per_dataset": [
+        35.17436218261719
+      ],
+      "mean_nasa_score": 9253.248046875,
+      "per_seed_mean_rmse": [
+        35.17436218261719
+      ],
+      "per_seed_std_rmse": 0.0
+    },
+    "ridge": {
+      "mean_rmse": 34.333900451660156,
+      "per_dataset": [
+        34.333900451660156
+      ],
+      "mean_nasa_score": 12278.2080078125
+    },
+    "mean_baseline": {
+      "mean_rmse": 43.3107795715332,
+      "per_dataset": [
+        43.3107795715332
+      ],
+      "mean_nasa_score": 49330.37109375
+    }
+  },
+  "seed_ids": [
+    42
+  ],
+  "scheduler_epoch_budget": 8,
+  "selection_epoch_budget": 60,
+  "loss_config": {
+    "weibull_alpha": 0.25,
+    "weibull_eta": 100.0,
+    "weibull_beta": 3.0
+  }
+}

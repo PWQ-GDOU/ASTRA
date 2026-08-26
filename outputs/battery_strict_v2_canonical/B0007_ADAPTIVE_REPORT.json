@@ -1,0 +1,128 @@
+{
+  "schema": "battery_strict_v2_b0007_adaptive",
+  "protocol": "B0007 adaptive test; strict14 selection frozen before adaptive evaluation",
+  "holdout": "B0007",
+  "status": "event_observed",
+  "eol_ah": 1.504530137360911,
+  "life_cycle": 124.0,
+  "neural_selection": {
+    "candidate": {
+      "name": "life_l24",
+      "model": "life",
+      "seq_len": 24,
+      "use_age": true,
+      "use_capacity_aux": true
+    },
+    "mean_inner_rmse": 10.208126862843832,
+    "fixed_epochs": 23
+  },
+  "method_selection": {
+    "candidate": {
+      "name": "life_l24",
+      "model": "life",
+      "seq_len": 24,
+      "use_age": true,
+      "use_capacity_aux": true
+    },
+    "mean_inner_rmse": 10.193893750508627,
+    "neural_inner_rmse": 10.208126862843832,
+    "ridge_inner_rmse": 14.065062522888184,
+    "improvement_vs_ridge": 3.8711687723795567,
+    "fixed_epochs": 23,
+    "blend_alpha": 0.9500000000000001,
+    "ridge_fallback": false
+  },
+  "selected_neural_metrics": {
+    "name": "selected_neural",
+    "status": "event_observed",
+    "rmse": 8.292010307312012,
+    "mae": 6.518632411956787,
+    "bias": -0.2175082266330719,
+    "nrmse_100_cycles": 0.08292010307312012,
+    "n_exact": 102,
+    "n_total": 102,
+    "stage_metrics": {
+      "early": {
+        "rmse": 10.087752342224121,
+        "mae": 8.085711479187012,
+        "bias": 7.153735637664795,
+        "n": 34
+      },
+      "mid": {
+        "rmse": 3.5755844116210938,
+        "mae": 3.224196672439575,
+        "bias": 0.4212419390678406,
+        "n": 34
+      },
+      "late": {
+        "rmse": 9.577303886413574,
+        "mae": 8.245988845825195,
+        "bias": -8.227500915527344,
+        "n": 34
+      }
+    }
+  },
+  "selected_method_blend_metrics": {
+    "name": "selected_method_blend",
+    "status": "event_observed",
+    "rmse": 8.166203498840332,
+    "mae": 6.40508508682251,
+    "bias": -0.4471583664417267,
+    "nrmse_100_cycles": 0.08166203498840333,
+    "n_exact": 102,
+    "n_total": 102,
+    "stage_metrics": {
+      "early": {
+        "rmse": 9.769365310668945,
+        "mae": 7.827542304992676,
+        "bias": 6.908263206481934,
+        "n": 34
+      },
+      "mid": {
+        "rmse": 3.3436617851257324,
+        "mae": 2.9866366386413574,
+        "bias": 0.1513361632823944,
+        "n": 34
+      },
+      "late": {
+        "rmse": 9.6664400100708,
+        "mae": 8.401073455810547,
+        "bias": -8.401073455810547,
+        "n": 34
+      }
+    }
+  },
+  "ridge_metrics": {
+    "name": "ridge",
+    "status": "event_observed",
+    "rmse": 7.92743444442749,
+    "mae": 6.609531402587891,
+    "bias": -4.810498237609863,
+    "nrmse_100_cycles": 0.0792743444442749,
+    "n_exact": 102,
+    "n_total": 102,
+    "stage_metrics": {
+      "early": {
+        "rmse": 3.845947265625,
+        "mae": 3.0130367279052734,
+        "bias": 2.244297981262207,
+        "n": 34
+      },
+      "mid": {
+        "rmse": 5.322076797485352,
+        "mae": 5.116608619689941,
+        "bias": -4.976843357086182,
+        "n": 34
+      },
+      "late": {
+        "rmse": 12.058890342712402,
+        "mae": 11.698949813842773,
+        "bias": -11.698949813842773,
+        "n": 34
+      }
+    }
+  },
+  "scheduler_epoch_budget": 160,
+  "nozzle_frozen": true,
+  "frozen_config_sha256": "8adee3bb9c3d6da504d32c3a8e60f2b0f120ec1d8b3e5a8e692f85510203ce9d"
+}

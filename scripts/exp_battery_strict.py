@@ -74,6 +74,11 @@ def seed_everything(seed: int) -> None:
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
+    # oneDNN CPU convolution can remain nondeterministic across repeated
+    # trainings on the same seed in the bundled PyTorch runtime.  The strict
+    # protocol prioritizes reproducibility over this small-model optimization.
+    if hasattr(torch.backends, "mkldnn"):
+        torch.backends.mkldnn.enabled = False
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
     try:

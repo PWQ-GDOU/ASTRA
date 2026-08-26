@@ -1,0 +1,228 @@
+{
+  "schema": "battery_strict_manifest_v3",
+  "data_root": "data/processed/nasa_battery/5. Battery Data Set",
+  "data_files": {
+    "B0005": "0eae4585baf3f200c09fe24c5ab884f1889679fc75206ca1aa19da704104f0b0",
+    "B0006": "fa818ab4db5db8ab21e910b6dd6c3e20d3761bb9672089e1a4de8f96074616c5",
+    "B0007": "d022afa086efaf54ab5b63f05220f5be178c8027e2fa8d68589db0e85a441a3b",
+    "B0018": "d1e6c923a43ea1c9666b3a90bbb521757a067fd60b4d17dbfaa49c50b179da69"
+  },
+  "protocol": "nested cell-LOOCV; strict14 exact labels; B0007 right-censored",
+  "features": [
+    "soh",
+    "soh_loss",
+    "capacity_margin",
+    "fade_1",
+    "fade_5",
+    "slope_5",
+    "slope_10",
+    "slope_20",
+    "slope_40",
+    "voltage_mean",
+    "voltage_std",
+    "voltage_min",
+    "voltage_mid",
+    "voltage_p10",
+    "current_mean_abs",
+    "current_std",
+    "temperature_mean",
+    "temperature_std",
+    "temperature_max",
+    "temperature_delta_early",
+    "ttv_30",
+    "ttv_27",
+    "ttv_25",
+    "duration_s",
+    "duration_ratio",
+    "ttv_27_ratio",
+    "cycle_age"
+  ],
+  "common_endpoint": 23,
+  "series": [
+    {
+      "name": "B0005",
+      "protocol": "strict14",
+      "status": "event_observed",
+      "eol_ah": 1.4,
+      "life_cycle": 124.0,
+      "observed_end": 124,
+      "observed_cycles": 125,
+      "init_capacity": 1.8353491942234077,
+      "last_capacity": 1.3967008232726328,
+      "min_capacity": 1.3967008232726328,
+      "exact_label_count": 125,
+      "metadata": {
+        "raw_cycle_count": 168,
+        "observed_cycle_count": 125,
+        "strict14_hit": 124,
+        "protocol_hit": 124,
+        "censoring": false,
+        "eol_rule": "strict14"
+      }
+    },
+    {
+      "name": "B0006",
+      "protocol": "strict14",
+      "status": "event_observed",
+      "eol_ah": 1.4,
+      "life_cycle": 108.0,
+      "observed_end": 108,
+      "observed_cycles": 109,
+      "init_capacity": 2.013326371345464,
+      "last_capacity": 1.395164296571563,
+      "min_capacity": 1.395164296571563,
+      "exact_label_count": 109,
+      "metadata": {
+        "raw_cycle_count": 168,
+        "observed_cycle_count": 109,
+        "strict14_hit": 108,
+        "protocol_hit": 108,
+        "censoring": false,
+        "eol_rule": "strict14"
+      }
+    },
+    {
+      "name": "B0007",
+      "protocol": "strict14",
+      "status": "right_censored",
+      "eol_ah": 1.4,
+      "life_cycle": null,
+      "observed_end": 167,
+      "observed_cycles": 168,
+      "init_capacity": 1.8806626717011388,
+      "last_capacity": 1.4324552720625434,
+      "min_capacity": 1.4004552399066514,
+      "exact_label_count": 0,
+      "metadata": {
+        "raw_cycle_count": 168,
+        "observed_cycle_count": 168,
+        "strict14_hit": null,
+        "protocol_hit": null,
+        "censoring": true,
+        "eol_rule": "strict14"
+      }
+    },
+    {
+      "name": "B0018",
+      "protocol": "strict14",
+      "status": "event_observed",
+      "eol_ah": 1.4,
+      "life_cycle": 96.0,
+      "observed_end": 96,
+      "observed_cycles": 97,
+      "init_capacity": 1.8396018424355423,
+      "last_capacity": 1.3968547782872414,
+      "min_capacity": 1.3968547782872414,
+      "exact_label_count": 97,
+      "metadata": {
+        "raw_cycle_count": 132,
+        "observed_cycle_count": 97,
+        "strict14_hit": 96,
+        "protocol_hit": 96,
+        "censoring": false,
+        "eol_rule": "strict14"
+      }
+    }
+  ],
+  "selection_seeds": [
+    42,
+    123,
+    456,
+    2026,
+    3407
+  ],
+  "final_seeds": [
+    42,
+    123,
+    456,
+    2026,
+    3407
+  ],
+  "candidates": [
+    {
+      "name": "ms_l16",
+      "model": "ms",
+      "seq_len": 16,
+      "use_age": true,
+      "use_capacity_aux": true
+    },
+    {
+      "name": "gru_l16",
+      "model": "gru",
+      "seq_len": 16,
+      "use_age": true,
+      "use_capacity_aux": true
+    },
+    {
+      "name": "transformer_l16",
+      "model": "transformer",
+      "seq_len": 16,
+      "use_age": true,
+      "use_capacity_aux": true
+    },
+    {
+      "name": "life_l8",
+      "model": "life",
+      "seq_len": 8,
+      "use_age": true,
+      "use_capacity_aux": true
+    },
+    {
+      "name": "life_l16",
+      "model": "life",
+      "seq_len": 16,
+      "use_age": true,
+      "use_capacity_aux": true
+    },
+    {
+      "name": "life_l24",
+      "model": "life",
+      "seq_len": 24,
+      "use_age": true,
+      "use_capacity_aux": true
+    },
+    {
+      "name": "life_l16_no_aux",
+      "model": "life",
+      "seq_len": 16,
+      "use_age": true,
+      "use_capacity_aux": false
+    },
+    {
+      "name": "life_l16_no_age",
+      "model": "life",
+      "seq_len": 16,
+      "use_age": false,
+      "use_capacity_aux": true
+    }
+  ],
+  "fixed_families": [
+    "ms_l16",
+    "life_l16",
+    "gru_l16",
+    "transformer_l16"
+  ],
+  "selection_objectives": {
+    "selected_neural": "minimum inner-cell equal-fold neural ensemble RMSE",
+    "selected_method_blend": "minimum inner-cell equal-fold neural/Ridge blend RMSE across candidate and alpha"
+  },
+  "selection_epoch_budget": 160,
+  "blend_alpha_step": 0.01,
+  "blend_calibration": "inner-cell OOF alpha grid 0..1 step 0.01 against Ridge; alpha=0 fallback allowed and frozen per outer fold",
+  "loss_and_censor_rule": "B0007 strict14 is right-censored; observed-record lower-bound hinge only",
+  "metrics": {
+    "nrmse_denominator_cycles": 100.0,
+    "stage_bins": "equal thirds by true RUL among event rows"
+  },
+  "baseline_definitions": [
+    "Ridge",
+    "Huber",
+    "SOH monotone",
+    "causal capacity trend"
+  ],
+  "script_sha256": "7b4bfefa24a6179434919e4d8424b874c07effd6f800d58b036f9f34ffe7da1e",
+  "config_sha256": "8adee3bb9c3d6da504d32c3a8e60f2b0f120ec1d8b3e5a8e692f85510203ce9d",
+  "quick": false,
+  "quick_disclaimer": null,
+  "nozzle_frozen": true
+}

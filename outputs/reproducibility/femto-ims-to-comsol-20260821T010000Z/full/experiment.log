@@ -1,0 +1,9 @@
+{
+  "output": "/workspace/outputs/reproducibility/femto-ims-to-comsol-20260821T010000Z/.full.attempt_1",
+  "sources": [
+    "femto",
+    "ims"
+  ],
+  "rows": 120,
+  "elapsed_sec": 190.15500116348267
+}

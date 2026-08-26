@@ -1,0 +1,2343 @@
+{
+  "schema": "femto_ims_to_comsol_transfer_report_v1",
+  "protocol": {
+    "schema": "femto_ims_to_comsol_transfer_v1",
+    "source_arms": [
+      "femto",
+      "ims"
+    ],
+    "source_protocol": "source-unit-disjoint pretraining; source validation only; no COMSOL rows or labels",
+    "target_protocol": "COMSOL operational aligned-cycle features; tracks 1..N fine-tune, track 4 chronological validation, track 5 final test",
+    "target_shots": {
+      "1": [
+        "1"
+      ],
+      "2": [
+        "1",
+        "2"
+      ],
+      "3": [
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    "target_feature_tier": "operational",
+    "target_scaler": "fit on target fine-tuning tracks only",
+    "target_label_scale": "fit on target fine-tuning tracks only",
+    "model": "source/target domain-specific projections + shared GRU encoder + independently initialized target head",
+    "transfer": "pretrained shared encoder copied; target projection and target head initialized independently",
+    "frozen_ablation": "shared encoder copied and frozen; target projection/head trainable",
+    "scratch": "same target architecture, data, seeds, epochs and early stopping with random initialization",
+    "ridge": "target-only baseline; alpha selected on track 4 and refit on tracks 1..N before track 5",
+    "seeds": [
+      42,
+      123
+    ],
+    "randomness_control": "Each source and target model is constructed only after its explicit seed is set; training resets the same seed, deterministic algorithms are requested, and CPU MKLDNN is disabled.",
+    "source_epochs": 8,
+    "target_epochs": 8,
+    "test_evaluated_once_after_selection": true,
+    "proxy_warning": "COMSOL is a reaction-wheel simulation domain, not real flight telemetry"
+  },
+  "preflight": {
+    "schema": "femto_ims_to_comsol_preflight_v1",
+    "comsol_archive": "/workspace/data/raw/competition/reaction_wheel_comsol_degradation.zip",
+    "comsol_sha256": "b628deb89634cf8732cd96bb62d675b820aedb0aa337fd36082db53bfebca8fe",
+    "comsol_feature_tier": "operational",
+    "comsol_groups": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "comsol_train_groups": [
+      "1",
+      "2",
+      "3"
+    ],
+    "comsol_validation_groups": [
+      "4"
+    ],
+    "comsol_test_groups": [
+      "5"
+    ],
+    "target_test_labels_used_for_fit": false,
+    "target_test_labels_used_for_validation": false,
+    "source_names": [
+      "femto",
+      "ims"
+    ],
+    "source_manifests": {
+      "femto": {
+        "source": "femto",
+        "sha256": "e21bb22bd8d54fd18ebe98b4b4e094c0c40469bda19811a2a642d5cc84ebd81f",
+        "unit_names": [
+          "Bearing1_1",
+          "Bearing1_2",
+          "Bearing2_1",
+          "Bearing2_2",
+          "Bearing3_1",
+          "Bearing3_2"
+        ],
+        "source_train_units": [
+          "Bearing1_1",
+          "Bearing1_2",
+          "Bearing2_1",
+          "Bearing2_2"
+        ],
+        "source_validation_units": [
+          "Bearing3_1",
+          "Bearing3_2"
+        ],
+        "feature_names": [
+          "acc_x_rms",
+          "acc_x_peak",
+          "acc_x_std",
+          "acc_x_kurtosis",
+          "acc_x_skew",
+          "acc_y_rms",
+          "acc_y_peak",
+          "acc_y_std",
+          "acc_y_kurtosis",
+          "acc_y_skew",
+          "acc_x_rms_slope_5",
+          "acc_y_rms_slope_5",
+          "acc_x_rms_slope_20",
+          "acc_y_rms_slope_20",
+          "acc_x_kurtosis_slope_5",
+          "acc_y_kurtosis_slope_5",
+          "acc_x_kurtosis_slope_20",
+          "acc_y_kurtosis_slope_20",
+          "acc_x_spectral_centroid",
+          "acc_y_spectral_centroid",
+          "acc_x_high_band_ratio",
+          "acc_y_high_band_ratio"
+        ],
+        "train_only_scaler_units": [
+          "Bearing1_1",
+          "Bearing1_2",
+          "Bearing2_1",
+          "Bearing2_2"
+        ],
+        "source_label_scale": 119.0,
+        "source_train_windows": 404,
+        "source_validation_windows": 202,
+        "target_data_used_for_source_fit": false
+      },
+      "ims": {
+        "source": "ims",
+        "sha256": "887eea9cdb541ff40de8164f1913f9a37d22b12e3c48cc0eaa2d6dc7c100f4e6",
+        "unit_names": [
+          "2nd_test",
+          "3rd_test"
+        ],
+        "source_train_units": [
+          "2nd_test"
+        ],
+        "source_validation_units": [
+          "3rd_test"
+        ],
+        "feature_names": [
+          "spectral_bin_01",
+          "spectral_bin_02",
+          "spectral_bin_03",
+          "spectral_bin_04",
+          "spectral_bin_05",
+          "spectral_bin_06",
+          "spectral_bin_07",
+          "spectral_bin_08",
+          "spectral_bin_09",
+          "spectral_bin_10",
+          "spectral_bin_11",
+          "spectral_bin_12",
+          "spectral_bin_13",
+          "spectral_bin_14",
+          "spectral_bin_15",
+          "spectral_bin_16",
+          "spectral_bin_17",
+          "spectral_bin_18",
+          "spectral_bin_19",
+          "spectral_bin_20"
+        ],
+        "train_only_scaler_units": [
+          "2nd_test"
+        ],
+        "source_label_scale": 6.81944465637207,
+        "source_train_windows": 962,
+        "source_validation_windows": 6302,
+        "target_data_used_for_source_fit": false
+      }
+    },
+    "adapter_shape": {
+      "source_feature_counts": {
+        "femto": 22,
+        "ims": 20
+      },
+      "target_feature_count": 13,
+      "separate_source_target_projection": true
+    },
+    "finite_checks": true
+  },
+  "sources": {
+    "femto": {
+      "manifest": {
+        "source": "femto",
+        "sha256": "e21bb22bd8d54fd18ebe98b4b4e094c0c40469bda19811a2a642d5cc84ebd81f",
+        "unit_names": [
+          "Bearing1_1",
+          "Bearing1_2",
+          "Bearing2_1",
+          "Bearing2_2",
+          "Bearing3_1",
+          "Bearing3_2"
+        ],
+        "source_train_units": [
+          "Bearing1_1",
+          "Bearing1_2",
+          "Bearing2_1",
+          "Bearing2_2"
+        ],
+        "source_validation_units": [
+          "Bearing3_1",
+          "Bearing3_2"
+        ],
+        "feature_names": [
+          "acc_x_rms",
+          "acc_x_peak",
+          "acc_x_std",
+          "acc_x_kurtosis",
+          "acc_x_skew",
+          "acc_y_rms",
+          "acc_y_peak",
+          "acc_y_std",
+          "acc_y_kurtosis",
+          "acc_y_skew",
+          "acc_x_rms_slope_5",
+          "acc_y_rms_slope_5",
+          "acc_x_rms_slope_20",
+          "acc_y_rms_slope_20",
+          "acc_x_kurtosis_slope_5",
+          "acc_y_kurtosis_slope_5",
+          "acc_x_kurtosis_slope_20",
+          "acc_y_kurtosis_slope_20",
+          "acc_x_spectral_centroid",
+          "acc_y_spectral_centroid",
+          "acc_x_high_band_ratio",
+          "acc_y_high_band_ratio"
+        ],
+        "train_only_scaler_units": [
+          "Bearing1_1",
+          "Bearing1_2",
+          "Bearing2_1",
+          "Bearing2_2"
+        ],
+        "source_label_scale": 119.0,
+        "source_train_windows": 404,
+        "source_validation_windows": 202,
+        "target_data_used_for_source_fit": false
+      },
+      "source_training": [
+        {
+          "seed": 42,
+          "best_validation_normalized_rmse": 0.289187490940094,
+          "best_epoch": 8,
+          "epochs_ran": 8,
+          "frozen_encoder": false,
+          "model_initialization_seed": 42
+        },
+        {
+          "seed": 123,
+          "best_validation_normalized_rmse": 0.24923719465732574,
+          "best_epoch": 8,
+          "epochs_ran": 8,
+          "frozen_encoder": false,
+          "model_initialization_seed": 123
+        }
+      ],
+      "target_audit_by_n": {
+        "1": {
+          "fit_groups": [
+            "1"
+          ],
+          "validation_groups": [
+            "4"
+          ],
+          "test_groups": [
+            "5"
+          ],
+          "feature_names": [
+            "周期编号",
+            "等效服役时长_小时",
+            "拉升阶段时长_秒",
+            "恒速阶段时长_秒",
+            "指令角速度_弧度每秒",
+            "拉升角速度斜率",
+            "恒速角速度均值_弧度每秒",
+            "恒速角速度标准差_弧度每秒",
+            "拉升电流峰值_安培",
+            "恒速电流均值_安培",
+            "恒速电流有效值_安培",
+            "电压均值_伏",
+            "绕组温度均值_摄氏度"
+          ],
+          "mean": [
+            149.5,
+            14463.900390625,
+            90.0,
+            90.0,
+            415.67572021484375,
+            4.473056793212891,
+            414.5334167480469,
+            3.265869140625,
+            0.1863289773464203,
+            0.11934666335582733,
+            0.119558185338974,
+            16.580934524536133,
+            23.049219131469727
+          ],
+          "std": [
+            86.60205841064453,
+            8234.99609375,
+            1.0,
+            1.0,
+            1.0,
+            0.22842518985271454,
+            3.5088841915130615,
+            5.979359149932861,
+            0.010209879837930202,
+            0.030780799686908722,
+            0.03096613474190235,
+            0.40736618638038635,
+            0.02441645972430706
+          ],
+          "label_scale_from_fit_groups": 269.0,
+          "test_labels_used_for_fit": false,
+          "test_labels_used_for_validation": false
+        },
+        "2": {
+          "fit_groups": [
+            "1",
+            "2"
+          ],
+          "validation_groups": [
+            "4"
+          ],
+          "test_groups": [
+            "5"
+          ],
+          "feature_names": [
+            "周期编号",
+            "等效服役时长_小时",
+            "拉升阶段时长_秒",
+            "恒速阶段时长_秒",
+            "指令角速度_弧度每秒",
+            "拉升角速度斜率",
+            "恒速角速度均值_弧度每秒",
+            "恒速角速度标准差_弧度每秒",
+            "拉升电流峰值_安培",
+            "恒速电流均值_安培",
+            "恒速电流有效值_安培",
+            "电压均值_伏",
+            "绕组温度均值_摄氏度"
+          ],
+          "mean": [
+            149.5,
+            14485.8154296875,
+            90.0,
+            90.0,
+            412.16510009765625,
+            4.453157424926758,
+            411.3780212402344,
+            2.7364232540130615,
+            0.18533796072006226,
+            0.11738096177577972,
+            0.117582306265831,
+            16.455392837524414,
+            23.04901885986328
+          ],
+          "std": [
+            86.60205841064453,
+            8243.1279296875,
+            1.0,
+            1.0,
+            3.5106048583984375,
+            0.20631778240203857,
+            4.166611671447754,
+            5.238101959228516,
+            0.01077408529818058,
+            0.029738808050751686,
+            0.02993199974298477,
+            0.39584240317344666,
+            0.020494380965828896
+          ],
+          "label_scale_from_fit_groups": 269.0,
+          "test_labels_used_for_fit": false,
+          "test_labels_used_for_validation": false
+        },
+        "3": {
+          "fit_groups": [
+            "1",
+            "2",
+            "3"
+          ],
+          "validation_groups": [
+            "4"
+          ],
+          "test_groups": [
+            "5"
+          ],
+          "feature_names": [
+            "周期编号",
+            "等效服役时长_小时",
+            "拉升阶段时长_秒",
+            "恒速阶段时长_秒",
+            "指令角速度_弧度每秒",
+            "拉升角速度斜率",
+            "恒速角速度均值_弧度每秒",
+            "恒速角速度标准差_弧度每秒",
+            "拉升电流峰值_安培",
+            "恒速电流均值_安培",
+            "恒速电流有效值_安培",
+            "电压均值_伏",
+            "绕组温度均值_摄氏度"
+          ],
+          "mean": [
+            149.5,
+            14653.830078125,
+            90.0,
+            90.0,
+            413.49298095703125,
+            4.455626487731934,
+            412.3999938964844,
+            3.083988666534424,
+            0.1863963007926941,
+            0.11866846680641174,
+            0.11888198554515839,
+            16.472352981567383,
+            23.049367904663086
+          ],
+          "std": [
+            86.60205841064453,
+            8303.2861328125,
+            1.0,
+            1.0,
+            3.4267680644989014,
+            0.2216910421848297,
+            4.68575382232666,
+            5.741882801055908,
+            0.010720699094235897,
+            0.030660852789878845,
+            0.030841676518321037,
+            0.43403080105781555,
+            0.02086690627038479
+          ],
+          "label_scale_from_fit_groups": 269.0,
+          "test_labels_used_for_fit": false,
+          "test_labels_used_for_validation": false
+        }
+      },
+      "source_model_parameter_count": 26903
+    },
+    "ims": {
+      "manifest": {
+        "source": "ims",
+        "sha256": "887eea9cdb541ff40de8164f1913f9a37d22b12e3c48cc0eaa2d6dc7c100f4e6",
+        "unit_names": [
+          "2nd_test",
+          "3rd_test"
+        ],
+        "source_train_units": [
+          "2nd_test"
+        ],
+        "source_validation_units": [
+          "3rd_test"
+        ],
+        "feature_names": [
+          "spectral_bin_01",
+          "spectral_bin_02",
+          "spectral_bin_03",
+          "spectral_bin_04",
+          "spectral_bin_05",
+          "spectral_bin_06",
+          "spectral_bin_07",
+          "spectral_bin_08",
+          "spectral_bin_09",
+          "spectral_bin_10",
+          "spectral_bin_11",
+          "spectral_bin_12",
+          "spectral_bin_13",
+          "spectral_bin_14",
+          "spectral_bin_15",
+          "spectral_bin_16",
+          "spectral_bin_17",
+          "spectral_bin_18",
+          "spectral_bin_19",
+          "spectral_bin_20"
+        ],
+        "train_only_scaler_units": [
+          "2nd_test"
+        ],
+        "source_label_scale": 6.81944465637207,
+        "source_train_windows": 962,
+        "source_validation_windows": 6302,
+        "target_data_used_for_source_fit": false
+      },
+      "source_training": [
+        {
+          "seed": 42,
+          "best_validation_normalized_rmse": 3.570830821990967,
+          "best_epoch": 8,
+          "epochs_ran": 8,
+          "frozen_encoder": false,
+          "model_initialization_seed": 42
+        },
+        {
+          "seed": 123,
+          "best_validation_normalized_rmse": 3.5423498153686523,
+          "best_epoch": 8,
+          "epochs_ran": 8,
+          "frozen_encoder": false,
+          "model_initialization_seed": 123
+        }
+      ],
+      "target_audit_by_n": {
+        "1": {
+          "fit_groups": [
+            "1"
+          ],
+          "validation_groups": [
+            "4"
+          ],
+          "test_groups": [
+            "5"
+          ],
+          "feature_names": [
+            "周期编号",
+            "等效服役时长_小时",
+            "拉升阶段时长_秒",
+            "恒速阶段时长_秒",
+            "指令角速度_弧度每秒",
+            "拉升角速度斜率",
+            "恒速角速度均值_弧度每秒",
+            "恒速角速度标准差_弧度每秒",
+            "拉升电流峰值_安培",
+            "恒速电流均值_安培",
+            "恒速电流有效值_安培",
+            "电压均值_伏",
+            "绕组温度均值_摄氏度"
+          ],
+          "mean": [
+            149.5,
+            14463.900390625,
+            90.0,
+            90.0,
+            415.67572021484375,
+            4.473056793212891,
+            414.5334167480469,
+            3.265869140625,
+            0.1863289773464203,
+            0.11934666335582733,
+            0.119558185338974,
+            16.580934524536133,
+            23.049219131469727
+          ],
+          "std": [
+            86.60205841064453,
+            8234.99609375,
+            1.0,
+            1.0,
+            1.0,
+            0.22842518985271454,
+            3.5088841915130615,
+            5.979359149932861,
+            0.010209879837930202,
+            0.030780799686908722,
+            0.03096613474190235,
+            0.40736618638038635,
+            0.02441645972430706
+          ],
+          "label_scale_from_fit_groups": 269.0,
+          "test_labels_used_for_fit": false,
+          "test_labels_used_for_validation": false
+        },
+        "2": {
+          "fit_groups": [
+            "1",
+            "2"
+          ],
+          "validation_groups": [
+            "4"
+          ],
+          "test_groups": [
+            "5"
+          ],
+          "feature_names": [
+            "周期编号",
+            "等效服役时长_小时",
+            "拉升阶段时长_秒",
+            "恒速阶段时长_秒",
+            "指令角速度_弧度每秒",
+            "拉升角速度斜率",
+            "恒速角速度均值_弧度每秒",
+            "恒速角速度标准差_弧度每秒",
+            "拉升电流峰值_安培",
+            "恒速电流均值_安培",
+            "恒速电流有效值_安培",
+            "电压均值_伏",
+            "绕组温度均值_摄氏度"
+          ],
+          "mean": [
+            149.5,
+            14485.8154296875,
+            90.0,
+            90.0,
+            412.16510009765625,
+            4.453157424926758,
+            411.3780212402344,
+            2.7364232540130615,
+            0.18533796072006226,
+            0.11738096177577972,
+            0.117582306265831,
+            16.455392837524414,
+            23.04901885986328
+          ],
+          "std": [
+            86.60205841064453,
+            8243.1279296875,
+            1.0,
+            1.0,
+            3.5106048583984375,
+            0.20631778240203857,
+            4.166611671447754,
+            5.238101959228516,
+            0.01077408529818058,
+            0.029738808050751686,
+            0.02993199974298477,
+            0.39584240317344666,
+            0.020494380965828896
+          ],
+          "label_scale_from_fit_groups": 269.0,
+          "test_labels_used_for_fit": false,
+          "test_labels_used_for_validation": false
+        },
+        "3": {
+          "fit_groups": [
+            "1",
+            "2",
+            "3"
+          ],
+          "validation_groups": [
+            "4"
+          ],
+          "test_groups": [
+            "5"
+          ],
+          "feature_names": [
+            "周期编号",
+            "等效服役时长_小时",
+            "拉升阶段时长_秒",
+            "恒速阶段时长_秒",
+            "指令角速度_弧度每秒",
+            "拉升角速度斜率",
+            "恒速角速度均值_弧度每秒",
+            "恒速角速度标准差_弧度每秒",
+            "拉升电流峰值_安培",
+            "恒速电流均值_安培",
+            "恒速电流有效值_安培",
+            "电压均值_伏",
+            "绕组温度均值_摄氏度"
+          ],
+          "mean": [
+            149.5,
+            14653.830078125,
+            90.0,
+            90.0,
+            413.49298095703125,
+            4.455626487731934,
+            412.3999938964844,
+            3.083988666534424,
+            0.1863963007926941,
+            0.11866846680641174,
+            0.11888198554515839,
+            16.472352981567383,
+            23.049367904663086
+          ],
+          "std": [
+            86.60205841064453,
+            8303.2861328125,
+            1.0,
+            1.0,
+            3.4267680644989014,
+            0.2216910421848297,
+            4.68575382232666,
+            5.741882801055908,
+            0.010720699094235897,
+            0.030660852789878845,
+            0.030841676518321037,
+            0.43403080105781555,
+            0.02086690627038479
+          ],
+          "label_scale_from_fit_groups": 269.0,
+          "test_labels_used_for_fit": false,
+          "test_labels_used_for_validation": false
+        }
+      },
+      "source_model_parameter_count": 26803
+    }
+  },
+  "macro_rows": [
+    {
+      "source": "femto",
+      "n_shots": 1,
+      "method": "transfer",
+      "seed": 42,
+      "raw_rmse": 82.53105163574219,
+      "mae": 64.85769653320312,
+      "bias": -58.3448486328125,
+      "normalized_rmse": 0.30680688340424606,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.33053985238075256,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 1042
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 1,
+      "method": "transfer",
+      "seed": 123,
+      "raw_rmse": 83.06980895996094,
+      "mae": 62.5578498840332,
+      "bias": -55.80601119995117,
+      "normalized_rmse": 0.30880969873591424,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.38554030656814575,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 1123
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 1,
+      "method": "frozen_encoder",
+      "seed": 42,
+      "raw_rmse": 101.79422760009766,
+      "mae": 81.0246810913086,
+      "bias": -74.70762634277344,
+      "normalized_rmse": 0.3784172029743407,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.41280731558799744,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": true,
+        "model_initialization_seed": 1042
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 1,
+      "method": "frozen_encoder",
+      "seed": 123,
+      "raw_rmse": 102.4565200805664,
+      "mae": 79.80342102050781,
+      "bias": -75.49625396728516,
+      "normalized_rmse": 0.38087925680507956,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.4475432336330414,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": true,
+        "model_initialization_seed": 1123
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 1,
+      "method": "scratch",
+      "seed": 42,
+      "raw_rmse": 67.06238555908203,
+      "mae": 48.01939010620117,
+      "bias": -46.94390106201172,
+      "normalized_rmse": 0.24930254854677336,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.29687416553497314,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 1042
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 1,
+      "method": "scratch",
+      "seed": 123,
+      "raw_rmse": 79.43663787841797,
+      "mae": 51.33025360107422,
+      "bias": -49.587711334228516,
+      "normalized_rmse": 0.2953034865368698,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.355915367603302,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 1123
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 1,
+      "method": "ridge",
+      "seed": null,
+      "raw_rmse": 9.251230239868164,
+      "mae": 7.306710243225098,
+      "bias": 7.306710243225098,
+      "normalized_rmse": 0.03439119048278128,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "ridge_alpha": 0.0001,
+      "ridge_validation_rmse": 1.0449960231781006
+    },
+    {
+      "source": "femto",
+      "n_shots": 1,
+      "method": "transfer_ensemble",
+      "seed": null,
+      "raw_rmse": 82.6845932006836,
+      "mae": 63.7077751159668,
+      "bias": -57.0754280090332,
+      "normalized_rmse": 0.30737766989101706,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "femto",
+      "n_shots": 1,
+      "method": "frozen_encoder_ensemble",
+      "seed": null,
+      "raw_rmse": 102.0815200805664,
+      "mae": 80.38946533203125,
+      "bias": -75.10193634033203,
+      "normalized_rmse": 0.37948520476046993,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "femto",
+      "n_shots": 1,
+      "method": "scratch_ensemble",
+      "seed": null,
+      "raw_rmse": 72.98648071289062,
+      "mae": 49.48773193359375,
+      "bias": -48.265804290771484,
+      "normalized_rmse": 0.2713252071111176,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "femto",
+      "n_shots": 1,
+      "method": "ridge_ensemble",
+      "seed": null,
+      "raw_rmse": 9.251230239868164,
+      "mae": 7.306710243225098,
+      "bias": 7.306710243225098,
+      "normalized_rmse": 0.03439119048278128,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "femto",
+      "n_shots": 2,
+      "method": "transfer",
+      "seed": 42,
+      "raw_rmse": 87.57174682617188,
+      "mae": 66.20292663574219,
+      "bias": -53.319400787353516,
+      "normalized_rmse": 0.3255455272348397,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.37180420756340027,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 2042
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 2,
+      "method": "transfer",
+      "seed": 123,
+      "raw_rmse": 69.15174865722656,
+      "mae": 48.15260314941406,
+      "bias": -43.605167388916016,
+      "normalized_rmse": 0.2570696976105077,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.31372496485710144,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 2123
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 2,
+      "method": "frozen_encoder",
+      "seed": 42,
+      "raw_rmse": 98.99537658691406,
+      "mae": 74.90339660644531,
+      "bias": -67.06007385253906,
+      "normalized_rmse": 0.36801255236771024,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.41763681173324585,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": true,
+        "model_initialization_seed": 2042
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 2,
+      "method": "frozen_encoder",
+      "seed": 123,
+      "raw_rmse": 89.06959533691406,
+      "mae": 68.43089294433594,
+      "bias": -60.243194580078125,
+      "normalized_rmse": 0.3311137373119482,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.3870418667793274,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": true,
+        "model_initialization_seed": 2123
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 2,
+      "method": "scratch",
+      "seed": 42,
+      "raw_rmse": 97.08465576171875,
+      "mae": 76.64329528808594,
+      "bias": -69.82270050048828,
+      "normalized_rmse": 0.3609095009729322,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.42017698287963867,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 2042
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 2,
+      "method": "scratch",
+      "seed": 123,
+      "raw_rmse": 74.8275375366211,
+      "mae": 57.33415985107422,
+      "bias": -52.61201095581055,
+      "normalized_rmse": 0.278169284522755,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.3309115767478943,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 2123
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 2,
+      "method": "ridge",
+      "seed": null,
+      "raw_rmse": 8.702335357666016,
+      "mae": 6.549773216247559,
+      "bias": 6.265874862670898,
+      "normalized_rmse": 0.03235068906195545,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "ridge_alpha": 0.01,
+      "ridge_validation_rmse": 0.9851158261299133
+    },
+    {
+      "source": "femto",
+      "n_shots": 2,
+      "method": "transfer_ensemble",
+      "seed": null,
+      "raw_rmse": 78.16224670410156,
+      "mae": 56.42182540893555,
+      "bias": -48.462284088134766,
+      "normalized_rmse": 0.290565972877701,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "femto",
+      "n_shots": 2,
+      "method": "frozen_encoder_ensemble",
+      "seed": null,
+      "raw_rmse": 93.97403717041016,
+      "mae": 71.50473022460938,
+      "bias": -63.651634216308594,
+      "normalized_rmse": 0.3493458630870266,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "femto",
+      "n_shots": 2,
+      "method": "scratch_ensemble",
+      "seed": null,
+      "raw_rmse": 85.84906768798828,
+      "mae": 66.98365783691406,
+      "bias": -61.21736145019531,
+      "normalized_rmse": 0.31914151556872966,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "femto",
+      "n_shots": 2,
+      "method": "ridge_ensemble",
+      "seed": null,
+      "raw_rmse": 8.702335357666016,
+      "mae": 6.549773216247559,
+      "bias": 6.265874862670898,
+      "normalized_rmse": 0.03235068906195545,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "femto",
+      "n_shots": 3,
+      "method": "transfer",
+      "seed": 42,
+      "raw_rmse": 76.49571228027344,
+      "mae": 54.231422424316406,
+      "bias": -43.029212951660156,
+      "normalized_rmse": 0.2843706776218343,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.3524891436100006,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 3042
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 3,
+      "method": "transfer",
+      "seed": 123,
+      "raw_rmse": 69.31986999511719,
+      "mae": 54.14395523071289,
+      "bias": -47.120792388916016,
+      "normalized_rmse": 0.2576946839967182,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.3147241175174713,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 3123
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 3,
+      "method": "frozen_encoder",
+      "seed": 42,
+      "raw_rmse": 95.63865661621094,
+      "mae": 75.14684295654297,
+      "bias": -57.3568229675293,
+      "normalized_rmse": 0.3555340394654682,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.41869133710861206,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": true,
+        "model_initialization_seed": 3042
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 3,
+      "method": "frozen_encoder",
+      "seed": 123,
+      "raw_rmse": 92.04467010498047,
+      "mae": 74.07823944091797,
+      "bias": -64.5539321899414,
+      "normalized_rmse": 0.3421734948140538,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.3975926637649536,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": true,
+        "model_initialization_seed": 3123
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 3,
+      "method": "scratch",
+      "seed": 42,
+      "raw_rmse": 72.76605987548828,
+      "mae": 51.10689926147461,
+      "bias": -44.95445251464844,
+      "normalized_rmse": 0.27050579879363673,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.3295214772224426,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 3042
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 3,
+      "method": "scratch",
+      "seed": 123,
+      "raw_rmse": 77.60400390625,
+      "mae": 55.942230224609375,
+      "bias": -52.11277770996094,
+      "normalized_rmse": 0.2884907208410781,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.35305795073509216,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 3123
+      }
+    },
+    {
+      "source": "femto",
+      "n_shots": 3,
+      "method": "ridge",
+      "seed": null,
+      "raw_rmse": 6.766458511352539,
+      "mae": 5.3681440353393555,
+      "bias": 5.340639591217041,
+      "normalized_rmse": 0.025154120860046612,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "ridge_alpha": 0.001,
+      "ridge_validation_rmse": 3.7536375522613525
+    },
+    {
+      "source": "femto",
+      "n_shots": 3,
+      "method": "transfer_ensemble",
+      "seed": null,
+      "raw_rmse": 72.3829345703125,
+      "mae": 53.083656311035156,
+      "bias": -45.07500457763672,
+      "normalized_rmse": 0.2690815411535781,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "femto",
+      "n_shots": 3,
+      "method": "frozen_encoder_ensemble",
+      "seed": null,
+      "raw_rmse": 93.54723358154297,
+      "mae": 74.22159576416016,
+      "bias": -60.95537567138672,
+      "normalized_rmse": 0.34775923264514114,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "femto",
+      "n_shots": 3,
+      "method": "scratch_ensemble",
+      "seed": null,
+      "raw_rmse": 75.10536193847656,
+      "mae": 53.523963928222656,
+      "bias": -48.53361511230469,
+      "normalized_rmse": 0.2792020889906192,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "femto",
+      "n_shots": 3,
+      "method": "ridge_ensemble",
+      "seed": null,
+      "raw_rmse": 6.766458511352539,
+      "mae": 5.3681440353393555,
+      "bias": 5.340639591217041,
+      "normalized_rmse": 0.025154120860046612,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "ims",
+      "n_shots": 1,
+      "method": "transfer",
+      "seed": 42,
+      "raw_rmse": 85.64514923095703,
+      "mae": 59.50080490112305,
+      "bias": -57.940162658691406,
+      "normalized_rmse": 0.31838345439017485,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.38084888458251953,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 1042
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 1,
+      "method": "transfer",
+      "seed": 123,
+      "raw_rmse": 50.68034744262695,
+      "mae": 32.31048583984375,
+      "bias": -28.743661880493164,
+      "normalized_rmse": 0.18840277859712623,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.31491026282310486,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 1123
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 1,
+      "method": "frozen_encoder",
+      "seed": 42,
+      "raw_rmse": 103.78925323486328,
+      "mae": 78.3329086303711,
+      "bias": -71.652587890625,
+      "normalized_rmse": 0.3858336551481906,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.4462214410305023,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": true,
+        "model_initialization_seed": 1042
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 1,
+      "method": "frozen_encoder",
+      "seed": 123,
+      "raw_rmse": 69.37500762939453,
+      "mae": 52.59320831298828,
+      "bias": -43.06153106689453,
+      "normalized_rmse": 0.25789965661484954,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.3551502525806427,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": true,
+        "model_initialization_seed": 1123
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 1,
+      "method": "scratch",
+      "seed": 42,
+      "raw_rmse": 101.4284896850586,
+      "mae": 78.64730834960938,
+      "bias": -73.48628234863281,
+      "normalized_rmse": 0.3770575824723368,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.4462144076824188,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 1042
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 1,
+      "method": "scratch",
+      "seed": 123,
+      "raw_rmse": 65.3302001953125,
+      "mae": 47.7799072265625,
+      "bias": -39.107208251953125,
+      "normalized_rmse": 0.2428631977520911,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.3620739281177521,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 1123
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 1,
+      "method": "ridge",
+      "seed": null,
+      "raw_rmse": 9.251230239868164,
+      "mae": 7.306710243225098,
+      "bias": 7.306710243225098,
+      "normalized_rmse": 0.03439119048278128,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "ridge_alpha": 0.0001,
+      "ridge_validation_rmse": 1.0449960231781006
+    },
+    {
+      "source": "ims",
+      "n_shots": 1,
+      "method": "transfer_ensemble",
+      "seed": null,
+      "raw_rmse": 67.86863708496094,
+      "mae": 44.7854118347168,
+      "bias": -43.34191131591797,
+      "normalized_rmse": 0.2522997661150964,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "ims",
+      "n_shots": 1,
+      "method": "frozen_encoder_ensemble",
+      "seed": null,
+      "raw_rmse": 86.45587158203125,
+      "mae": 65.2493896484375,
+      "bias": -57.357059478759766,
+      "normalized_rmse": 0.32139729212651025,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "ims",
+      "n_shots": 1,
+      "method": "scratch_ensemble",
+      "seed": null,
+      "raw_rmse": 82.94340515136719,
+      "mae": 62.63134765625,
+      "bias": -56.29674530029297,
+      "normalized_rmse": 0.30833979610173673,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "ims",
+      "n_shots": 1,
+      "method": "ridge_ensemble",
+      "seed": null,
+      "raw_rmse": 9.251230239868164,
+      "mae": 7.306710243225098,
+      "bias": 7.306710243225098,
+      "normalized_rmse": 0.03439119048278128,
+      "n": 281,
+      "fit_groups": [
+        "1"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "ims",
+      "n_shots": 2,
+      "method": "transfer",
+      "seed": 42,
+      "raw_rmse": 95.91912078857422,
+      "mae": 73.23211669921875,
+      "bias": -68.45757293701172,
+      "normalized_rmse": 0.3565766572065956,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.4188028573989868,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 2042
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 2,
+      "method": "transfer",
+      "seed": 123,
+      "raw_rmse": 75.7700424194336,
+      "mae": 53.89891052246094,
+      "bias": -49.22745132446289,
+      "normalized_rmse": 0.2816730201465933,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.3393036127090454,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 2123
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 2,
+      "method": "frozen_encoder",
+      "seed": 42,
+      "raw_rmse": 116.70642852783203,
+      "mae": 90.28236389160156,
+      "bias": -89.47826385498047,
+      "normalized_rmse": 0.4338528941555094,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.5006908774375916,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": true,
+        "model_initialization_seed": 2042
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 2,
+      "method": "frozen_encoder",
+      "seed": 123,
+      "raw_rmse": 93.45978546142578,
+      "mae": 72.59478759765625,
+      "bias": -63.85243225097656,
+      "normalized_rmse": 0.3474341466967501,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.4061098098754883,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": true,
+        "model_initialization_seed": 2123
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 2,
+      "method": "scratch",
+      "seed": 42,
+      "raw_rmse": 86.29866027832031,
+      "mae": 66.78240966796875,
+      "bias": -63.69270706176758,
+      "normalized_rmse": 0.3208128634881796,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.3789842128753662,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 2042
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 2,
+      "method": "scratch",
+      "seed": 123,
+      "raw_rmse": 79.47393798828125,
+      "mae": 56.44089126586914,
+      "bias": -50.63284683227539,
+      "normalized_rmse": 0.29544214865532065,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.35515862703323364,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 2123
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 2,
+      "method": "ridge",
+      "seed": null,
+      "raw_rmse": 8.702335357666016,
+      "mae": 6.549773216247559,
+      "bias": 6.265874862670898,
+      "normalized_rmse": 0.03235068906195545,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "ridge_alpha": 0.01,
+      "ridge_validation_rmse": 0.9851158261299133
+    },
+    {
+      "source": "ims",
+      "n_shots": 2,
+      "method": "transfer_ensemble",
+      "seed": null,
+      "raw_rmse": 85.67704772949219,
+      "mae": 63.56250762939453,
+      "bias": -58.84251403808594,
+      "normalized_rmse": 0.31850203616911593,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "ims",
+      "n_shots": 2,
+      "method": "frozen_encoder_ensemble",
+      "seed": null,
+      "raw_rmse": 104.8807373046875,
+      "mae": 81.202392578125,
+      "bias": -76.66535186767578,
+      "normalized_rmse": 0.3898912167460502,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "ims",
+      "n_shots": 2,
+      "method": "scratch_ensemble",
+      "seed": null,
+      "raw_rmse": 82.55904388427734,
+      "mae": 61.42215347290039,
+      "bias": -57.162776947021484,
+      "normalized_rmse": 0.3069109438077225,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "ims",
+      "n_shots": 2,
+      "method": "ridge_ensemble",
+      "seed": null,
+      "raw_rmse": 8.702335357666016,
+      "mae": 6.549773216247559,
+      "bias": 6.265874862670898,
+      "normalized_rmse": 0.03235068906195545,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "ims",
+      "n_shots": 3,
+      "method": "transfer",
+      "seed": 42,
+      "raw_rmse": 49.343814849853516,
+      "mae": 35.07673263549805,
+      "bias": -23.15764045715332,
+      "normalized_rmse": 0.18343425594741083,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.22777286171913147,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 3042
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 3,
+      "method": "transfer",
+      "seed": 123,
+      "raw_rmse": 52.175174713134766,
+      "mae": 34.76723098754883,
+      "bias": -27.095993041992188,
+      "normalized_rmse": 0.19395975729789874,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.2518587112426758,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 3123
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 3,
+      "method": "frozen_encoder",
+      "seed": 42,
+      "raw_rmse": 70.98272705078125,
+      "mae": 55.02698516845703,
+      "bias": -39.577911376953125,
+      "normalized_rmse": 0.2638763087389637,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.30982691049575806,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": true,
+        "model_initialization_seed": 3042
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 3,
+      "method": "frozen_encoder",
+      "seed": 123,
+      "raw_rmse": 68.85725402832031,
+      "mae": 51.57175064086914,
+      "bias": -38.65825271606445,
+      "normalized_rmse": 0.25597492203836547,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.31206533312797546,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": true,
+        "model_initialization_seed": 3123
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 3,
+      "method": "scratch",
+      "seed": 42,
+      "raw_rmse": 65.80333709716797,
+      "mae": 47.7359504699707,
+      "bias": -33.788394927978516,
+      "normalized_rmse": 0.24462207099318947,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.29748213291168213,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 3042
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 3,
+      "method": "scratch",
+      "seed": 123,
+      "raw_rmse": 47.613380432128906,
+      "mae": 32.46087646484375,
+      "bias": -21.54676055908203,
+      "normalized_rmse": 0.17700141424583238,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "fit_diagnostics": {
+        "best_validation_normalized_rmse": 0.2328767329454422,
+        "best_epoch": 8,
+        "epochs_ran": 8,
+        "frozen_encoder": false,
+        "model_initialization_seed": 3123
+      }
+    },
+    {
+      "source": "ims",
+      "n_shots": 3,
+      "method": "ridge",
+      "seed": null,
+      "raw_rmse": 6.766458511352539,
+      "mae": 5.3681440353393555,
+      "bias": 5.340639591217041,
+      "normalized_rmse": 0.025154120860046612,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ],
+      "ridge_alpha": 0.001,
+      "ridge_validation_rmse": 3.7536375522613525
+    },
+    {
+      "source": "ims",
+      "n_shots": 3,
+      "method": "transfer_ensemble",
+      "seed": null,
+      "raw_rmse": 50.58547592163086,
+      "mae": 33.88481140136719,
+      "bias": -25.12681770324707,
+      "normalized_rmse": 0.18805009636294,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "ims",
+      "n_shots": 3,
+      "method": "frozen_encoder_ensemble",
+      "seed": null,
+      "raw_rmse": 69.87730407714844,
+      "mae": 53.200382232666016,
+      "bias": -39.11808395385742,
+      "normalized_rmse": 0.2597669296548269,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "ims",
+      "n_shots": 3,
+      "method": "scratch_ensemble",
+      "seed": null,
+      "raw_rmse": 56.412025451660156,
+      "mae": 39.52724075317383,
+      "bias": -27.667579650878906,
+      "normalized_rmse": 0.2097101317905582,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    },
+    {
+      "source": "ims",
+      "n_shots": 3,
+      "method": "ridge_ensemble",
+      "seed": null,
+      "raw_rmse": 6.766458511352539,
+      "mae": 5.3681440353393555,
+      "bias": 5.340639591217041,
+      "normalized_rmse": 0.025154120860046612,
+      "n": 281,
+      "fit_groups": [
+        "1",
+        "2",
+        "3"
+      ],
+      "validation_groups": [
+        "4"
+      ],
+      "test_groups": [
+        "5"
+      ]
+    }
+  ],
+  "elapsed_sec": 35.12617111206055
+}

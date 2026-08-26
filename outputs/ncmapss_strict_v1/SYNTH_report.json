@@ -1,0 +1,124 @@
+{
+  "dataset": "SYNTH",
+  "dev_units": 6,
+  "test_units": 2,
+  "selected_candidate": {
+    "name": "ms_tcn_phys_cond",
+    "model": "ms_tcn",
+    "feature_set": "physical_with_conditions",
+    "seq_len": 30,
+    "hidden": 96,
+    "dropout": 0.1
+  },
+  "frozen_epochs": 10,
+  "seed_ids": [
+    42
+  ],
+  "per_seed_test_rmse": [
+    35.17436218261719
+  ],
+  "ensemble_test_rmse": 35.17436218261719,
+  "metrics": [
+    {
+      "name": "selected_neural",
+      "rmse": 35.17436218261719,
+      "mae": 31.326663970947266,
+      "bias": -20.00550079345703,
+      "nrmse": 0.2813948974609375,
+      "nasa_score": 9253.248046875,
+      "n": 425
+    },
+    {
+      "name": "ridge",
+      "rmse": 34.333900451660156,
+      "mae": 29.640365600585938,
+      "bias": -18.43386459350586,
+      "nrmse": 0.27467120361328123,
+      "nasa_score": 12278.2080078125,
+      "n": 425
+    },
+    {
+      "name": "mean_baseline",
+      "rmse": 43.3107795715332,
+      "mae": 39.55079650878906,
+      "bias": -12.189833641052246,
+      "nrmse": 0.3464862365722656,
+      "nasa_score": 49330.37109375,
+      "n": 425
+    }
+  ],
+  "candidate_selection": [
+    {
+      "candidate": {
+        "name": "ms_tcn_phys_cond",
+        "model": "ms_tcn",
+        "feature_set": "physical_with_conditions",
+        "seq_len": 30,
+        "hidden": 96,
+        "dropout": 0.1
+      },
+      "val_rmse": 21.053422927856445,
+      "val_rmse_std": 0.0,
+      "median_best_epoch_sel": 8,
+      "median_best_epoch_final": 10
+    },
+    {
+      "candidate": {
+        "name": "bigru_attn_phys_cond",
+        "model": "bigru_attn",
+        "feature_set": "physical_with_conditions",
+        "seq_len": 30,
+        "hidden": 96,
+        "dropout": 0.1
+      },
+      "val_rmse": 28.08238983154297,
+      "val_rmse_std": 0.0,
+      "median_best_epoch_sel": 5,
+      "median_best_epoch_final": 10
+    },
+    {
+      "candidate": {
+        "name": "transformer_phys_cond",
+        "model": "transformer",
+        "feature_set": "physical_with_conditions",
+        "seq_len": 30,
+        "hidden": 96,
+        "dropout": 0.1
+      },
+      "val_rmse": 26.61960792541504,
+      "val_rmse_std": 0.0,
+      "median_best_epoch_sel": 9,
+      "median_best_epoch_final": 10
+    }
+  ],
+  "scaler": {
+    "feature_set": "physical_with_conditions",
+    "feature_names": [
+      "alt",
+      "Mach",
+      "TRA",
+      "T2",
+      "Ps30",
+      "phi",
+      "NRf",
+      "NRc",
+      "BPR",
+      "htBleed",
+      "Nf_dmd",
+      "PCNfR_dmd",
+      "W31",
+      "W32",
+      "T24",
+      "T30",
+      "T48",
+      "T50"
+    ],
+    "fit_dataset": "SYNTH",
+    "fit_split": "dev"
+  },
+  "loss_config": {
+    "weibull_alpha": 0.25,
+    "weibull_eta": 100.0,
+    "weibull_beta": 3.0
+  }
+}

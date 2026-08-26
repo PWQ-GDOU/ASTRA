@@ -1,0 +1,14 @@
+{
+  "updated_at": 1787292432.4685054,
+  "schema": "femto_ims_to_comsol_supervisor_v1",
+  "state": "completed",
+  "attempt": 1,
+  "supervisor_elapsed_sec": 210.24977411600003,
+  "published_output": "/workspace/outputs/reproducibility/femto-ims-to-comsol-20260821T010000Z/full",
+  "macro_rows": 120,
+  "sources": [
+    "femto",
+    "ims"
+  ],
+  "report_elapsed_sec": 190.05766558647156
+}

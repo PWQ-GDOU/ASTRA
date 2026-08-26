@@ -1,0 +1,855 @@
+{
+  "protocol": "nested cell-LOOCV; strict14 exact labels; B0007 right-censored",
+  "selection_seeds": [
+    42,
+    123,
+    456,
+    2026,
+    3407
+  ],
+  "final_seeds": [
+    42,
+    123,
+    456,
+    2026,
+    3407
+  ],
+  "candidates": [
+    {
+      "name": "ms_l16",
+      "model": "ms",
+      "seq_len": 16,
+      "use_age": true,
+      "use_capacity_aux": true
+    },
+    {
+      "name": "gru_l16",
+      "model": "gru",
+      "seq_len": 16,
+      "use_age": true,
+      "use_capacity_aux": true
+    },
+    {
+      "name": "transformer_l16",
+      "model": "transformer",
+      "seq_len": 16,
+      "use_age": true,
+      "use_capacity_aux": true
+    },
+    {
+      "name": "life_l8",
+      "model": "life",
+      "seq_len": 8,
+      "use_age": true,
+      "use_capacity_aux": true
+    },
+    {
+      "name": "life_l16",
+      "model": "life",
+      "seq_len": 16,
+      "use_age": true,
+      "use_capacity_aux": true
+    },
+    {
+      "name": "life_l24",
+      "model": "life",
+      "seq_len": 24,
+      "use_age": true,
+      "use_capacity_aux": true
+    },
+    {
+      "name": "life_l16_no_aux",
+      "model": "life",
+      "seq_len": 16,
+      "use_age": true,
+      "use_capacity_aux": false
+    },
+    {
+      "name": "life_l16_no_age",
+      "model": "life",
+      "seq_len": 16,
+      "use_age": false,
+      "use_capacity_aux": true
+    }
+  ],
+  "fixed_families": [
+    "ms_l16",
+    "life_l16",
+    "gru_l16",
+    "transformer_l16"
+  ],
+  "common_endpoint": 23,
+  "selection_epoch_budget": 160,
+  "outer_selections": [
+    {
+      "outer_holdout": "B0005",
+      "neural_selection": {
+        "candidate": {
+          "name": "life_l24",
+          "model": "life",
+          "seq_len": 24,
+          "use_age": true,
+          "use_capacity_aux": true
+        },
+        "mean_inner_rmse": 10.38889765739441,
+        "fixed_epochs": 26
+      },
+      "method_selection": {
+        "candidate": {
+          "name": "life_l24",
+          "model": "life",
+          "seq_len": 24,
+          "use_age": true,
+          "use_capacity_aux": true
+        },
+        "mean_inner_rmse": 10.372924327850342,
+        "neural_inner_rmse": 10.38889765739441,
+        "ridge_inner_rmse": 14.050317764282227,
+        "improvement_vs_ridge": 3.6773934364318848,
+        "fixed_epochs": 26,
+        "blend_alpha": 0.9400000000000001
+      },
+      "candidate_rows": [
+        {
+          "candidate": {
+            "name": "ms_l16",
+            "model": "ms",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0006": 8.176565170288086,
+            "B0018": 15.063605308532715
+          },
+          "mean_rmse": 11.6200852394104,
+          "ridge_mean_rmse": 14.050317764282227,
+          "blend_alpha": 0.8,
+          "blend_mean_rmse": 11.443470239639282,
+          "blend_improvement_vs_ridge": 2.6068475246429443,
+          "median_best_epoch": 34
+        },
+        {
+          "candidate": {
+            "name": "gru_l16",
+            "model": "gru",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0006": 11.781900405883789,
+            "B0018": 16.352779388427734
+          },
+          "mean_rmse": 14.067339897155762,
+          "ridge_mean_rmse": 14.050317764282227,
+          "blend_alpha": 0.49,
+          "blend_mean_rmse": 12.685949802398682,
+          "blend_improvement_vs_ridge": 1.364367961883545,
+          "median_best_epoch": 23
+        },
+        {
+          "candidate": {
+            "name": "transformer_l16",
+            "model": "transformer",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0006": 10.649985313415527,
+            "B0018": 14.721418380737305
+          },
+          "mean_rmse": 12.685701847076416,
+          "ridge_mean_rmse": 14.050317764282227,
+          "blend_alpha": 0.73,
+          "blend_mean_rmse": 12.476741313934326,
+          "blend_improvement_vs_ridge": 1.5735764503479004,
+          "median_best_epoch": 36
+        },
+        {
+          "candidate": {
+            "name": "life_l8",
+            "model": "life",
+            "seq_len": 8,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0006": 9.425043106079102,
+            "B0018": 16.099905014038086
+          },
+          "mean_rmse": 12.762474060058594,
+          "ridge_mean_rmse": 14.050317764282227,
+          "blend_alpha": 0.68,
+          "blend_mean_rmse": 12.350173950195312,
+          "blend_improvement_vs_ridge": 1.700143814086914,
+          "median_best_epoch": 37
+        },
+        {
+          "candidate": {
+            "name": "life_l16",
+            "model": "life",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0006": 8.289013862609863,
+            "B0018": 14.408652305603027
+          },
+          "mean_rmse": 11.348833084106445,
+          "ridge_mean_rmse": 14.050317764282227,
+          "blend_alpha": 0.8,
+          "blend_mean_rmse": 11.155427932739258,
+          "blend_improvement_vs_ridge": 2.8948898315429688,
+          "median_best_epoch": 27
+        },
+        {
+          "candidate": {
+            "name": "life_l24",
+            "model": "life",
+            "seq_len": 24,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0006": 7.537614345550537,
+            "B0018": 13.240180969238281
+          },
+          "mean_rmse": 10.38889765739441,
+          "ridge_mean_rmse": 14.050317764282227,
+          "blend_alpha": 0.9400000000000001,
+          "blend_mean_rmse": 10.372924327850342,
+          "blend_improvement_vs_ridge": 3.6773934364318848,
+          "median_best_epoch": 26
+        },
+        {
+          "candidate": {
+            "name": "life_l16_no_aux",
+            "model": "life",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": false
+          },
+          "inner_cell_rmse": {
+            "B0006": 8.318490982055664,
+            "B0018": 14.38040542602539
+          },
+          "mean_rmse": 11.349448204040527,
+          "ridge_mean_rmse": 14.050317764282227,
+          "blend_alpha": 0.8,
+          "blend_mean_rmse": 11.15363097190857,
+          "blend_improvement_vs_ridge": 2.8966867923736572,
+          "median_best_epoch": 27
+        },
+        {
+          "candidate": {
+            "name": "life_l16_no_age",
+            "model": "life",
+            "seq_len": 16,
+            "use_age": false,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0006": 9.334165573120117,
+            "B0018": 13.969907760620117
+          },
+          "mean_rmse": 11.652036666870117,
+          "ridge_mean_rmse": 14.050317764282227,
+          "blend_alpha": 0.7000000000000001,
+          "blend_mean_rmse": 11.101425886154175,
+          "blend_improvement_vs_ridge": 2.9488918781280518,
+          "median_best_epoch": 37
+        }
+      ],
+      "selection_cells": [
+        "B0006",
+        "B0018"
+      ],
+      "common_endpoint": 23
+    },
+    {
+      "outer_holdout": "B0006",
+      "neural_selection": {
+        "candidate": {
+          "name": "transformer_l16",
+          "model": "transformer",
+          "seq_len": 16,
+          "use_age": true,
+          "use_capacity_aux": true
+        },
+        "mean_inner_rmse": 12.820305824279785,
+        "fixed_epochs": 105
+      },
+      "method_selection": {
+        "candidate": {
+          "name": "gru_l16",
+          "model": "gru",
+          "seq_len": 16,
+          "use_age": true,
+          "use_capacity_aux": true
+        },
+        "mean_inner_rmse": 11.954333543777466,
+        "neural_inner_rmse": 13.344974756240845,
+        "ridge_inner_rmse": 13.869693756103516,
+        "improvement_vs_ridge": 1.9153602123260498,
+        "fixed_epochs": 51,
+        "blend_alpha": 0.59
+      },
+      "candidate_rows": [
+        {
+          "candidate": {
+            "name": "ms_l16",
+            "model": "ms",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 7.3860859870910645,
+            "B0018": 23.249319076538086
+          },
+          "mean_rmse": 15.317702531814575,
+          "ridge_mean_rmse": 13.869693756103516,
+          "blend_alpha": 0.39,
+          "blend_mean_rmse": 13.31532335281372,
+          "blend_improvement_vs_ridge": 0.5543704032897949,
+          "median_best_epoch": 41
+        },
+        {
+          "candidate": {
+            "name": "gru_l16",
+            "model": "gru",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 7.23443078994751,
+            "B0018": 19.45551872253418
+          },
+          "mean_rmse": 13.344974756240845,
+          "ridge_mean_rmse": 13.869693756103516,
+          "blend_alpha": 0.59,
+          "blend_mean_rmse": 11.954333543777466,
+          "blend_improvement_vs_ridge": 1.9153602123260498,
+          "median_best_epoch": 51
+        },
+        {
+          "candidate": {
+            "name": "transformer_l16",
+            "model": "transformer",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 6.923984527587891,
+            "B0018": 18.71662712097168
+          },
+          "mean_rmse": 12.820305824279785,
+          "ridge_mean_rmse": 13.869693756103516,
+          "blend_alpha": 0.66,
+          "blend_mean_rmse": 12.185216665267944,
+          "blend_improvement_vs_ridge": 1.6844770908355713,
+          "median_best_epoch": 105
+        },
+        {
+          "candidate": {
+            "name": "life_l8",
+            "model": "life",
+            "seq_len": 8,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 6.639965534210205,
+            "B0018": 24.679441452026367
+          },
+          "mean_rmse": 15.659703493118286,
+          "ridge_mean_rmse": 13.869693756103516,
+          "blend_alpha": 0.36,
+          "blend_mean_rmse": 13.449290037155151,
+          "blend_improvement_vs_ridge": 0.42040371894836426,
+          "median_best_epoch": 41
+        },
+        {
+          "candidate": {
+            "name": "life_l16",
+            "model": "life",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 8.075882911682129,
+            "B0018": 22.248939514160156
+          },
+          "mean_rmse": 15.162411212921143,
+          "ridge_mean_rmse": 13.869693756103516,
+          "blend_alpha": 0.45,
+          "blend_mean_rmse": 12.784787654876709,
+          "blend_improvement_vs_ridge": 1.0849061012268066,
+          "median_best_epoch": 33
+        },
+        {
+          "candidate": {
+            "name": "life_l24",
+            "model": "life",
+            "seq_len": 24,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 7.518551826477051,
+            "B0018": 20.339561462402344
+          },
+          "mean_rmse": 13.929056644439697,
+          "ridge_mean_rmse": 13.869693756103516,
+          "blend_alpha": 0.53,
+          "blend_mean_rmse": 12.63886046409607,
+          "blend_improvement_vs_ridge": 1.2308332920074463,
+          "median_best_epoch": 24
+        },
+        {
+          "candidate": {
+            "name": "life_l16_no_aux",
+            "model": "life",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": false
+          },
+          "inner_cell_rmse": {
+            "B0005": 8.280885696411133,
+            "B0018": 22.220096588134766
+          },
+          "mean_rmse": 15.25049114227295,
+          "ridge_mean_rmse": 13.869693756103516,
+          "blend_alpha": 0.44,
+          "blend_mean_rmse": 12.759082317352295,
+          "blend_improvement_vs_ridge": 1.1106114387512207,
+          "median_best_epoch": 33
+        },
+        {
+          "candidate": {
+            "name": "life_l16_no_age",
+            "model": "life",
+            "seq_len": 16,
+            "use_age": false,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 8.56405258178711,
+            "B0018": 21.202024459838867
+          },
+          "mean_rmse": 14.883038520812988,
+          "ridge_mean_rmse": 13.869693756103516,
+          "blend_alpha": 0.45,
+          "blend_mean_rmse": 12.924942970275879,
+          "blend_improvement_vs_ridge": 0.9447507858276367,
+          "median_best_epoch": 39
+        }
+      ],
+      "selection_cells": [
+        "B0005",
+        "B0018"
+      ],
+      "common_endpoint": 23
+    },
+    {
+      "outer_holdout": "B0007",
+      "neural_selection": {
+        "candidate": {
+          "name": "life_l24",
+          "model": "life",
+          "seq_len": 24,
+          "use_age": true,
+          "use_capacity_aux": true
+        },
+        "mean_inner_rmse": 10.208126862843832,
+        "fixed_epochs": 23
+      },
+      "method_selection": {
+        "candidate": {
+          "name": "life_l24",
+          "model": "life",
+          "seq_len": 24,
+          "use_age": true,
+          "use_capacity_aux": true
+        },
+        "mean_inner_rmse": 10.193893750508627,
+        "neural_inner_rmse": 10.208126862843832,
+        "ridge_inner_rmse": 14.065062522888184,
+        "improvement_vs_ridge": 3.8711687723795567,
+        "fixed_epochs": 23,
+        "blend_alpha": 0.9500000000000001
+      },
+      "candidate_rows": [
+        {
+          "candidate": {
+            "name": "ms_l16",
+            "model": "ms",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 11.401611328125,
+            "B0006": 7.562484264373779,
+            "B0018": 16.95747184753418
+          },
+          "mean_rmse": 11.97385581334432,
+          "ridge_mean_rmse": 14.065062522888184,
+          "blend_alpha": 0.8200000000000001,
+          "blend_mean_rmse": 11.8283371925354,
+          "blend_improvement_vs_ridge": 2.236725330352783,
+          "median_best_epoch": 23
+        },
+        {
+          "candidate": {
+            "name": "gru_l16",
+            "model": "gru",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 10.561456680297852,
+            "B0006": 8.869565963745117,
+            "B0018": 19.084117889404297
+          },
+          "mean_rmse": 12.838380177815756,
+          "ridge_mean_rmse": 14.065062522888184,
+          "blend_alpha": 0.76,
+          "blend_mean_rmse": 12.68544864654541,
+          "blend_improvement_vs_ridge": 1.3796138763427734,
+          "median_best_epoch": 27
+        },
+        {
+          "candidate": {
+            "name": "transformer_l16",
+            "model": "transformer",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 11.42638111114502,
+            "B0006": 8.74549674987793,
+            "B0018": 17.002456665039062
+          },
+          "mean_rmse": 12.39144484202067,
+          "ridge_mean_rmse": 14.065062522888184,
+          "blend_alpha": 0.8200000000000001,
+          "blend_mean_rmse": 12.283201535542807,
+          "blend_improvement_vs_ridge": 1.781860987345377,
+          "median_best_epoch": 29
+        },
+        {
+          "candidate": {
+            "name": "life_l8",
+            "model": "life",
+            "seq_len": 8,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 13.195931434631348,
+            "B0006": 7.294589042663574,
+            "B0018": 18.106679916381836
+          },
+          "mean_rmse": 12.86573346455892,
+          "ridge_mean_rmse": 14.065062522888184,
+          "blend_alpha": 0.73,
+          "blend_mean_rmse": 12.566521803538004,
+          "blend_improvement_vs_ridge": 1.4985407193501796,
+          "median_best_epoch": 21
+        },
+        {
+          "candidate": {
+            "name": "life_l16",
+            "model": "life",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 10.37481689453125,
+            "B0006": 7.593061923980713,
+            "B0018": 15.009062767028809
+          },
+          "mean_rmse": 10.992313861846924,
+          "ridge_mean_rmse": 14.065062522888184,
+          "blend_alpha": 0.91,
+          "blend_mean_rmse": 10.955614566802979,
+          "blend_improvement_vs_ridge": 3.109447956085205,
+          "median_best_epoch": 23
+        },
+        {
+          "candidate": {
+            "name": "life_l24",
+            "model": "life",
+            "seq_len": 24,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 9.70881175994873,
+            "B0006": 7.3839592933654785,
+            "B0018": 13.531609535217285
+          },
+          "mean_rmse": 10.208126862843832,
+          "ridge_mean_rmse": 14.065062522888184,
+          "blend_alpha": 0.9500000000000001,
+          "blend_mean_rmse": 10.193893750508627,
+          "blend_improvement_vs_ridge": 3.8711687723795567,
+          "median_best_epoch": 23
+        },
+        {
+          "candidate": {
+            "name": "life_l16_no_aux",
+            "model": "life",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": false
+          },
+          "inner_cell_rmse": {
+            "B0005": 10.358039855957031,
+            "B0006": 7.596578598022461,
+            "B0018": 14.989873886108398
+          },
+          "mean_rmse": 10.981497446695963,
+          "ridge_mean_rmse": 14.065062522888184,
+          "blend_alpha": 0.91,
+          "blend_mean_rmse": 10.945906003316244,
+          "blend_improvement_vs_ridge": 3.1191565195719395,
+          "median_best_epoch": 23
+        },
+        {
+          "candidate": {
+            "name": "life_l16_no_age",
+            "model": "life",
+            "seq_len": 16,
+            "use_age": false,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 11.165119171142578,
+            "B0006": 7.08342981338501,
+            "B0018": 15.222092628479004
+          },
+          "mean_rmse": 11.156880537668863,
+          "ridge_mean_rmse": 14.065062522888184,
+          "blend_alpha": 0.86,
+          "blend_mean_rmse": 11.048951148986816,
+          "blend_improvement_vs_ridge": 3.016111373901367,
+          "median_best_epoch": 32
+        }
+      ],
+      "selection_cells": [
+        "B0005",
+        "B0006",
+        "B0018"
+      ],
+      "common_endpoint": 23
+    },
+    {
+      "outer_holdout": "B0018",
+      "neural_selection": {
+        "candidate": {
+          "name": "transformer_l16",
+          "model": "transformer",
+          "seq_len": 16,
+          "use_age": true,
+          "use_capacity_aux": true
+        },
+        "mean_inner_rmse": 7.811750888824463,
+        "fixed_epochs": 58
+      },
+      "method_selection": {
+        "candidate": {
+          "name": "transformer_l16",
+          "model": "transformer",
+          "seq_len": 16,
+          "use_age": true,
+          "use_capacity_aux": true
+        },
+        "mean_inner_rmse": 7.811750888824463,
+        "neural_inner_rmse": 7.811750888824463,
+        "ridge_inner_rmse": 14.054455757141113,
+        "improvement_vs_ridge": 6.24270486831665,
+        "fixed_epochs": 58,
+        "blend_alpha": 1.0
+      },
+      "candidate_rows": [
+        {
+          "candidate": {
+            "name": "ms_l16",
+            "model": "ms",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 6.373096942901611,
+            "B0006": 11.912293434143066
+          },
+          "mean_rmse": 9.142695188522339,
+          "ridge_mean_rmse": 14.054455757141113,
+          "blend_alpha": 0.85,
+          "blend_mean_rmse": 8.969619274139404,
+          "blend_improvement_vs_ridge": 5.084836483001709,
+          "median_best_epoch": 21
+        },
+        {
+          "candidate": {
+            "name": "gru_l16",
+            "model": "gru",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 8.160483360290527,
+            "B0006": 11.569779396057129
+          },
+          "mean_rmse": 9.865131378173828,
+          "ridge_mean_rmse": 14.054455757141113,
+          "blend_alpha": 0.88,
+          "blend_mean_rmse": 9.771586894989014,
+          "blend_improvement_vs_ridge": 4.2828688621521,
+          "median_best_epoch": 23
+        },
+        {
+          "candidate": {
+            "name": "transformer_l16",
+            "model": "transformer",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 5.3653764724731445,
+            "B0006": 10.258125305175781
+          },
+          "mean_rmse": 7.811750888824463,
+          "ridge_mean_rmse": 14.054455757141113,
+          "blend_alpha": 1.0,
+          "blend_mean_rmse": 7.811750888824463,
+          "blend_improvement_vs_ridge": 6.24270486831665,
+          "median_best_epoch": 58
+        },
+        {
+          "candidate": {
+            "name": "life_l8",
+            "model": "life",
+            "seq_len": 8,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 6.013198375701904,
+            "B0006": 12.518171310424805
+          },
+          "mean_rmse": 9.265684843063354,
+          "ridge_mean_rmse": 14.054455757141113,
+          "blend_alpha": 0.84,
+          "blend_mean_rmse": 9.091454982757568,
+          "blend_improvement_vs_ridge": 4.963000774383545,
+          "median_best_epoch": 21
+        },
+        {
+          "candidate": {
+            "name": "life_l16",
+            "model": "life",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 6.029174327850342,
+            "B0006": 12.290898323059082
+          },
+          "mean_rmse": 9.160036325454712,
+          "ridge_mean_rmse": 14.054455757141113,
+          "blend_alpha": 0.81,
+          "blend_mean_rmse": 8.868361234664917,
+          "blend_improvement_vs_ridge": 5.186094522476196,
+          "median_best_epoch": 20
+        },
+        {
+          "candidate": {
+            "name": "life_l24",
+            "model": "life",
+            "seq_len": 24,
+            "use_age": true,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 4.635869026184082,
+            "B0006": 11.574569702148438
+          },
+          "mean_rmse": 8.10521936416626,
+          "ridge_mean_rmse": 14.054455757141113,
+          "blend_alpha": 0.85,
+          "blend_mean_rmse": 7.823531150817871,
+          "blend_improvement_vs_ridge": 6.230924606323242,
+          "median_best_epoch": 28
+        },
+        {
+          "candidate": {
+            "name": "life_l16_no_aux",
+            "model": "life",
+            "seq_len": 16,
+            "use_age": true,
+            "use_capacity_aux": false
+          },
+          "inner_cell_rmse": {
+            "B0005": 6.002930641174316,
+            "B0006": 12.137825965881348
+          },
+          "mean_rmse": 9.070378303527832,
+          "ridge_mean_rmse": 14.054455757141113,
+          "blend_alpha": 0.8300000000000001,
+          "blend_mean_rmse": 8.85658049583435,
+          "blend_improvement_vs_ridge": 5.197875261306763,
+          "median_best_epoch": 20
+        },
+        {
+          "candidate": {
+            "name": "life_l16_no_age",
+            "model": "life",
+            "seq_len": 16,
+            "use_age": false,
+            "use_capacity_aux": true
+          },
+          "inner_cell_rmse": {
+            "B0005": 8.012428283691406,
+            "B0006": 14.999218940734863
+          },
+          "mean_rmse": 11.505823612213135,
+          "ridge_mean_rmse": 14.054455757141113,
+          "blend_alpha": 0.66,
+          "blend_mean_rmse": 10.789178848266602,
+          "blend_improvement_vs_ridge": 3.2652769088745117,
+          "median_best_epoch": 22
+        }
+      ],
+      "selection_cells": [
+        "B0005",
+        "B0006"
+      ],
+      "common_endpoint": 23
+    }
+  ],
+  "selection_objectives": {
+    "selected_neural": "minimum inner-cell equal-fold neural ensemble RMSE",
+    "selected_method_blend": "minimum inner-cell equal-fold neural/Ridge blend RMSE across candidate and alpha"
+  },
+  "blend_calibration": "inner-cell OOF alpha grid 0..1 step 0.01 against Ridge; alpha=0 fallback allowed and frozen per outer fold",
+  "censor_rule": "B0007 strict14 is right-censored; observed-record lower-bound hinge only",
+  "nrmse_denominator_cycles": 100.0,
+  "nozzle_frozen": true,
+  "config_sha256": "8adee3bb9c3d6da504d32c3a8e60f2b0f120ec1d8b3e5a8e692f85510203ce9d"
+}

@@ -1,0 +1,68 @@
+{
+  "created_utc": "2026-07-24T12:13:29.488328+00:00",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Mar 23 2026, 19:04:32) [GCC 13.3.0]",
+  "python_executable": "/data/disk3/spacecraft_rul/venv/bin/python",
+  "numpy": "2.4.4",
+  "torch": "2.6.0+cu124",
+  "cuda_available": true,
+  "cuda_version": "12.4",
+  "cuda_devices": [
+    "NVIDIA GeForce RTX 2080 Ti",
+    "NVIDIA GeForce RTX 2080 Ti",
+    "NVIDIA GeForce RTX 2080 Ti",
+    "NVIDIA GeForce RTX 2080 Ti"
+  ],
+  "requested_device": "cuda:0",
+  "resolved_device": "cuda:0",
+  "device_warning": null,
+  "deterministic_algorithms": true,
+  "quick": false,
+  "phase": "all",
+  "seeds": [
+    42,
+    123,
+    456,
+    2026,
+    3407
+  ],
+  "script": "/data/disk3/spacecraft_rul/scripts/exp_nozzle_strict.py",
+  "script_sha256": "30b5cddad1df877c66cc9b8c4227279675cb13504aac2b4662a8ee04689a28ec",
+  "dataset_manifest": {
+    "path": "/data/disk3/spacecraft_rul/data/raw/nozzle_ablation_full.csv",
+    "canonical_relative_path": "data/raw/nozzle_ablation_full.csv",
+    "encoding": "gbk",
+    "sha256": "2d1b4d906b8832e84f802eea449eb1ec0d744911604bd37cbfa70241e807a7c2",
+    "expected_sha256": "2d1b4d906b8832e84f802eea449eb1ec0d744911604bd37cbfa70241e807a7c2",
+    "sha256_verified": true,
+    "row_count": 56,
+    "columns": [
+      "阶段",
+      "累计时间_s",
+      "本段推进_s",
+      "状态",
+      "最小网格质量",
+      "喉部流体温度_K",
+      "喉部固体温度_K",
+      "喉部压力_Pa",
+      "内壁热流_W_m2",
+      "最大烧蚀速度_m_s",
+      "累计烧蚀深度_mm",
+      "目标烧蚀深度_mm",
+      "相对误差_pct"
+    ],
+    "failure_depth_mm": 0.2585,
+    "failure_depth_atol_mm": 2e-06,
+    "failure_index": 55,
+    "failure_time_s": 20.0
+  },
+  "config_hash": "767e1a8fe7299d4147e55bd6fe2f6bfd190ad29c0e15832e0433ec10c4ace7f9",
+  "effective_final_seeds": [
+    42,
+    123,
+    456,
+    2026,
+    3407
+  ],
+  "elapsed_seconds": 222.8011424340075
+}

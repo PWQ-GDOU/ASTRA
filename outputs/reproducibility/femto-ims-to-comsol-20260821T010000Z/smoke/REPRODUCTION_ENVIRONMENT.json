@@ -1,0 +1,50 @@
+{
+  "code_sha256": "0ab544e9692574e265eccd6cca41b963993cdbe279b58fa6b3090565553c4c72",
+  "created_unix_sec": 1787292185.0976648,
+  "data_mount_must_be_read_only": true,
+  "determinism_environment": {
+    "MKL_NUM_THREADS": "4",
+    "NUMEXPR_NUM_THREADS": "4",
+    "OMP_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4",
+    "PYTHONHASHSEED": "0"
+  },
+  "input_audit": {
+    "all_hashes_match": true,
+    "data_root": "/workspace/data",
+    "inputs": {
+      "processed/femto_bearing.zip": {
+        "actual_sha256": "e21bb22bd8d54fd18ebe98b4b4e094c0c40469bda19811a2a642d5cc84ebd81f",
+        "expected_sha256": "e21bb22bd8d54fd18ebe98b4b4e094c0c40469bda19811a2a642d5cc84ebd81f",
+        "path": "/workspace/data/processed/femto_bearing.zip",
+        "sha256_matches": true
+      },
+      "processed/ims_processed": {
+        "actual_sha256": "887eea9cdb541ff40de8164f1913f9a37d22b12e3c48cc0eaa2d6dc7c100f4e6",
+        "expected_sha256": "887eea9cdb541ff40de8164f1913f9a37d22b12e3c48cc0eaa2d6dc7c100f4e6",
+        "path": "/workspace/data/processed/ims_processed",
+        "sha256_matches": true
+      },
+      "raw/competition/reaction_wheel_comsol_degradation.zip": {
+        "actual_sha256": "b628deb89634cf8732cd96bb62d675b820aedb0aa337fd36082db53bfebca8fe",
+        "expected_sha256": "b628deb89634cf8732cd96bb62d675b820aedb0aa337fd36082db53bfebca8fe",
+        "path": "/workspace/data/raw/competition/reaction_wheel_comsol_degradation.zip",
+        "sha256_matches": true
+      }
+    }
+  },
+  "packages": {
+    "h5py": "3.11.0",
+    "numpy": "1.26.4",
+    "pandas": "2.2.2",
+    "scikit-learn": "1.5.1",
+    "scipy": "1.13.1",
+    "torch": "2.3.1+cpu"
+  },
+  "platform": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.36",
+  "python": {
+    "executable": "/usr/local/bin/python",
+    "version": "3.11.9 (main, Sep  4 2024, 23:15:21) [GCC 12.2.0]"
+  },
+  "schema": "femto_ims_to_comsol_reproduction_v1"
+}

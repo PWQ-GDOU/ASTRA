@@ -1,0 +1,16 @@
+{
+  "completed": {
+    "full": {
+      "macro_rows": 120,
+      "report": "/workspace/outputs/reproducibility/femto-ims-to-comsol-20260821T020000Z/full/REPORT.json",
+      "source_arms": [
+        "femto",
+        "ims"
+      ]
+    },
+    "preflight": "passed"
+  },
+  "output_root": "/workspace/outputs/reproducibility/femto-ims-to-comsol-20260821T020000Z",
+  "phase": "full",
+  "schema": "femto_ims_to_comsol_reproduction_result_v1"
+}

@@ -1,0 +1,140 @@
+{
+  "schema": "femto_ims_to_comsol_preflight_v1",
+  "comsol_archive": "/workspace/data/raw/competition/reaction_wheel_comsol_degradation.zip",
+  "comsol_sha256": "b628deb89634cf8732cd96bb62d675b820aedb0aa337fd36082db53bfebca8fe",
+  "comsol_feature_tier": "operational",
+  "comsol_groups": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5"
+  ],
+  "comsol_train_groups": [
+    "1",
+    "2",
+    "3"
+  ],
+  "comsol_validation_groups": [
+    "4"
+  ],
+  "comsol_test_groups": [
+    "5"
+  ],
+  "target_test_labels_used_for_fit": false,
+  "target_test_labels_used_for_validation": false,
+  "source_names": [
+    "femto",
+    "ims"
+  ],
+  "source_manifests": {
+    "femto": {
+      "source": "femto",
+      "sha256": "e21bb22bd8d54fd18ebe98b4b4e094c0c40469bda19811a2a642d5cc84ebd81f",
+      "unit_names": [
+        "Bearing1_1",
+        "Bearing1_2",
+        "Bearing2_1",
+        "Bearing2_2",
+        "Bearing3_1",
+        "Bearing3_2"
+      ],
+      "source_train_units": [
+        "Bearing1_1",
+        "Bearing1_2",
+        "Bearing2_1",
+        "Bearing2_2"
+      ],
+      "source_validation_units": [
+        "Bearing3_1",
+        "Bearing3_2"
+      ],
+      "feature_names": [
+        "acc_x_rms",
+        "acc_x_peak",
+        "acc_x_std",
+        "acc_x_kurtosis",
+        "acc_x_skew",
+        "acc_y_rms",
+        "acc_y_peak",
+        "acc_y_std",
+        "acc_y_kurtosis",
+        "acc_y_skew",
+        "acc_x_rms_slope_5",
+        "acc_y_rms_slope_5",
+        "acc_x_rms_slope_20",
+        "acc_y_rms_slope_20",
+        "acc_x_kurtosis_slope_5",
+        "acc_y_kurtosis_slope_5",
+        "acc_x_kurtosis_slope_20",
+        "acc_y_kurtosis_slope_20",
+        "acc_x_spectral_centroid",
+        "acc_y_spectral_centroid",
+        "acc_x_high_band_ratio",
+        "acc_y_high_band_ratio"
+      ],
+      "train_only_scaler_units": [
+        "Bearing1_1",
+        "Bearing1_2",
+        "Bearing2_1",
+        "Bearing2_2"
+      ],
+      "source_label_scale": 119.0,
+      "source_train_windows": 404,
+      "source_validation_windows": 202,
+      "target_data_used_for_source_fit": false
+    },
+    "ims": {
+      "source": "ims",
+      "sha256": "887eea9cdb541ff40de8164f1913f9a37d22b12e3c48cc0eaa2d6dc7c100f4e6",
+      "unit_names": [
+        "2nd_test",
+        "3rd_test"
+      ],
+      "source_train_units": [
+        "2nd_test"
+      ],
+      "source_validation_units": [
+        "3rd_test"
+      ],
+      "feature_names": [
+        "spectral_bin_01",
+        "spectral_bin_02",
+        "spectral_bin_03",
+        "spectral_bin_04",
+        "spectral_bin_05",
+        "spectral_bin_06",
+        "spectral_bin_07",
+        "spectral_bin_08",
+        "spectral_bin_09",
+        "spectral_bin_10",
+        "spectral_bin_11",
+        "spectral_bin_12",
+        "spectral_bin_13",
+        "spectral_bin_14",
+        "spectral_bin_15",
+        "spectral_bin_16",
+        "spectral_bin_17",
+        "spectral_bin_18",
+        "spectral_bin_19",
+        "spectral_bin_20"
+      ],
+      "train_only_scaler_units": [
+        "2nd_test"
+      ],
+      "source_label_scale": 6.81944465637207,
+      "source_train_windows": 962,
+      "source_validation_windows": 6302,
+      "target_data_used_for_source_fit": false
+    }
+  },
+  "adapter_shape": {
+    "source_feature_counts": {
+      "femto": 22,
+      "ims": 20
+    },
+    "target_feature_count": 13,
+    "separate_source_target_projection": true
+  },
+  "finite_checks": true
+}
