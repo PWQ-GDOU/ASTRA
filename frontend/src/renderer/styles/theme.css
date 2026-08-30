@@ -1,0 +1,94 @@
+/* ===== Spacecraft 方案 C 主题（浅色） ===== */
+/* 所有 CSS 变量定义 */
+
+:root {
+  /* ── Background Layers ── */
+  --bg-deep: #e5e7eb;
+  --bg-base: #f0f2f6;
+  --bg-elevated: #ffffff;
+
+  /* ── Surfaces ── */
+  --surface: rgba(255, 255, 255, 0.65);
+  --surface-hover: rgba(255, 255, 255, 0.97);
+  --surface-active: rgba(240, 241, 247, 0.95);
+
+  /* ── Typography ── */
+  --foreground: #1a1a24;
+  --foreground-muted: #5a5a6e;
+  --foreground-dim: #8a8a9e;
+
+  /* ── Accent ── */
+  --accent: #1154e7;
+  --accent-hover: #4f46e5;
+  --accent-glow: rgba(99, 102, 241, 0.25);
+  --accent-secondary: #0891b2;
+  --accent-secondary-glow: rgba(8, 145, 178, 0.25);
+
+  /* ── Semantic Colors ── */
+  --success: #16a34a;
+  --success-glow: rgba(22, 163, 74, 0.25);
+  --warning: #d97706;
+  --warning-glow: rgba(217, 119, 6, 0.25);
+  --danger: #dc2626;
+  --danger-glow: rgba(220, 38, 38, 0.25);
+
+  /* ── Borders ── */
+  --border: rgba(0, 0, 0, 0.08);
+  --border-light: rgba(0, 0, 0, 0.05);
+  --border-hover: rgba(0, 0, 0, 0.12);
+
+  /* ── Radii ── */
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+
+  /* ── Sizing ── */
+  --sidebar-width: 240px;
+  --titlebar-height: 44px;
+
+  /* ── Fonts ── */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', monospace;
+
+  /* ── Animation ── */
+  --easing: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 150ms var(--easing);
+  --transition-normal: 250ms var(--easing);
+}
+
+/* ── Keyframes ── */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* ── shadcn/ui 浅色主题 CSS 变量覆写 ── */
+.dark {
+  --background: 0 0% 100%;
+  --foreground: 240 10% 8%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 8%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 8%;
+  --primary: 239 84% 67%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+  --accent-hsl: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border-hsl: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 240 5.9% 10%;
+  --radius: 16px;
+}

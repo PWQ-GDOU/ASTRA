@@ -1,0 +1,484 @@
+{
+  "started_at": "2026-08-01T00:00:00+00:00",
+  "updated_at": "2026-08-01T07:36:07.626569+00:00",
+  "total_tasks": 158,
+  "completed": 158,
+  "rounds": 2,
+  "interventions": 1,
+  "tasks": {
+    "1": {
+      "status": "done"
+    },
+    "2": {
+      "status": "done"
+    },
+    "3": {
+      "status": "done"
+    },
+    "4": {
+      "status": "done"
+    },
+    "5": {
+      "status": "done"
+    },
+    "6": {
+      "status": "done"
+    },
+    "7": {
+      "status": "done"
+    },
+    "8": {
+      "status": "done"
+    },
+    "9": {
+      "status": "done"
+    },
+    "10": {
+      "status": "done"
+    },
+    "11": {
+      "status": "done"
+    },
+    "12": {
+      "status": "done"
+    },
+    "13": {
+      "status": "done"
+    },
+    "14": {
+      "status": "done"
+    },
+    "15": {
+      "status": "done"
+    },
+    "16": {
+      "status": "done"
+    },
+    "17": {
+      "status": "done"
+    },
+    "18": {
+      "status": "done"
+    },
+    "19": {
+      "status": "done"
+    },
+    "20": {
+      "status": "done"
+    },
+    "21": {
+      "status": "done"
+    },
+    "22": {
+      "status": "done"
+    },
+    "23": {
+      "status": "done"
+    },
+    "24": {
+      "status": "done"
+    },
+    "25": {
+      "status": "done"
+    },
+    "26": {
+      "status": "done"
+    },
+    "27": {
+      "status": "done"
+    },
+    "28": {
+      "status": "done"
+    },
+    "29": {
+      "status": "done"
+    },
+    "30": {
+      "status": "done"
+    },
+    "31": {
+      "status": "done"
+    },
+    "32": {
+      "status": "done"
+    },
+    "33": {
+      "status": "done"
+    },
+    "34": {
+      "status": "done"
+    },
+    "35": {
+      "status": "done"
+    },
+    "36": {
+      "status": "done"
+    },
+    "37": {
+      "status": "done"
+    },
+    "38": {
+      "status": "done"
+    },
+    "39": {
+      "status": "done"
+    },
+    "40": {
+      "status": "done"
+    },
+    "41": {
+      "status": "done"
+    },
+    "42": {
+      "status": "done"
+    },
+    "43": {
+      "status": "done"
+    },
+    "44": {
+      "status": "done"
+    },
+    "45": {
+      "status": "done"
+    },
+    "46": {
+      "status": "done"
+    },
+    "47": {
+      "status": "done"
+    },
+    "48": {
+      "status": "done"
+    },
+    "49": {
+      "status": "done"
+    },
+    "50": {
+      "status": "done"
+    },
+    "51": {
+      "status": "done"
+    },
+    "52": {
+      "status": "done"
+    },
+    "53": {
+      "status": "done"
+    },
+    "54": {
+      "status": "done"
+    },
+    "55": {
+      "status": "done"
+    },
+    "56": {
+      "status": "done"
+    },
+    "57": {
+      "status": "done"
+    },
+    "58": {
+      "status": "done"
+    },
+    "59": {
+      "status": "done"
+    },
+    "60": {
+      "status": "done"
+    },
+    "61": {
+      "status": "done"
+    },
+    "62": {
+      "status": "done"
+    },
+    "63": {
+      "status": "done"
+    },
+    "64": {
+      "status": "done"
+    },
+    "65": {
+      "status": "done"
+    },
+    "66": {
+      "status": "done"
+    },
+    "67": {
+      "status": "done"
+    },
+    "68": {
+      "status": "done"
+    },
+    "69": {
+      "status": "done"
+    },
+    "70": {
+      "status": "done"
+    },
+    "71": {
+      "status": "done"
+    },
+    "72": {
+      "status": "done"
+    },
+    "73": {
+      "status": "done"
+    },
+    "74": {
+      "status": "done"
+    },
+    "75": {
+      "status": "done"
+    },
+    "76": {
+      "status": "done"
+    },
+    "77": {
+      "status": "done"
+    },
+    "78": {
+      "status": "done"
+    },
+    "79": {
+      "status": "done"
+    },
+    "80": {
+      "status": "done"
+    },
+    "81": {
+      "status": "done"
+    },
+    "82": {
+      "status": "done"
+    },
+    "83": {
+      "status": "done"
+    },
+    "84": {
+      "status": "done"
+    },
+    "85": {
+      "status": "done"
+    },
+    "86": {
+      "status": "done"
+    },
+    "87": {
+      "status": "done"
+    },
+    "88": {
+      "status": "done"
+    },
+    "89": {
+      "status": "done"
+    },
+    "90": {
+      "status": "done"
+    },
+    "91": {
+      "status": "done"
+    },
+    "92": {
+      "status": "done"
+    },
+    "93": {
+      "status": "done"
+    },
+    "94": {
+      "status": "done"
+    },
+    "95": {
+      "status": "done"
+    },
+    "96": {
+      "status": "done"
+    },
+    "97": {
+      "status": "done"
+    },
+    "98": {
+      "status": "done"
+    },
+    "99": {
+      "status": "done"
+    },
+    "100": {
+      "status": "done"
+    },
+    "101": {
+      "status": "done"
+    },
+    "102": {
+      "status": "done"
+    },
+    "103": {
+      "status": "done"
+    },
+    "104": {
+      "status": "done"
+    },
+    "105": {
+      "status": "done"
+    },
+    "106": {
+      "status": "done"
+    },
+    "107": {
+      "status": "done"
+    },
+    "108": {
+      "status": "done"
+    },
+    "109": {
+      "status": "done"
+    },
+    "110": {
+      "status": "done"
+    },
+    "111": {
+      "status": "done"
+    },
+    "112": {
+      "status": "done"
+    },
+    "113": {
+      "status": "done"
+    },
+    "114": {
+      "status": "done"
+    },
+    "115": {
+      "status": "done"
+    },
+    "116": {
+      "status": "done"
+    },
+    "117": {
+      "status": "done"
+    },
+    "118": {
+      "status": "done"
+    },
+    "119": {
+      "status": "done"
+    },
+    "120": {
+      "status": "done"
+    },
+    "121": {
+      "status": "done"
+    },
+    "122": {
+      "status": "done"
+    },
+    "123": {
+      "status": "done"
+    },
+    "124": {
+      "status": "done"
+    },
+    "125": {
+      "status": "done"
+    },
+    "126": {
+      "status": "done"
+    },
+    "127": {
+      "status": "done"
+    },
+    "128": {
+      "status": "done"
+    },
+    "129": {
+      "status": "done"
+    },
+    "130": {
+      "status": "done"
+    },
+    "131": {
+      "status": "done"
+    },
+    "132": {
+      "status": "done"
+    },
+    "133": {
+      "status": "done"
+    },
+    "134": {
+      "status": "done"
+    },
+    "135": {
+      "status": "done"
+    },
+    "136": {
+      "status": "done"
+    },
+    "137": {
+      "status": "done"
+    },
+    "138": {
+      "status": "done"
+    },
+    "139": {
+      "status": "done"
+    },
+    "140": {
+      "status": "done"
+    },
+    "141": {
+      "status": "done"
+    },
+    "142": {
+      "status": "done"
+    },
+    "143": {
+      "status": "done"
+    },
+    "144": {
+      "status": "done"
+    },
+    "145": {
+      "status": "done"
+    },
+    "146": {
+      "status": "done"
+    },
+    "147": {
+      "status": "done"
+    },
+    "148": {
+      "status": "done"
+    },
+    "149": {
+      "status": "done"
+    },
+    "150": {
+      "status": "done"
+    },
+    "151": {
+      "status": "done"
+    },
+    "152": {
+      "status": "done"
+    },
+    "153": {
+      "status": "done"
+    },
+    "154": {
+      "status": "done"
+    },
+    "155": {
+      "status": "done"
+    },
+    "156": {
+      "status": "done"
+    },
+    "157": {
+      "status": "done"
+    },
+    "158": {
+      "status": "done"
+    }
+  }
+}
