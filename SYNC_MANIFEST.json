@@ -3,10 +3,10 @@
   "generated_at": "2026-08-26",
   "repository": "https://github.com/PWQ-GDOU/ASTRA.git",
   "source_branch": "master",
-  "remote_branch": "algorithm/main",
+  "remote_branch": "main",
   "purpose": "将 ASTRA 赛事工程、复现实验、数据材料和审计结果交接给文书部门。",
   "workspace_policy": {
-    "project_root": "H:/项目代码目录/ZCodeProject",
+    "project_root": "H:/项目代码/航天器",
     "c_drive_project_files": false,
     "dirty_worktree_unrelated_files_preserved": true
   },

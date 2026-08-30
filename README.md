@@ -8,6 +8,13 @@
 
 ASTRA 是一个面向航天器关键组件寿命预测的跨域退化迁移学习框架。通过将**喷嘴烧蚀**（源域）的退化知识迁移至**反作用轮**与**电池**（目标域），结合物理约束灰盒模型，实现小样本下的高精度剩余寿命（RUL）预测。
 
+## 评委与复现入口
+
+评委版技术报告：`ASTRA_技术报告_评委优化版.docx`。
+
+主分支：`main`，承载主实验协议、数据/仿真说明、Docker 环境、测试、审计结果和评委文档。软件仪表板作为工程演示层维护，入口见 `docs/engineering_demo.md`、`scripts/run_engineering_demo.py` 和 `outputs/engineering_demo/femto_ims_to_comsol_v5/`。完整分支约定见 `docs/BRANCHING.md`。
+
+公开仓库：`https://github.com/PWQ-GDOU/ASTRA`
 ## 📊 核心特性
 
 - **跨域退化迁移**：PEUDA 双时间-频率域自适应 + 对比学习

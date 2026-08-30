@@ -2,7 +2,7 @@
 
 更新时间：2026-08-26
 项目仓库：`https://github.com/PWQ-GDOU/ASTRA.git`
-工作区：`H:\项目代码目录\ZCodeProject`
+工作区：`H:\项目代码\航天器`
 
 ## 交接内容
 
@@ -90,3 +90,10 @@ docker compose up --build engineering-demo
 3. 不要把电池链路写成已证明正向迁移；其 strict v3 结果仍是 diagnostic。
 4. 不要把 v5 探索性后验复现写成未见盲测；应保留 `requires_unseen_outer_holdout_confirmation` 的限定。
 5. 论文或申报书中的精确数值应优先引用 `FINAL_RESULTS_TABLE.md` 和对应输出目录中的机器可读报告。
+
+
+## 评委版技术报告
+
+优化后的评委版报告位于 ASTRA_技术报告_评委优化版.docx。该版本补充了参考文献、软件工程演示层、GitHub 获取路径和交付物索引，并保留电池诊断、COMSOL 仿真代理及 v5 探索性证据边界。
+
+主分支策略见 docs/BRANCHING.md；评委默认使用 main。
