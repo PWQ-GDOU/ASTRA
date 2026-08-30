@@ -10,9 +10,9 @@ ASTRA 是一个面向航天器关键组件寿命预测的跨域退化迁移学�
 
 ## 评委与复现入口
 
-评委版技术报告：`ASTRA_技术报告_评委优化版.docx`。
+评委版技术报告：`ASTRA_report_software_branch.docx`（软件分支整合版；原优化版仍保留作历史版本）。
 
-主分支：`main`，承载主实验协议、数据/仿真说明、Docker 环境、测试、审计结果和评委文档。软件仪表板作为工程演示层维护，入口见 `docs/engineering_demo.md`、`scripts/run_engineering_demo.py` 和 `outputs/engineering_demo/femto_ims_to_comsol_v5/`。完整分支约定见 `docs/BRANCHING.md`。
+主分支：`main`，承载主实验协议、数据/仿真说明、Docker 环境、测试、审计结果和评委文档。软件仪表板单独维护在 `software-demo` 分支；主分支只保留分支说明 `docs/software_demo_branch.md`。完整分支约定见 `docs/BRANCHING.md`。
 
 公开仓库：`https://github.com/PWQ-GDOU/ASTRA`
 ## 📊 核心特性
@@ -464,12 +464,12 @@ Docker Desktop Linux 实跑记录见 `docs/docker_reproduction_report_20260821.m
 
 ### 工程寿命状态演示（FEMTO -> COMSOL v5）
 
-在锁定的 v5 审计产物之上，`scripts/run_engineering_demo.py` 生成完全离线可打开的
+软件演示位于 `software-demo` 分支。在锁定的 v5 审计产物之上，`scripts/run_engineering_demo.py` 生成完全离线可打开的
 反作用轮寿命状态回放：正常操作模式仅展示预测 RUL，只有显式切换到 audit replay 时才会
 显示留出标签及误差。该界面明确标注 COMSOL 反作用轮仿真代理、探索性后验复现和仍需未见
-outer-holdout 确认的证据边界。
+outer-holdout 确认的证据边界。软件分支的完整说明见 `software-demo:docs/engineering_demo.md`；主分支不包含该展示模块。软件分支的完整说明见 `software-demo:docs/engineering_demo.md`；主分支不包含该展示模块。
 
-本地构建并直接打开 `outputs/engineering_demo/femto_ims_to_comsol_v5/index.html`：
+切换到 `software-demo` 后，本地构建并直接打开 `outputs/engineering_demo/femto_ims_to_comsol_v5/index.html`：
 
 ```powershell
 .\scripts\run_engineering_demo.ps1 -NoServe
@@ -482,7 +482,7 @@ outer-holdout 确认的证据边界。
 ```
 
 Docker Desktop：`docker compose up --build engineering-demo`，然后打开
-`http://localhost:8090/`。完整操作与审计说明见 `docs/engineering_demo.md`。
+`http://localhost:8090/`。完整操作与审计说明见 `software-demo:docs/engineering_demo.md`。
 
 ### 环境配置
 

@@ -2,25 +2,25 @@
 
 ## 主分支
 
-`main` 是评委和复现人员应使用的主分支，固定承载：
+`main` 是评委和复现人员应使用的主分支，固定承载主实验和可审计复现材料，不以软件界面作为默认入口：
 
 - 主实验协议与结果：`scripts/exp_cross_transfer_v3.py`
 - FEMTO -> COMSOL outer-fold 验证：`scripts/exp_femto_ims_to_comsol_outerloo_v5.py`
 - 数据、Docker 环境、测试和审计材料
 - 评委版技术报告及其生成脚本
 
-当前主实验基线提交为 `86b405f`（2026-08-29 前已完成的主实验与复现材料）。软件界面、仪表板和演示脚本不得替换 `main` 的主实验协议或结果文件。
+当前主实验基线提交为 `86b405f`（2026-08-29 前已完成的主实验与复现材料）。软件界面、仪表板和演示脚本不属于 `main` 的核心实验面；它们在 `software-demo` 分支维护。`main` 中只保留软件分支的入口说明，不复制软件实现、静态页面或演示输出。
 
 ## 软件支线
 
-软件部分作为工程演示层维护。建议使用 `feature/software` 或 `software-demo` 分支开发，目录和入口包括：
+软件部分作为工程演示层维护，当前本地分支名为 `software-demo`。该分支目录和入口包括：
 
 - `scripts/run_engineering_demo.py`
 - `scripts/run_engineering_demo.ps1`
 - `docs/engineering_demo.md`
 - `outputs/engineering_demo/femto_ims_to_comsol_v5/`
 
-软件支线合并前必须通过工程演示测试，并确认不修改主实验的切分、标签、scaler、outer-fold、指标和审计文件。
+软件支线合并或发布前必须通过工程演示测试，并确认不修改主实验的切分、标签、scaler、outer-fold、指标和审计文件。软件分支可以读取 `main` 生成的锁定审计结果，但不能回写主实验结果。
 
 ## 历史算法与仿真分支
 
@@ -28,12 +28,12 @@
 
 ## 远端同步
 
-当前本地 `main` 已与主实验提交一致。远端 GitHub 的默认分支设置属于仓库管理操作，需要在 GitHub 仓库设置中将默认分支切换为 `main`；远端同步前先确认新增软件分支名称，再执行：
+当前本地 `main` 已与主实验提交一致。远端 GitHub 的默认分支设置属于仓库管理操作，需要在 GitHub 仓库设置中将默认分支切换为 `main`；网络可用后先抓取远端并确认同学分支名称，再执行：
 
 ```bash
 git fetch origin --prune
 git push origin main:main
-git push origin feature/software:feature/software
+git push origin software-demo:software-demo
 ```
 
-不要删除 `algorithm/main` 或软件分支，除非团队已完成备份、评审和迁移确认。
+如远端已有同学的独立软件分支，应先核对提交内容，再将其重命名或合并到 `software-demo`，不要把它直接合并到 `main`。不要删除 `algorithm/main` 或其他历史分支，除非团队已完成备份、评审和迁移确认。

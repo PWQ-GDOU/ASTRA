@@ -47,7 +47,7 @@ holdout 进行确认；因此只能写成“探索性严格协议证据”或“
 - `OUTER_FOLD_SUMMARY.csv`：逐 outer fold 的指标。
 - `PREDICTIONS.csv`：最终预测及审计所需字段。
 - `SUPERVISOR_STATUS.json`：长实验完成状态。
-- `outputs/engineering_demo/femto_ims_to_comsol_v5/index.html`：离线工程寿命状态回放。
+- `software-demo:outputs/engineering_demo/femto_ims_to_comsol_v5/index.html`：离线工程寿命状态回放；软件实现与说明不放在评委默认的 `main` 分支。
 
 Docker 的 canonical full 和独立第二次 full 位于
 `outputs/reproducibility/femto-ims-to-comsol-20260821T010000Z/` 与
@@ -58,10 +58,11 @@ Docker 报告记录了 Python/PyTorch/NumPy/scikit-learn 版本、镜像摘要�
 
 从仓库根目录运行：
 
+切换到 `software-demo` 后，如需使用工程演示服务，执行：
+
 ```powershell
 docker compose up --build engineering-demo
 ```
-
 运行严格迁移复现：
 
 ```powershell
@@ -94,6 +95,6 @@ docker compose up --build engineering-demo
 
 ## 评委版技术报告
 
-优化后的评委版报告位于 ASTRA_技术报告_评委优化版.docx。该版本补充了参考文献、软件工程演示层、GitHub 获取路径和交付物索引，并保留电池诊断、COMSOL 仿真代理及 v5 探索性证据边界。
+优化后的评委版报告位于 `ASTRA_report_software_branch.docx`。该版本补充了参考文献、软件工程演示层、GitHub 获取路径和交付物索引，并保留电池诊断、COMSOL 仿真代理及 v5 探索性证据边界。主实验与正式复现材料在 `main`；软件演示在 `software-demo`。
 
 主分支策略见 docs/BRANCHING.md；评委默认使用 main。
