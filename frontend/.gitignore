@@ -1,0 +1,15 @@
+/prompt/
+/demo/
+/QuantMind/
+/node_modules/
+/.playwright-cli/
+/docs/
+/dist/
+/dist-electron/
+/out/
+/out-*/
+/coverage/
+/.env
+/.env.*
+!/.env.example
+*.log
