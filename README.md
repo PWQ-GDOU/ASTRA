@@ -53,7 +53,6 @@ Simulated via a reduced-order ODE model calibrated by COMSOL (20s trajectory err
 | **Estimated** (depth+rate)| **2.01 s** | RF: 0.40 s | Extremely low error under strict leakage check |
 | **Physics-Obs** (proxy)| **37.90 s** | Huber: 27.29 s | Proxies introduce noise; classical models are more robust |
 | **Observable** (T/Q/P)| **38.15 s** | Ridge: 28.99 s | Baseline benchmark |
-
 ## 🏗️ System Architecture
 
 ```text
@@ -63,21 +62,26 @@ ASTRA/
 │   ├── data/                 # Data loaders (C-MAPSS, NASA, COMSOL, FEMTO)
 │   ├── baselines/            # Classical ML (Ridge, Huber, GBDT, RF)
 │   ├── evaluate/             # Strict evaluation metrics & protocols
-│   └── uncertainty/          # Bayesian uncertainty estimation
+│   ├── uncertainty/          # Bayesian uncertainty estimation
 ├── scripts/                  # End-to-end pipelines
-│   ├── exp_ncmapss_strict.py       # N-CMAPSS rigorous benchmark
-│   ├── exp_femto_to_comsol_v5.py   # Cross-domain transfer v5
-│   ├── run_nozzle_sota.py          # Multi-trajectory nozzle benchmark
-│   └── exp_main_suite.py           # Full competition suite
-├── frontend/                 # 🆕 Electron + React desktop dashboard
+│   ├── exp_ncmapss_strict.py         # N-CMAPSS rigorous benchmark
+│   ├── exp_femto_to_comsol_v5.py     # Cross-domain transfer v5
+│   ├── run_nozzle_sota.py            # Multi-trajectory nozzle benchmark
+│   ├── exp_main_suite.py             # Full competition suite
+├── frontend/                 # 🖥️ Electron + React desktop dashboard
 │   ├── src/main/             #   Electron main process
 │   ├── src/preload/          #   Preload bridge
 │   ├── src/renderer/         #   React + Tailwind UI
-│   └── src/shared/           #   Shared types
+│   ├── src/shared/           #   Shared types
+├── simulation/               # 🧪 COMSOL physical modeling docs (added back)
+│   ├── nozzle_ablation_20s/  #   ReactingFlowSST + ALE moving mesh throat ablation
+│   ├── geo_battery_pinn_extreme/  # PINN for GEO satellite battery degradation
+│   ├── reaction_wheel_em_parker/  # Parker EM model for reaction wheel
 ├── docker/                   # One-click reproduction environment
 ├── exp_*.py                  # Individual experiment entry points
 ├── tests/                    # Unit tests for data leakage and stability
-└── ASTRA_*.docx              # Judge-facing technical reports
+├── docs/                     # Supporting documentation & audits
+├── ASTRA_*.docx              # Judge-facing technical reports
 ```
 
 ## 🔧 Quick Start & Reproduction
