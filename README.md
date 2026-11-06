@@ -119,3 +119,11 @@ This project strictly adheres to high-standard engineering and scientific resear
 *   **Competition Host:** Innovation Academy for Microsatellites, Chinese Academy of Sciences.
 *   **Datasets:** NASA C-MAPSS, N-CMAPSS, FEMTO/IMS, RAVDESS.
 *   **Frameworks:** PyTorch, Scikit-Learn, SciPy.
+## 🌿 Branch Navigation (Project Organization)
+
+To maintain a clean codebase and professional software engineering standards, this project is organized using multiple Git branches:
+
+*   **`main` (Default)**: Contains the core documentation, final strict benchmark results, and the unified evaluation pipeline. ***(You are here)***
+*   **`software-demo`**: A standalone branch containing the engineering software dashboard and UI for visualization. The main branch does not include UI dependencies to keep the algorithmic pipeline lightweight.
+*   **`algorithm/nozzle-rul`** & **`algorithm/battery-rul`**: Independent development branches for domain-specific algorithm training and hyperparameter tuning.
+*   **`software-development`**: Historical branch for feature integration and bug fixing before merging into the demo.
