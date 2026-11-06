@@ -4,12 +4,14 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)](https://pytorch.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Electron](https://img.shields.io/badge/Electron-Desktop-47848F?logo=electron)](https://www.electronjs.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 ## 📖 Project Overview
+
 ASTRA is a rigorous cross-domain transfer learning framework designed for **Remaining Useful Life (RUL) prediction** of spacecraft critical components. Developed for the *"Aerospace System Transfer Reliability Analysis"* competition hosted by the **Innovation Academy for Microsatellites, Chinese Academy of Sciences (CAS)**, this project addresses the challenge of predicting RUL with extremely limited target-domain data.
 
-The framework successfully transfers degradation knowledge from the source domain (nozzle ablation) to target domains (reaction wheels and batteries) by combining physics-informed gray-box models with unsupervised domain adaptation.
+The framework successfully transfers degradation knowledge from the source domain (nozzle ablation) to target domains (reaction wheels and batteries) by combining physics-informed gray-box models with unsupervised domain adaptation. It is accompanied by an **Electron desktop dashboard** that turns raw experiment outputs into an interactive, visualizable engineering workflow.
 
 ## 🌟 Key Features & Innovations
 
@@ -17,6 +19,7 @@ The framework successfully transfers degradation knowledge from the source domai
 *   **Physics-Informed Gray-Box Model:** Embeds the Arrhenius degradation equation directly into the neural network architecture to ensure physical consistency.
 *   **Self-Supervised Pretraining (SHRDL):** Employs Health State Decomposition Learning to extract robust features from unlabeled data, significantly improving few-shot transfer capability.
 *   **Uncertainty Quantification (PCBNN):** Integrates a Physics-Constrained Bayesian Neural Network to provide reliable confidence intervals for predictions.
+*   **Desktop Engineering Dashboard:** Electron + React application for interactive visualization of training curves, RUL trajectories, uncertainty bands, and ablation studies.
 
 ## 🏆 Benchmark Results (Selected)
 
@@ -55,19 +58,26 @@ Simulated via a reduced-order ODE model calibrated by COMSOL (20s trajectory err
 
 ```text
 ASTRA/
-├── src/
-│   ├── models/             # Core Models (SHRDL, PEUDA, PCBNN, TCN, BiGRU)
-│   ├── data/               # Data loaders (C-MAPSS, NASA, COMSOL, FEMTO)
-│   ├── baselines/          # Classical ML (Ridge, Huber, GBDT, RF)
-│   ├── evaluate/           # Strict evaluation metrics & protocols
-│   └── uncertainty/        # Bayesian uncertainty estimation
-├── scripts/                # End-to-end pipelines
+├── src/                      # Core Python package
+│   ├── models/               # Core Models (SHRDL, PEUDA, PCBNN, TCN, BiGRU)
+│   ├── data/                 # Data loaders (C-MAPSS, NASA, COMSOL, FEMTO)
+│   ├── baselines/            # Classical ML (Ridge, Huber, GBDT, RF)
+│   ├── evaluate/             # Strict evaluation metrics & protocols
+│   └── uncertainty/          # Bayesian uncertainty estimation
+├── scripts/                  # End-to-end pipelines
 │   ├── exp_ncmapss_strict.py       # N-CMAPSS rigorous benchmark
 │   ├── exp_femto_to_comsol_v5.py   # Cross-domain transfer v5
 │   ├── run_nozzle_sota.py          # Multi-trajectory nozzle benchmark
 │   └── exp_main_suite.py           # Full competition suite
-├── docker/                 # One-click reproduction environment
-└── tests/                  # Unit tests for data leakage and stability
+├── frontend/                 # 🆕 Electron + React desktop dashboard
+│   ├── src/main/             #   Electron main process
+│   ├── src/preload/          #   Preload bridge
+│   ├── src/renderer/         #   React + Tailwind UI
+│   └── src/shared/           #   Shared types
+├── docker/                   # One-click reproduction environment
+├── exp_*.py                  # Individual experiment entry points
+├── tests/                    # Unit tests for data leakage and stability
+└── ASTRA_*.docx              # Judge-facing technical reports
 ```
 
 ## 🔧 Quick Start & Reproduction
@@ -106,6 +116,22 @@ python scripts/run_nozzle_sota_validation.py \
     --window-size 20 --epochs 160 --device cuda:0
 ```
 
+### 4. Launch the Desktop Dashboard
+
+```bash
+cd frontend
+npm install
+npm run dev         # Run both Vite dev server and Electron main process
+# or
+npm run build       # Package into a production executable (dist-electron/)
+```
+
+The dashboard connects to the Python backend via an IPC bridge and provides interactive visualizations of:
+- Training curves & ablation trajectories
+- RUL prediction trajectories with uncertainty bands
+- Transfer-learning heatmaps (FEMTO → COMSOL)
+- One-click benchmark runner for all competition experiments
+
 ## 🔬 Engineering Safeguards
 
 This project strictly adheres to high-standard engineering and scientific research protocols:
@@ -118,12 +144,4 @@ This project strictly adheres to high-standard engineering and scientific resear
 
 *   **Competition Host:** Innovation Academy for Microsatellites, Chinese Academy of Sciences.
 *   **Datasets:** NASA C-MAPSS, N-CMAPSS, FEMTO/IMS, RAVDESS.
-*   **Frameworks:** PyTorch, Scikit-Learn, SciPy.
-## 🌿 Branch Navigation (Project Organization)
-
-To maintain a clean codebase and professional software engineering standards, this project is organized using multiple Git branches:
-
-*   **`main` (Default)**: Contains the core documentation, final strict benchmark results, and the unified evaluation pipeline. ***(You are here)***
-*   **`software-demo`**: A standalone branch containing the engineering software dashboard and UI for visualization. The main branch does not include UI dependencies to keep the algorithmic pipeline lightweight.
-*   **`algorithm/nozzle-rul`** & **`algorithm/battery-rul`**: Independent development branches for domain-specific algorithm training and hyperparameter tuning.
-*   **`software-development`**: Historical branch for feature integration and bug fixing before merging into the demo.
+*   **Frameworks:** PyTorch, Scikit-Learn, SciPy, Electron, React.
