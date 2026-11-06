@@ -1,0 +1,128 @@
+{
+  "model_id": "geo_satellite_battery_pinn_extreme_segment",
+  "software": "COMSOL Multiphysics 6.4 (Build 293)",
+  "unit_system": "SI",
+  "study": {
+    "type": "Time-Dependent",
+    "time_range": "range(0, 1, 1200) s",
+    "total_cycles": 1200,
+    "mesh": "Free Tetrahedral, 3240 elements, min quality 0.2137"
+  },
+  "cell_geometry": {
+    "type": "18650 Cylindrical",
+    "radius": {
+      "value": "9 mm",
+      "param": "cell_r"
+    },
+    "height": {
+      "value": "65 mm",
+      "param": "cell_h"
+    },
+    "volume": {
+      "value": "pi*(9e-3)^2*65e-3 = 1.654e-5 m³",
+      "param": "cell_vol"
+    },
+    "tab_radius": {
+      "value": "3.2 mm",
+      "param": "tab_r"
+    },
+    "tab_height": {
+      "value": "2 mm",
+      "param": "tab_h"
+    },
+    "components": [
+      "cell_body",
+      "positive_cap",
+      "negative_cap",
+      "satellite_mounting_base"
+    ]
+  },
+  "electrical": {
+    "nominal_capacity": {
+      "value": "2 Ah (2000 mAh)",
+      "param": "Qnom/QmAh"
+    },
+    "charge_cutoff_voltage": {
+      "value": "4.2 V",
+      "param": "Vmax"
+    },
+    "discharge_cutoff_voltage": {
+      "value": "2.5 V",
+      "param": "Vmin"
+    },
+    "initial_internal_resistance": {
+      "value": "0.034 Ω",
+      "param": "Rbase"
+    },
+    "charge_rate": {
+      "value": "2C",
+      "param": "Cchg"
+    },
+    "cv_cutoff_rate": {
+      "value": "0.05C",
+      "param": "CcvEnd"
+    },
+    "discharge_rate": {
+      "value": "0.667C",
+      "param": "Cdis"
+    },
+    "capacity_test_rate": {
+      "value": "0.5C",
+      "param": "Ccap"
+    }
+  },
+  "degradation": {
+    "GEO_cycle_degradation_coefficient": {
+      "value": "2.15e-4",
+      "param": "kdeg"
+    },
+    "failure_SOH_threshold": {
+      "value": "0.80 (80%)",
+      "param": "failureSOH"
+    },
+    "resistance_growth_factor": "Rbase * 2.8 (per unit stress)",
+    "thermal_time_constant": "18 s"
+  },
+  "thermal": {
+    "surface_emissivity": {
+      "value": "0.82",
+      "param": "eps_rad"
+    },
+    "stefan_boltzmann": {
+      "value": "5.670374419e-8 W/(m²·K⁴)",
+      "param": "sigmaSB"
+    },
+    "deep_space_temperature": {
+      "value": "4 K",
+      "param": "TspaceK"
+    },
+    "satellite_thermal_control_temp": {
+      "value": "298.15 K (25°C)",
+      "param": "TctrlK"
+    },
+    "equivalent_thermal_control_coeff": {
+      "value": "1.4 W/(m²·K)",
+      "param": "hctrl"
+    },
+    "ambient_temp_model": "Tamb = 25 + 0.35*sin(2π*phase46) °C"
+  },
+  "orbit": {
+    "type": "GEO (Geostationary Earth Orbit)",
+    "shadow_duration_model": "shadow_min = 5 + 67*sin(π*phase46)^0.65 [minutes]",
+    "max_shadow": "72 minutes (equinox)"
+  },
+  "derived_variables": {
+    "F_DOD": "0.8 * shadow_min / 72",
+    "Idis": "Cdis * Qnom = 1.334 A",
+    "heat_gen": "Idis² * rint * (0.36 + F_DOD)",
+    "heat_gen_density": "heat_gen / cell_vol",
+    "Tamb": "25 + 0.35*sin(2π*phase46)",
+    "thermal_target": "Tamb + 30 * heat_gen",
+    "aging": "1 - soh",
+    "formation": "1 + 1.35*exp(-cycle/18)",
+    "temp_accel": "exp(0.048 * (clamp(tcell, -20, 60) - 25))",
+    "stress": "clamp((0.20 + 0.92*F_DOD^1.35 + 0.45*aging) * temp_accel * formation, 0, 5)",
+    "capacity_mAh": "QmAh * soh",
+    "rul_cycles": "max((soh - failureSOH) / (kdeg * stress), 0)"
+  }
+}

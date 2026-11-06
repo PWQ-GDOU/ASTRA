@@ -1,0 +1,371 @@
+{
+  "model_id": "reaction_wheel_degradation_simulation_v8",
+  "software": "COMSOL Multiphysics 6.4",
+  "models": {
+    "em_entity": {
+      "name": "反作用轮二维实体电磁模型",
+      "description": "2D solid-frame EM model: stator, rotor, magnet, windings, air gap",
+      "physics": [],
+      "geometry_sequence": [
+        {
+          "op": "Circle",
+          "tag": "rotor",
+          "name": "转子铁芯"
+        },
+        {
+          "op": "Circle",
+          "tag": "airgapo",
+          "name": "气隙外圆"
+        },
+        {
+          "op": "Circle",
+          "tag": "airgapi",
+          "name": "气隙内圆"
+        },
+        {
+          "op": "Difference",
+          "tag": "airgap",
+          "name": "气隙"
+        },
+        {
+          "op": "Circle",
+          "tag": "yokeo",
+          "name": "定子轭外圆"
+        },
+        {
+          "op": "Circle",
+          "tag": "yokei",
+          "name": "定子轭内圆"
+        },
+        {
+          "op": "Difference",
+          "tag": "yoke",
+          "name": "定子轭"
+        },
+        {
+          "op": "Circle",
+          "tag": "outerairo",
+          "name": "外部空气外圆"
+        },
+        {
+          "op": "Circle",
+          "tag": "outerairi",
+          "name": "外部空气内圆"
+        },
+        {
+          "op": "Difference",
+          "tag": "outerair",
+          "name": "外部空气"
+        },
+        {
+          "op": "Polygon",
+          "tag": "pm0",
+          "name": "永磁体1"
+        },
+        {
+          "op": "Polygon",
+          "tag": "pm1",
+          "name": "永磁体2"
+        },
+        {
+          "op": "Polygon",
+          "tag": "pm2",
+          "name": "永磁体3"
+        },
+        {
+          "op": "Polygon",
+          "tag": "pm3",
+          "name": "永磁体4"
+        },
+        {
+          "op": "Polygon",
+          "tag": "pm4",
+          "name": "永磁体5"
+        },
+        {
+          "op": "Polygon",
+          "tag": "pm5",
+          "name": "永磁体6"
+        },
+        {
+          "op": "Polygon",
+          "tag": "pm6",
+          "name": "永磁体7"
+        },
+        {
+          "op": "Polygon",
+          "tag": "pm7",
+          "name": "永磁体8"
+        },
+        {
+          "op": "Polygon",
+          "tag": "tooth0",
+          "name": "定子齿1"
+        },
+        {
+          "op": "Polygon",
+          "tag": "coil0",
+          "name": "绕组槽1"
+        },
+        {
+          "op": "Polygon",
+          "tag": "tooth1",
+          "name": "定子齿2"
+        },
+        {
+          "op": "Polygon",
+          "tag": "coil1",
+          "name": "绕组槽2"
+        },
+        {
+          "op": "Polygon",
+          "tag": "tooth2",
+          "name": "定子齿3"
+        },
+        {
+          "op": "Polygon",
+          "tag": "coil2",
+          "name": "绕组槽3"
+        },
+        {
+          "op": "Polygon",
+          "tag": "tooth3",
+          "name": "定子齿4"
+        },
+        {
+          "op": "Polygon",
+          "tag": "coil3",
+          "name": "绕组槽4"
+        },
+        {
+          "op": "Polygon",
+          "tag": "tooth4",
+          "name": "定子齿5"
+        },
+        {
+          "op": "Polygon",
+          "tag": "coil4",
+          "name": "绕组槽5"
+        },
+        {
+          "op": "Polygon",
+          "tag": "tooth5",
+          "name": "定子齿6"
+        },
+        {
+          "op": "Polygon",
+          "tag": "coil5",
+          "name": "绕组槽6"
+        },
+        {
+          "op": "Polygon",
+          "tag": "tooth6",
+          "name": "定子齿7"
+        },
+        {
+          "op": "Polygon",
+          "tag": "coil6",
+          "name": "绕组槽7"
+        },
+        {
+          "op": "Polygon",
+          "tag": "tooth7",
+          "name": "定子齿8"
+        },
+        {
+          "op": "Polygon",
+          "tag": "coil7",
+          "name": "绕组槽8"
+        },
+        {
+          "op": "Polygon",
+          "tag": "tooth8",
+          "name": "定子齿9"
+        },
+        {
+          "op": "Polygon",
+          "tag": "coil8",
+          "name": "绕组槽9"
+        },
+        {
+          "op": "Polygon",
+          "tag": "tooth9",
+          "name": "定子齿10"
+        },
+        {
+          "op": "Polygon",
+          "tag": "coil9",
+          "name": "绕组槽10"
+        },
+        {
+          "op": "Polygon",
+          "tag": "tooth10",
+          "name": "定子齿11"
+        },
+        {
+          "op": "Polygon",
+          "tag": "coil10",
+          "name": "绕组槽11"
+        },
+        {
+          "op": "Polygon",
+          "tag": "tooth11",
+          "name": "定子齿12"
+        },
+        {
+          "op": "Polygon",
+          "tag": "coil11",
+          "name": "绕组槽12"
+        },
+        {
+          "op": "Finalize",
+          "tag": "fin",
+          "name": "形成联合体"
+        }
+      ],
+      "parameters": {
+        "gamma": {
+          "expr": "0",
+          "desc": "0为健康，1为失效阈值"
+        },
+        "Vdc": {
+          "expr": "28[V]",
+          "desc": "驱动电压"
+        },
+        "Br_pm": {
+          "expr": "1.2[T]*(1-0.4*gamma)",
+          "desc": "退磁故障参数"
+        },
+        "R_phase": {
+          "expr": "1.8[ohm]*(1-0.35*gamma)",
+          "desc": "匝间短路等效参数"
+        },
+        "T_wear": {
+          "expr": "6e-3[N*m]*gamma^1.7",
+          "desc": "轴承磨损等效参数"
+        },
+        "Jwheel": {
+          "expr": "9.55e-4[kg*m^2]",
+          "desc": "0.4 Nms@4000 rpm等效值"
+        }
+      }
+    },
+    "parker_system": {
+      "name": "反作用轮帕克对齐系统模型（系统级 ODE）",
+      "description": "反作用轮无刷直流电机系统级退化预测全局常微分方程模型。参考帕克等人在《空间研究进展》2023 年第 71 卷第 6 期论文的系统级预测思想。当前版本加入相电流一阶动态、绕组集总热动态、温度反馈电阻、非线性摩擦退化和等效齿槽/振动遥测。定量使用前必须用论文、厂家或实测数据替换待填默认参数。",
+      "has_solution": true,
+      "parameters": {
+        "Vdc": {
+          "expr": "28",
+          "desc": "直流母线电压，单位 V；对应 0.4 Nms 级产品 12-30 V 供电范围的上限工况"
+        },
+        "pole_pairs": {
+          "expr": "4",
+          "desc": "典型 8 极反作用轮无刷直流电机；若论文或实物不同需待实测校准"
+        },
+        "R0": {
+          "expr": "1.8",
+          "desc": "健康相电阻，单位 ohm，待实测校准"
+        },
+        "L0": {
+          "expr": "1.2e-3",
+          "desc": "健康相电感，单位 H，待实测校准"
+        },
+        "Kt0": {
+          "expr": "0.054",
+          "desc": "健康转矩常数，单位 N*m/A；按帕克论文系统级 kT 健康参数框架对齐，待实测校准"
+        },
+        "Ke0": {
+          "expr": "0.054",
+          "desc": "健康反电势常数，单位 V*s/rad；在国际单位制中近似取 Ke=Kt，待实测校准"
+        },
+        "Jwheel": {
+          "expr": "9.55e-4",
+          "desc": "转子和飞轮等效转动惯量，单位 kg*m^2；由 0.4 Nms @ 4000 rpm 反推"
+        },
+        "T0": {
+          "expr": "5.0e-4",
+          "desc": "健康库仑摩擦力矩，单位 N*m；按 10 mNm 最大转矩留出稳态和加速裕度"
+        },
+        "B0": {
+          "expr": "1.0e-5",
+          "desc": "健康黏性轴承摩擦系数 b，单位 N*m*s/rad；按帕克论文系统级 b 健康参数框架对齐，待实测校准"
+        },
+        "Tcog0": {
+          "expr": "1.0e-4",
+          "desc": "等效齿槽/转矩脉动幅值，单位 N*m，用于降低系统级模型对槽极细节的遗漏误差，待实测校准"
+        },
+        "T_wear": {
+          "expr": "0.0",
+          "desc": "故障参数：轴承磨损引起的额外摩擦力矩，单位 N*m"
+        },
+        "dR": {
+          "expr": "0.0",
+          "desc": "故障参数：绕组匝间短路导致的相电阻下降比例"
+        },
+        "dBr": {
+          "expr": "0.0",
+          "desc": "故障参数：永磁体剩磁衰减比例"
+        },
+        "gamma": {
+          "expr": "0.0",
+          "desc": "归一化退化等级，0 为健康，1 为失效阈值"
+        },
+        "omega_cmd": {
+          "expr": "418.879",
+          "desc": "代表性转速指令，单位 rad/s；对应 4000 rpm"
+        },
+        "Kp_speed": {
+          "expr": "0.018",
+          "desc": "等效驱动速度环比例增益"
+        },
+        "Tamb": {
+          "expr": "20",
+          "desc": "环境温度，单位 degC"
+        },
+        "alphaCu": {
+          "expr": "0.00393",
+          "desc": "铜电阻温度系数，单位 1/K"
+        },
+        "Rth": {
+          "expr": "18",
+          "desc": "绕组到壳体集总热阻，单位 K/W，待实测校准"
+        },
+        "Cth": {
+          "expr": "45",
+          "desc": "绕组集总热容，单位 J/K，待实测校准"
+        },
+        "eta_fric_heat": {
+          "expr": "0.60",
+          "desc": "摩擦功进入绕组/邻近热节点的等效比例，待实测校准"
+        },
+        "vib_gain": {
+          "expr": "3.0e-7",
+          "desc": "由不平衡和轴承磨损折算的振动加速度增益，待实测校准"
+        },
+        "t_end": {
+          "expr": "0.35",
+          "desc": "每个退化等级的瞬态仿真时长，单位 s"
+        },
+        "dt_out": {
+          "expr": "1e-3",
+          "desc": "后处理输出时间间隔，单位 s"
+        }
+      }
+    }
+  },
+  "degradation": {
+    "gamma": {
+      "description": "归一化退化等级",
+      "range": "0 (健康) → 1 (失效阈值)",
+      "default": 0
+    },
+    "modes": {
+      "permanent_magnet_demagnetization": "Br = 1.2T * (1 - 0.4*gamma)",
+      "inter_turn_short_circuit": "R_phase = 1.8Ω * (1 - 0.35*gamma)",
+      "bearing_wear": "T_wear = 6e-3 N·m * gamma^1.7",
+      "winding_resistance_drift": "dR = f(gamma)",
+      "remanence_decay": "dBr = f(gamma)"
+    }
+  }
+}
